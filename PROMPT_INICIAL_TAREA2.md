@@ -137,7 +137,9 @@ usa, UI, manejo de permisos/errores) para validarlo.
 se copian TODOS y corren LOCALES, para que la app quede FULL OPERATIVA y autocontenida.** El
 coordinador rutea solo a agentes locales. El fallback remoto→local del T1 deja de ser necesario (no hay
 remotos), pero el ruteo/guardrails se conservan. Al renombrar, actualizar `langgraph.json`,
-`src/fichas.py`, el catálogo y los tests.
+`src/fichas.py`, el catálogo y los tests. **Cada agente conserva su estructura de PAQUETE del T1 —
+`__init__.py`, `graph.py`, `herramientas.py`, `prompts.py` + sus módulos de datos (`bd_*.py`, `rag.py`,
+cliente de API); NUNCA un solo `.py` suelto** (detalle de archivos por agente en §11).
 
 | Nuevo nombre | Origen T1 | Herramientas (reales) |
 |---|---|---|
@@ -317,18 +319,63 @@ tarea_2_curso_2/
 ├── langgraph.json                # registra los 8 grafos agente_<funcionalidad> (incl. agente_administrador)
 ├── src/
 │   ├── fichas.py                 # name+description por grafo (renombrados)
-│   ├── agente_machinelearning/   # graph.py · herramientas.py · prompts.py · bd_modelos.py (SQLite)
+│   │
+│   │   # ── ESTRUCTURA ESTÁNDAR DE CADA AGENTE (igual que en T1; NO dejar un solo .py) ──
+│   │   # Todo agente es un PAQUETE con, como mínimo:
+│   │   #   __init__.py · graph.py (construye el StateGraph) · herramientas.py (las tools)
+│   │   #   · prompts.py (system/instrucciones)
+│   │   # y además su(s) módulo(s) de datos cuando aplique (bd_*.py SQLite, rag.py, etc.).
+│   │
+│   ├── agente_machinelearning/
+│   │   ├── __init__.py
+│   │   ├── graph.py
+│   │   ├── herramientas.py       # recomendar_tecnica, metricas_recomendadas, elegir_modelo, consultar_modelos
+│   │   ├── prompts.py
+│   │   └── bd_modelos.py         # catálogo de modelos (SQLite)
 │   ├── agente_mlbioinformatica/
+│   │   ├── __init__.py
+│   │   ├── graph.py
+│   │   ├── herramientas.py       # mismas 4 tools, catálogos biológicos
+│   │   ├── prompts.py
+│   │   └── bd_modelos.py         # catálogo (SQLite)
 │   ├── agente_bioinformatica/
-│   ├── agente_reiki/             # + rag.py (Redis cloud)
-│   ├── agente_cocinachilena/     # + bd_recetas.py (SQLite)
-│   ├── agente_meteorologia/      # API real Open-Meteo + bd_clima.py (SQLite: pronósticos + observados) + ciudades de Chile
+│   │   ├── __init__.py
+│   │   ├── graph.py
+│   │   ├── herramientas.py       # consultar_mis_apuntes
+│   │   └── prompts.py
+│   ├── agente_reiki/
+│   │   ├── __init__.py
+│   │   ├── graph.py
+│   │   ├── herramientas.py       # principios_reiki, posiciones_manos, info_simbolo, buscar_reiki
+│   │   ├── prompts.py
+│   │   └── rag.py                # RAG → Redis cloud (RedisVectorStore; fallback local)
+│   ├── agente_cocinachilena/
+│   │   ├── __init__.py
+│   │   ├── graph.py
+│   │   ├── herramientas.py       # listar_recetas, ver_receta, costear_receta
+│   │   ├── prompts.py
+│   │   └── bd_recetas.py         # recetas + costeo (SQLite)
+│   ├── agente_meteorologia/
+│   │   ├── __init__.py
+│   │   ├── graph.py
+│   │   ├── herramientas.py       # pronostico_hoy, pronostico_semana, historial_pronostico, comparar_pronostico_vs_real
+│   │   ├── prompts.py
+│   │   ├── openmeteo.py          # cliente de la API real Open-Meteo (sin key) + catálogo de ciudades de Chile
+│   │   └── bd_clima.py           # SQLite: pronósticos diarios + observados reales
 │   ├── agente_viajes/
-│   ├── agente_administrador/     # NUEVO: conoce el catálogo (listar_agentes, describir_agente)
+│   │   ├── __init__.py
+│   │   ├── graph.py
+│   │   ├── herramientas.py       # buscar_vuelos, buscar_hoteles, buscar_actividades
+│   │   └── prompts.py
+│   ├── agente_administrador/     # NUEVO
+│   │   ├── __init__.py
+│   │   ├── graph.py
+│   │   ├── herramientas.py       # listar_agentes, describir_agente (lee el catálogo/fichas)
+│   │   └── prompts.py
 │   ├── coordinador/              # graph.py (supervisor) · catalogo.py · a2a.py · guardrails.py · auth.py · prompts.py
 │   ├── api/                      # NUEVO: FastAPI (app.py, dependencia API_KEY, rutas /consulta /salud /agentes)
 │   ├── memoria/                  # NUEVO: SQLite (esquema, historial, destinatarios, despachos)
-│   └── canales/                  # NUEVO: web (BFF), correo, y el canal avanzado elegido
+│   └── canales/                  # NUEVO: web (BFF), correo, y el canal avanzado elegido (voz/avatar)
 ├── tools/
 │   ├── coordinador_web.py        # frontend web de chat (adaptado: habla con FastAPI, BFF con API_KEY)
 │   ├── monitor_web.py            # backoffice (accesos + baneos)

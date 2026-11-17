@@ -2,7 +2,7 @@
 > **Archivo:** `respuestas/salida_013.md`  
 > **Objetivo:** 013 · Respuesta — app publicada por HTTPS con proxy y verificada públicamente; monitor pendiente de su proxy  
 > **Grupo del curso:** Fabio Durán - Gustavo Reyes - Ezequiel Muñoz  
-> **Creación:** 20261117 1910 · **Última modificación:** 20261117 1910
+> **Creación:** 20261117 1910 · **Última modificación:** 20261117 1919
 <!--/encabezado-grupo-->
 
 # 013 · Respuesta — Publicación con proxy + verificación pública
@@ -34,19 +34,32 @@ https con login → 200                             (entrega el chat)
 → **La app está en producción por HTTPS**, con login propio (WEB_USER/WEB_PASS) y la API_KEY
 server-side (el navegador nunca la ve). Chat en `/` y voz en `/voz`.
 
-## 3. Monitor — `monitortarea2curso2.etmk.cl` → :8798 ⏳ pendiente
+## 3. Monitor publicado — `monitortarea2curso2.etmk.cl` → :8798 ✅
 
-Actualmente responde la **página "Welcome" por defecto de ISPConfig** (200 sin login) → **su proxy aún
-no está configurado**. Queda crear/editar ese Website con SSL + Let's Encrypt + las mismas directivas
-apuntando a `http://127.0.0.1:8798/`.
+El usuario configuró el Website con SSL + Let's Encrypt + las directivas de proxy a `127.0.0.1:8798`.
+**Verificación pública desde la VPS:**
 
-## 4. Estado
+```
+http  → 301 → https://monitortarea2curso2.etmk.cl/   (force-HTTPS OK)
+https sin login → 401                                 (Basic Auth del monitor)
+https con login → 200                                 (nuestro monitor)
+   contenido: "Monitor de operacion", "Accesos", "Clave Gemini"
+```
 
-- ✅ **App pública y verificada end-to-end por HTTPS** (chat + voz), con force-HTTPS y login.
-- ✅ Backend ya verificado (registro 012): consultas reales ruteando a los agentes.
-- ⏳ **Monitor:** falta su proxy (instrucciones entregadas).
+→ **El monitor está en producción por HTTPS**, con login propio (MONITOR_USER/MONITOR_PASS).
+
+## 4. Estado — PUBLICACIÓN COMPLETA ✅
+
+- ✅ **App** `https://tarea2curso2.etmk.cl/` (chat + voz) verificada end-to-end por HTTPS.
+- ✅ **Monitor** `https://monitortarea2curso2.etmk.cl/` verificado por HTTPS.
+- ✅ Ambos con **force-HTTPS** (`http→301→https`) y **login** (401 sin credenciales, 200 con ellas).
+- ✅ Backend verificado (registro 012): consultas reales ruteando a los agentes; correo real (011).
+
+Las **3 implementaciones** quedan **en producción y verificadas**: FastAPI (API_KEY), web de chat +
+correo, y voz (Etapa A) — todas accesibles por sus subdominios públicos.
 
 ## 5. Próximos pasos
 
-1. (Usuario) Configurar el proxy de `monitortarea2curso2.etmk.cl` (:8798) → yo verifico.
-2. **Evidencias de rúbrica** por la web: chat, voz, correo, y el 200/401 (acceso permitido/rechazado).
+1. **Evidencias de rúbrica** por la web: capturas de chat, voz, correo recibido, y el 200/401
+   (acceso permitido/rechazado) en el monitor.
+2. Opcional: **RAG → Redis cloud** (cuando llegue la URL); **Etapa B** (avatar 2D).

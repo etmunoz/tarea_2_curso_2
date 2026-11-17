@@ -30,7 +30,7 @@ una: opción, problema que resuelve y qué se reutiliza del Taller 1.
 agentes NUNCA se llaman directo desde el frontend ni desde fuera: solo a través de FastAPI.**
 
 ```
-  [Frontend web de chat]        [Canal avanzado: WhatsApp/voz/llamada/avatar]
+  [Frontend web de chat]        [Canal avanzado: avatar por VOZ en el sitio (Impl 3, §3)]
             │   (el navegador habla con su backend; la API_KEY NO viaja al browser)
             ▼
      ┌───────────────────────────────────────────────┐
@@ -286,7 +286,7 @@ enviar fuera de la allowlist.
 - **Secretos fuera** de frontend, repo, ZIP y capturas. **`.env.example`** con nombres y **valores
   ficticios** (incluye `API_KEY`, `GOOGLE_API_KEY`, `REDIS_URL`, `SMTP_*`, tokens del canal). El
   evaluador usa sus propias credenciales.
-- **Acciones con efecto real** (correo, mensajes, llamadas, audio): **cuentas y destinatarios de
+- **Acciones con efecto real** (correo y el audio del avatar por voz, §3): **cuentas y destinatarios de
   prueba**; controlar envíos y **costos**; documentar cómo **evitar envíos accidentales** y **detener**
   procesos.
 - Portar los **guardrails** del T1: entrada (inyección/jailbreak), salida, **respuesta de agente = dato
@@ -308,7 +308,7 @@ Capturas de **ejecución LOCAL propia**. Por cada caso, **tabla**: Entorno y fec
 Solicitud, Resultado esperado, Resultado obtenido, Observaciones. Debe verse: la **solicitud** y la
 **respuesta/entrega efectiva** en cada canal (web, correo recibido, mensaje, avatar); el **log** que
 relaciona solicitud→**FastAPI**→agente (+A2A); la **prueba de acceso** (con API_KEY = 200, sin/`API_KEY`
-inválida = 401, sin exponer la clave). Voz/llamada/avatar: **audio/video** o enlace. Ocultar
+inválida = 401, sin exponer la clave). Avatar por voz (§3): **audio/video** o enlace. Ocultar
 secretos/datos; distinguir **probado / pendiente / simulado**; no rotular LOCAL como producción.
 
 ## 11. Estructura del proyecto (COPIA de `tarea_1_curso_2`, adaptada)
@@ -457,7 +457,9 @@ tarea_2_curso_2/
   plan de la Etapa A.)*
 - **Nombres finales** de los agentes (confirmar §4).
 - **Puertos y nombres de servicios** systemd nuevos.
-- (Pendiente del usuario) **URL del Redis cloud**, **`API_KEY`** y **credenciales del canal** (vía privada).
+- (Pendiente del usuario) **URL del Redis cloud** y **`API_KEY`** (vía privada). El canal avanzado
+  decidido (avatar por **voz**, Etapas A/B) es **gratis y sin credenciales**; solo la **Etapa C**
+  (avatar realista de pago) requeriría la **key del SaaS de avatar**, y únicamente si se aborda.
 
 ## 16. Primeros pasos (en orden, con validación)
 

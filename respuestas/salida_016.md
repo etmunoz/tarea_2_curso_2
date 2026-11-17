@@ -2,7 +2,7 @@
 > **Archivo:** `respuestas/salida_016.md`  
 > **Objetivo:** 016 · Respuesta — chat con ruteo por turno, ver ruteo y enviar por correo (paridad con el Taller 1)  
 > **Grupo del curso:** Fabio Durán - Gustavo Reyes - Ezequiel Muñoz  
-> **Creación:** 20261117 1944 · **Última modificación:** 20261117 1944
+> **Creación:** 20261117 1944 · **Última modificación:** 20261117 1948
 <!--/encabezado-grupo-->
 
 # 016 · Funcionalidades del chat (ruteo por turno + correo)
@@ -44,17 +44,24 @@ Los demás campos (`elegido`, `motivo`, `origen`, `respuesta`) son plano/sobre-e
 Cada respuesta mantiene su botón **🧭 Ver ruteo** que re-pinta el ruteo de **ese** turno (ahora correcto
 por #1).
 
-## 4. Verificación
+## 4. Verificación (tras reinicio) — ✅
 
-`app.py` y `web.py` **compilan**. La verificación funcional (ruta por turno y endpoints de correo) se
-hace tras el reinicio:
-```bash
-sudo systemctl restart t2c2-api t2c2-web
+`app.py` y `web.py` compilan. Probado en vivo contra el gateway (servicios `active`):
+
 ```
-→ Se comprobará: dos consultas en la misma sesión devuelven **cada una su ruta corta** (no acumulada), y
-`/api/enviar` despacha a un destinatario de la allowlist.
+CONSULTA 1 (sesión S)  -> Agente de Meteorología | ruta(4): guardia_entrada, supervisor, agente_local, guardia_salida
+CONSULTA 2 (MISMA sesión S) -> Agente Administrador | ruta(4): guardia_entrada, supervisor, agente_local, guardia_salida
+```
+→ **La ruta ya NO se acumula**: el segundo turno devuelve 4 pasos (no 8). Bug resuelto.
+
+```
+GET /correo  -> {configurado: True, destinatarios: ['etmunoz@gmail.com']}
+POST /enviar a nadie@noexiste.xyz -> {ok:false, error:"destinatario no está en la allowlist…"}
+```
+→ Endpoints de correo operativos; allowlist gatillando (no envía fuera de la lista).
 
 ## 5. Estado
 
-- ✅ Código publicado en web6; compila. Bitácora **000–016** en el repo.
-- ⏳ Pendiente: reinicio (sudo) + verificación funcional.
+- ✅ **Verificado en producción:** ruteo por turno, estado de correo y allowlist del envío.
+- ✅ Chat con el diseño del T1 + ver ruteo + enviar por correo (paridad con el Taller 1).
+- ✅ Bitácora **000–016** en el repo.

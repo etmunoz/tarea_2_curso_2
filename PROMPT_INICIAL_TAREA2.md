@@ -234,7 +234,7 @@ con precios en CLP. No hace: no gestiona pagos ni seguros.
   devuelve el texto formateado (y, si aporta, una versión estructurada). **Formatear NO altera**
   cifras/unidades/condiciones (fidelidad).
 
-## 5. Infraestructura NUEVA (separada y aislada del Taller 1 y de lucecitaOS)
+## 5. Infraestructura NUEVA (separada y aislada del Taller 1)
 
 - **Dominios nuevos** (otro link, distinto del T1):
   - App pública (**FastAPI + frontend web de chat**): **`tarea2curso2.etmk.cl`** (reemplaza a
@@ -248,8 +248,9 @@ con precios en CLP. No hace: no gestiona pagos ni seguros.
   `EnvironmentFile`.
 - **Publicación:** Website ISPConfig por subdominio + Let's Encrypt + *Redirect* proxy a
   `127.0.0.1:<puerto>`, con **force-HTTPS ANTES del proxy**.
-- **Puertos LIBRES** (confirmar en §12): el T1 usa 2024/8790/8793/8794 y lucecitaOS 8795; elegir nuevos.
-- **No tocar ni romper** los 5 servicios `agente-*` del T1 ni `lucecitaos`.
+- **Puertos LIBRES** (confirmar en §12): el T1 usa 2024/8790/8793/8794; elegir nuevos sin colisión con
+  nada en uso en la VPS.
+- **No tocar ni romper** los 5 servicios `agente-*` del T1 ni ningún otro servicio ya en marcha en la VPS.
 
 ## 6. Memoria y datos (decisiones nuevas de T2)
 
@@ -385,7 +386,7 @@ tarea_2_curso_2/
 ## 14. Restricciones duras
 
 1. **EVALÚA EL ESPACIO/RECURSOS DE LA VPS ANTES DE CREAR NADA ALLÁ** (RAM, disco, puertos). El VPS es
-   chico (**≈3.8 GB RAM, sin swap, 2 CPU**) y ya corre los 5 servicios del T1 + lucecitaOS. **No romper
+   chico (**≈3.8 GB RAM, sin swap, 2 CPU**) y ya corre los 5 servicios del T1 (entre otros). **No romper
    nada.** Si no cabe, avísame con alternativas.
 2. **No incluir secretos reales** en repo/ZIP/capturas. Cuentas de prueba para acciones reales.
 3. **No modificar producción automáticamente ante un fallo:** informar y pedir aprobación.

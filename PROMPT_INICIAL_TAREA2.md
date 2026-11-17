@@ -241,7 +241,12 @@ con precios en CLP. No hace: no gestiona pagos ni seguros.
 - **Dominios nuevos** (otro link, distinto del T1):
   - App pública (**FastAPI + frontend web de chat**): **`tarea2curso2.etmk.cl`** (reemplaza a
     `coordinador.etmk.cl`).
-  - Monitor/backoffice: **`monitortarea2curso2.etmk.cl`**.
+  - Monitor/backoffice: **`monitortarea2curso2.etmk.cl`**. **Repropósito respecto del T1:** en el T1 el
+    monitor trazaba el **puente A2A** (tráfico entrante de los compañeros); en T2 **no hay puente ni
+    agentes remotos** (todo local), así que el monitor se **redefine** como **backoffice de operación y
+    seguridad**: baneos de **fail2ban**, **log de accesos a FastAPI** (quién/cuándo, 200 vs 401 sin
+    exponer la API_KEY), **bitácora de despachos de correo** (§7) e **historial de conversación** (§6).
+    Con login propio; no expone agentes.
   - **Los agentes (`langgraph`) NO tienen subdominio** (solo 127.0.0.1).
 - **Correo de despacho:** buzón nuevo **`tarea2curso2@etmk.cl`** (lo creo yo en ISPConfig; secreto en
   EnvironmentFile).
@@ -378,7 +383,7 @@ tarea_2_curso_2/
 │   └── canales/                  # NUEVO: web (BFF), correo, y el canal avanzado elegido (voz/avatar)
 ├── tools/
 │   ├── coordinador_web.py        # frontend web de chat (adaptado: habla con FastAPI, BFF con API_KEY)
-│   ├── monitor_web.py            # backoffice (accesos + baneos)
+│   ├── monitor_web.py            # backoffice repropuesto: baneos fail2ban + accesos FastAPI + despachos + historial
 │   ├── configurar_fichas.py      # aplica fichas (vigilante en systemd)
 │   ├── aplicar_encabezados.py · empaquetar_entrega.py · exportar_pdf.py · guardar_evidencias.py …
 ├── data/                         # datos de los agentes (reiki/*, catálogos semilla)
@@ -413,7 +418,11 @@ tarea_2_curso_2/
   **Apache reverse proxy + Let's Encrypt**, **force-HTTPS antes del proxy**, **secretos en `/etc/*.env`**,
   **`sys.path` incluye el raíz**, **PATH absoluto de `uv`** (SSH no interactivo).
 - **Seguridad del servidor:** MySQL local, firewall acotado, FTP off, Dovecot TLS, **fail2ban** (jail de
-  escaneos que registra baneos en el **monitor**), kernel/sysctl/SSH endurecidos.
+  escaneos que registra baneos en el **monitor repropuesto**, §5), kernel/sysctl/SSH endurecidos.
+- **Puente A2A del T1 → NO se porta a T2.** En el T1 había un `puente_a2a` + servicio `agente-puente` +
+  su monitor para el **tráfico A2A entrante de compañeros**. En T2 **todos los agentes son locales (sin
+  remotos)**, así que **no hay puente**; el monitor se **reaprovecha** como backoffice de operación y
+  seguridad (§5).
 - **Correo:** SPF/DKIM/DMARC **PASS**; buzón dedicado; **nunca auto-envío** desde respuestas de agentes;
   allowlist.
 - **Empaquetado/reproducibilidad:** `empaquetar_entrega.py`, encabezados idempotentes

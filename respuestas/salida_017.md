@@ -2,7 +2,7 @@
 > **Archivo:** `respuestas/salida_017.md`  
 > **Objetivo:** 017 · Respuesta — historial persistente del chat y voz integrada en la misma página  
 > **Grupo del curso:** Fabio Durán - Gustavo Reyes - Ezequiel Muñoz  
-> **Creación:** 20261117 1954 · **Última modificación:** 20261117 1954
+> **Creación:** 20261117 1954 · **Última modificación:** 20261117 1958
 <!--/encabezado-grupo-->
 
 # 017 · Historial persistente + voz integrada
@@ -33,15 +33,20 @@ En vez de navegar a `/voz`, el micrófono vive **en el chat**:
 
 `web.py` **compila**.
 
-## 3. Verificación (tras reiniciar `t2c2-web`)
+## 3. Verificación (tras reiniciar `t2c2-web`) — ✅
 
-```bash
-sudo systemctl restart t2c2-web
+`t2c2-web active`; `GET /` (con login) → **200**. La página del chat contiene todas las piezas:
+
 ```
-→ Se comprobará que la página sirve con el micrófono integrado, el toggle de voz y la restauración del
-historial.
+✔ class="micbtn"  ✔ id="mic"  ✔ id="tts"        (micrófono integrado + toggle de voz)
+✔ SpeechRecognition  ✔ speechSynthesis          (STT + TTS en la misma página)
+✔ guardarHist  ✔ restaurarHist  ✔ t2_hist_      (historial persistente)
+✔ Ruteo del coordinador  ✔ mailModal  ✔ "Enviar por correo"  (features previas intactas)
+✔ sin enlace a /voz                              (la voz ya vive en el chat)
+```
 
 ## 4. Estado
 
-- ✅ Código publicado en web6; compila. Bitácora **000–017** en el repo.
-- ⏳ Pendiente: reinicio de `t2c2-web` (sudo) + prueba en el navegador.
+- ✅ **Verificado en producción:** micrófono integrado, toggle de voz, historial persistente; el chat
+  conserva correo y ruteo por turno.
+- ✅ Bitácora **000–017** en el repo.

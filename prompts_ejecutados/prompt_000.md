@@ -1,3 +1,10 @@
+<!--encabezado-grupo-->
+> **Archivo:** `prompts_ejecutados/prompt_000.md`  
+> **Objetivo:** 000 · Prompt inicial de arranque de la Tarea 2 (fuente de verdad: encargo, arquitectura heredada del T1 y decisiones resueltas)  
+> **Grupo del curso:** Fabio Durán - Gustavo Reyes - Ezequiel Muñoz  
+> **Creación:** 20261117 1430 · **Última modificación:** 20261117 1430
+<!--/encabezado-grupo-->
+
 # PROMPT INICIAL — Tarea 2 · Curso 2 (Taller de implementación y ejecución local)
 
 > Este es el **primer prompt** que pegaré para arrancar la Tarea 2. Es la fuente de verdad del
@@ -390,8 +397,8 @@ tarea_2_curso_2/
 ├── tests/                        # pytest (ruteo, guardrails, API+API_KEY, acceso, fidelidad)
 ├── deploy/                       # systemd/*.service (t2c2-*), README, *.env.example, BITACORA
 ├── evidencias/                   # capturas LOCALES + tablas del §10
-├── prompts_ejecutados/           # NN-slug.md (estándar del grupo)
-├── respuestas/                   # NN-slug.md (salida completa de cada prompt)
+├── prompts_ejecutados/           # prompt_NNN.md (estándar del grupo; 000 = este prompt inicial)
+├── respuestas/                   # salida_NNN.md (salida completa de cada prompt)
 └── entrega/                      # documento-entrega, LEEME, REPOS.txt, zip
 ```
 
@@ -433,9 +440,10 @@ tarea_2_curso_2/
 - **Encabezado de grupo** en todo archivo que admita comentarios: Archivo, Objetivo, `Grupo del curso:
   Fabio Durán - Gustavo Reyes - Ezequiel Muñoz`, `Creación` y `Última modificación` (`yyyymmdd HHMM`).
   En frontmatter YAML va DENTRO como comentarios. Lo mantiene `tools/aplicar_encabezados.py`.
-- **Registro de prompts:** cada prompt → `prompts_ejecutados/NN-slug.md` y su salida completa →
-  `respuestas/NN-slug.md` (mismo número, desde **01** en este repo). La respuesta guarda archivos
-  tocados + salida real + estado + pendientes.
+- **Registro de prompts:** cada prompt → `prompts_ejecutados/prompt_NNN.md` y su salida completa →
+  `respuestas/salida_NNN.md` (mismo número correlativo, **desde `000`** en este repo; `000` = este
+  prompt inicial de arranque). La salida guarda archivos tocados + salida real + estado + pendientes.
+  Ambos llevan el **encabezado de grupo** (bloque `<!--encabezado-grupo-->`).
 - **Commits** en español, terminando con `Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>`;
   **push tras cada paso**. Rama `main`.
 
@@ -477,7 +485,7 @@ tarea_2_curso_2/
 
 ---
 
-**Primer pedido al arrancar:** «Lee `PROMPT_INICIAL_TAREA2.md`. (1) Evalúa recursos de la VPS; (2)
+**Primer pedido al arrancar:** «Lee este prompt (`prompts_ejecutados/prompt_000.md`). (1) Evalúa recursos de la VPS; (2)
 propón la estructura del repo `tarea_2_curso_2` con los agentes renombrados `agente_<funcionalidad>`
 TODO local; (3) dame el plan de las 3 implementaciones sobre el **gateway FastAPI protegido por
 `API_KEY`**; la integración avanzada **ya está decidida** (avatar por VOZ, §3) → entrégame el **plan de

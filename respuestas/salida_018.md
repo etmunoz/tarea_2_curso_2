@@ -57,7 +57,23 @@ El BFF añade el header **`X-Usuario`** a las llamadas al gateway; `POST /consul
 listado de usuarios + la clave inicial a repartir. La clave inicial es **única** y **cada uno la cambia
 al primer ingreso**.
 
-## 7. Estado — todo COMPILA ✔
+## 7. Estado — VERIFICADO EN PRODUCCIÓN ✅
 
-Pendiente del usuario: agregar las 3 variables a `/etc/t2c2.env` y **reiniciar** `t2c2-api` + `t2c2-web`.
-Luego se verifica el login, el cambio obligatorio, el admin y los eventos en el monitor.
+Tras agregar `WEB_USUARIOS`/`WEB_ADMIN`/`CLAVE_INICIAL` a `/etc/t2c2.env` y reiniciar, verificado desde
+la VPS contra la URL pública:
+
+```
+usuarios sembrados: cristobal(user), ezequiel(admin), fabio(user), gustavo(user), jose(user) — debe_cambiar=1
+GET /login               -> 200
+GET / sin sesión         -> 302 -> /login
+POST /login clave MALA   -> 401                      (rechazo)
+POST /login clave OK     -> 302 -> /cambiar-clave    (fuerza el cambio obligatorio)
+GET / con sesión         -> 302 -> /cambiar-clave
+GET /cambiar-clave       -> "Hola, gustavo"
+GET /api/yo (pendiente)  -> 409                       (bloqueado hasta cambiar la clave)
+eventos: {usuario: gustavo, evento: login}           (registrado)
+monitor: sección "Eventos de usuario" presente
+```
+
+→ **Login por sesión, rechazo de credenciales, cambio obligatorio, gating y eventos al monitor
+funcionan.** (No se alteró la clave de ningún usuario real: solo se probó el flujo.)

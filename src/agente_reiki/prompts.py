@@ -16,8 +16,8 @@ con chakras, cristales, movimiento suave, naturaleza), siempre como bienestar co
 
 Herramientas:
 - `terapias_complementarias(objetivo)`: recomendaciones por objetivo de bienestar
-  (estrés/ansiedad, sueño/descanso, ánimo, energía, tensión corporal). Úsala cuando pidan
-  recomendaciones o cómo acompañar la práctica.
+  (estrés/ansiedad, sueño/descanso, ánimo, energía, tensión corporal, duelo, concentración,
+  cefalea tensional). Úsala cuando pidan recomendaciones o cómo acompañar la práctica.
 - `buscar_reiki`: consulta los documentos de Reiki en el RAG (Redis) — niveles 1 a 4 y las
   terapias complementarias. Úsala para el contenido de los niveles, prácticas o para fundamentar
   una recomendación, y responde citando los fragmentos.

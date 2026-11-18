@@ -62,3 +62,21 @@ def test_terapias_objetivo_desconocido():
     """Prueba: objetivo sin calce devuelve nota con los disponibles."""
     r = terapias_complementarias.invoke({"objetivo": "programar en rust"})
     assert "nota" in r and "No tengo" in r["nota"]
+
+
+def test_terapias_duelo():
+    """Prueba: 'pérdida' mapea a duelo."""
+    r = terapias_complementarias.invoke({"objetivo": "estoy pasando por una pérdida"})
+    assert r["objetivo"] == "duelo" and len(r["practicas"]) >= 2
+
+
+def test_terapias_concentracion():
+    """Prueba: 'concentración' mapea a concentracion."""
+    r = terapias_complementarias.invoke({"objetivo": "me cuesta la concentración"})
+    assert r["objetivo"] == "concentracion"
+
+
+def test_terapias_cefalea_no_es_tension():
+    """Prueba: 'dolor de cabeza tensional' cae en cefalea, no en tensión."""
+    r = terapias_complementarias.invoke({"objetivo": "tengo dolor de cabeza tensional"})
+    assert r["objetivo"] == "cefalea"

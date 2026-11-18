@@ -2,7 +2,7 @@
 > **Archivo:** `data/reiki/terapias-complementarias.md`  
 > **Objetivo:** Reiki y terapias holísticas complementarias · recomendaciones de bienestar  
 > **Grupo del curso:** Fabio Durán - Gustavo Reyes - Ezequiel Muñoz  
-> **Creación:** 20261118 0930 · **Última modificación:** 20261118 0930
+> **Creación:** 20261118 0930 · **Última modificación:** 20261118 1010
 <!--/encabezado-grupo-->
 
 # Reiki y terapias holísticas complementarias
@@ -47,6 +47,17 @@ embarazo o una condición de salud, siempre acudir a un profesional de la salud.
   hidratación.
 - **Tensión corporal leve:** posiciones de manos en hombros, zona media y lumbar + estiramientos
   suaves + calor local. Si el dolor es intenso o persistente, consultar a un profesional de la salud.
+- **Duelo y pérdida:** Reiki en el centro del pecho (zona del corazón) para contención + respiración
+  suave y pausas de gratitud (Gokai "sé amable contigo") + escritura o diario de recuerdos +
+  sonoterapia tranquila y apoyo de la red cercana. El duelo intenso o prolongado se acompaña con apoyo
+  psicológico profesional.
+- **Concentración y foco:** Reiki en la frente/entrecejo y la corona antes de la tarea + respiración
+  consciente 2–3 min + aromaterapia de menta o romero + pausas conscientes y menos distracciones. Las
+  dificultades de atención sostenidas conviene consultarlas.
+- **Cefalea tensional (dolor de cabeza por tensión):** posiciones de manos en sienes, nuca y hombros +
+  respiración lenta relajando la mandíbula + compresa tibia en cuello/hombros + hidratación y pausas de
+  pantalla. Si el dolor es intenso, súbito, frecuente o viene con otros síntomas, acudir a un
+  profesional de la salud (esto no es un diagnóstico).
 
 ## Cómo estructurar una sesión complementaria
 

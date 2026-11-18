@@ -110,13 +110,45 @@ TERAPIAS = {
         ],
         "nota": "Para tensión leve; si el dolor es intenso o persistente, acude a un profesional.",
     },
+    "duelo": {
+        "practicas": [
+            "Reiki en el centro del pecho (zona del corazón) para contención",
+            "Respiración suave y pausas de gratitud (Gokai: sé amable contigo)",
+            "Escritura o diario de recuerdos para elaborar la pérdida",
+            "Sonoterapia tranquila y apoyarte en tu red cercana",
+        ],
+        "nota": "Acompañamiento de bienestar; el duelo intenso o prolongado se trabaja con apoyo psicológico.",
+    },
+    "concentracion": {
+        "practicas": [
+            "Reiki en la frente/entrecejo y la corona antes de la tarea",
+            "Respiración consciente 2-3 min para centrarte",
+            "Aromaterapia de menta o romero (difusión suave)",
+            "Pausas conscientes y reducir distracciones",
+        ],
+        "nota": "Para enfocar mejor; dificultades de atención sostenidas conviene consultarlas.",
+    },
+    "cefalea": {
+        "practicas": [
+            "Posiciones de manos en sienes, nuca y hombros",
+            "Respiración lenta y relajar la mandíbula",
+            "Compresa tibia en cuello y hombros",
+            "Hidratación y pausas de pantalla",
+        ],
+        "nota": "Alivio de tensión leve; si es intenso, súbito, frecuente o con otros síntomas, consulta a un profesional.",
+    },
 }
 # Sinónimos → objetivo canónico (para que la recomendación encuentre el calce).
+# Orden: lo más específico primero (p. ej. 'cabeza'→cefalea antes que 'dolor'→tensión).
 SINONIMOS = {
     "ansiedad": "estres", "relajacion": "estres", "calma": "estres",
     "descanso": "sueno", "dormir": "sueno", "insomnio": "sueno",
     "tristeza": "animo", "desanimo": "animo", "humor": "animo",
     "vitalidad": "energia", "cansancio": "energia", "fatiga": "energia",
+    "perdida": "duelo", "pena": "duelo", "luto": "duelo",
+    "concentrar": "concentracion", "atencion": "concentracion", "foco": "concentracion",
+    "enfoque": "concentracion", "estudiar": "concentracion",
+    "cefalea": "cefalea", "cabeza": "cefalea", "jaqueca": "cefalea", "migrana": "cefalea",
     "dolor": "tension", "contractura": "tension", "rigidez": "tension",
 }
 
@@ -185,19 +217,18 @@ def buscar_reiki(consulta: str) -> list[dict] | dict:
 @tool
 def terapias_complementarias(objetivo: str) -> dict:
     """Recomienda terapias holísticas complementarias basadas en Reiki para un objetivo de bienestar.
-    Objetivos: 'estrés/ansiedad', 'sueño/descanso', 'ánimo', 'energía/vitalidad', 'tensión corporal'.
+    Objetivos: 'estrés/ansiedad', 'sueño/descanso', 'ánimo', 'energía/vitalidad', 'tensión corporal',
+    'duelo', 'concentración', 'cefalea tensional (dolor de cabeza)'.
     Devuelve {objetivo, practicas:[...], nota}. Es bienestar COMPLEMENTARIO, NO consejo médico ni
     diagnóstico. Si no reconoce el objetivo, sugiere los disponibles en una línea."""
-    clave = _buscar(TERAPIAS, objetivo)
+    # Sinónimos primero (más específico): así "dolor de cabeza" cae en cefalea, no en tensión.
+    q = _norm(objetivo)
+    clave = next((canon for syn, canon in SINONIMOS.items() if syn in q), None)
     if not clave:
-        q = _norm(objetivo)
-        for syn, canon in SINONIMOS.items():
-            if syn in q:
-                clave = canon
-                break
+        clave = _buscar(TERAPIAS, objetivo)
     if not clave:
-        return {"nota": f"No tengo recomendaciones para «{objetivo}». "
-                        f"Objetivos: estrés, sueño, ánimo, energía, tensión corporal."}
+        return {"nota": f"No tengo recomendaciones para «{objetivo}». Objetivos: estrés, sueño, "
+                        f"ánimo, energía, tensión corporal, duelo, concentración, cefalea tensional."}
     datos = TERAPIAS[clave]
     return {"objetivo": clave, "practicas": datos["practicas"], "nota": datos["nota"]}
 

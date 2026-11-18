@@ -31,11 +31,13 @@
 - Se corrigió la relevancia: antes `TP53` (texto libre) traía MDM2; con `gene_exact` + humano por
   defecto trae la proteína correcta.
 
-## 3. Pendiente para activación en vivo
+## 3. Verificación en vivo (gateway, tras reiniciar)
 
-- `sudo systemctl restart t2c2-langgraph` (código nuevo del agente) y `t2c2-fichas` (ficha nueva).
-- Verificación por el gateway (consulta de proteína ruteada al Agente de Bioinformática) → evidencias.
+- **"¿Qué función tiene TP53 humana? Accession y URL"** → Agente de Bioinformática:
+  *"…actúa como factor de transcripción… Accession: `P04637` · URL: uniprot.org/uniprotkb/P04637"*.
+- **"Dame datos de la proteína BRCA1"** → Agente de Bioinformática: P38398, 1863 aa, función oficial.
+- Ruteo: `guardia_entrada → supervisor → agente_local → guardia_salida`. Datos **en vivo** de UniProt.
 
 ## 4. Estado
 
-- ✅ Código + prompt + ficha + tests; desplegado. Bitácora **028**.
+- ✅ Código + prompt + ficha + tests; desplegado y **verificado en producción**. Bitácora **028**.

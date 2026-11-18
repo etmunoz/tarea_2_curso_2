@@ -136,6 +136,19 @@ prompt actualizado. Reindexado en Redis: **18 fragmentos** (antes 9). Verificado
   reemplazar la medicación… sigue las indicaciones de tu médico, Reiki solo como apoyo"*. Guardrail OK.
 - Todas con `ruta: guardia_entrada → supervisor → agente_local → guardia_salida`.
 
+## Anexo 5 · Bioinformática real (UniProt en vivo)
+
+Agente de Bioinformática con herramienta `consultar_proteina` (UniProt REST, sin API key). Verificado
+en producción (gateway):
+
+- **TP53** → `P04637` · Homo sapiens · 393 aa · función oficial · URL de UniProt.
+- **BRCA1** → `P38398` · 1863 aa. **INS** → `P01308`. **hemoglobin** → `HBB` (P68871).
+- Datos **en vivo** y citables (accession + URL); corregida la relevancia con `gene_exact` + humano
+  por defecto (antes "TP53" por texto libre traía MDM2).
+- Ruteo: `guardia_entrada → supervisor → agente_local → guardia_salida` (ficha actualizada).
+
+---
+
 ### Catálogo ampliado (registro 027) + arreglo de ruteo
 
 - **Duelo** → Reiki en el corazón + respiración/gratitud + diario de recuerdos (deriva a apoyo psicológico).

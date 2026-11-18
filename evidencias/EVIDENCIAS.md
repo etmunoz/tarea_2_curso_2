@@ -136,6 +136,21 @@ prompt actualizado. Reindexado en Redis: **18 fragmentos** (antes 9). Verificado
   reemplazar la medicación… sigue las indicaciones de tu médico, Reiki solo como apoyo"*. Guardrail OK.
 - Todas con `ruta: guardia_entrada → supervisor → agente_local → guardia_salida`.
 
+## Anexo 6 · ML-bioinformática diferenciado + Cocina (restricciones/nutrición)
+
+Verificado en producción (gateway), tras reiniciar:
+
+- **Pipeline bio-ML** ("pipeline para clasificar secuencias de proteínas") → **ML en Bioinformática**:
+  embeddings ESM-2/ProtT5 + Gradient Boosting (tool `recomendar_pipeline`).
+- **ML general** ("overfitting en modelo tabular") → **Machine Learning**: regularización + early
+  stopping + CV. ⇒ la separación entre ambos agentes funciona.
+- **Cocina por restricción** ("vegetarianas y económicas") → **Cocina Chilena**: Pebre $211,
+  Arroz graneado $298… (tool `recomendar_recetas`, ordenado por costo/persona).
+- **Nutrición** ("calorías del pastel de choclo") → **Cocina Chilena**: ~686 kcal/persona con nota de
+  estimación aproximada (tool `info_nutricional`).
+
+---
+
 ## Anexo 5 · Bioinformática real (UniProt en vivo)
 
 Agente de Bioinformática con herramienta `consultar_proteina` (UniProt REST, sin API key). Verificado

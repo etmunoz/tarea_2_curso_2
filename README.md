@@ -122,7 +122,8 @@ uv run python src/canales/monitor.py
 ```
 
 En servidor, usar los servicios systemd `t2c2-*` y la publicación con proxy: ver
-[`deploy/README-T2.md`](deploy/README-T2.md).
+[`deploy/README-T2.md`](deploy/README-T2.md). El **diagrama técnico completo** (componentes, flujos y
+fuentes de datos, mantenido al día) está en [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md).
 
 ## Probar
 

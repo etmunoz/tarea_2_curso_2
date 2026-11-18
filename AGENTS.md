@@ -78,6 +78,9 @@ flowchart TD
 8. **Flujo de trabajo:** editar en el **repo local** → desplegar con `deploy/deploy_local_a_vps.sh` →
    reiniciar los servicios `t2c2-*` (sudo) → commit/push. Dejar traza en `prompts_ejecutados/` +
    `respuestas/` + `evidencias/`.
+9. **Arquitectura viva:** todo cambio que agregue/quite/modifique un agente, una herramienta con efecto
+   externo, un servicio, una fuente de datos o un flujo **actualiza [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md)**
+   en el mismo cambio (diagrama + tablas + "Última revisión"), siguiendo su "Prompt de mantención".
 
 ## Estructura
 ```

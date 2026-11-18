@@ -1,0 +1,16 @@
+{
+  "dependencies": [
+    "."
+  ],
+  "graphs": {
+    "agente_viajes": "./src/agente_viajes/graph.py:graph",
+    "agente_machinelearning": "./src/agente_machinelearning/graph.py:graph",
+    "agente_reiki": "./src/agente_reiki/graph.py:graph",
+    "agente_cocinachilena": "./src/agente_cocinachilena/graph.py:graph",
+    "agente_meteorologia": "./src/agente_meteorologia/graph.py:graph",
+    "agente_bioinformatica": "./src/agente_bioinformatica/graph.py:graph",
+    "agente_mlbioinformatica": "./src/agente_mlbioinformatica/graph.py:graph",
+    "agente_administrador": "./src/agente_administrador/graph.py:graph"
+  },
+  "env": ".env"
+}

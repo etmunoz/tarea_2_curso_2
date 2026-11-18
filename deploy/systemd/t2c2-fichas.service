@@ -1,0 +1,24 @@
+# --8<-- encabezado-grupo
+# Archivo: deploy/systemd/t2c2-fichas.service
+# Objetivo: Servicio systemd · vigilante que re-aplica las fichas (agent cards) cuando langgraph las borra.
+# Grupo del curso: Fabio Durán - Gustavo Reyes - Ezequiel Muñoz
+# --8<-- fin-encabezado-grupo
+[Unit]
+Description=T2C2 - vigilante de fichas (re-aplica agent cards)
+After=t2c2-langgraph.service
+Requires=t2c2-langgraph.service
+
+[Service]
+User=web6
+Group=client1
+WorkingDirectory=/var/www/clients/client1/web6/home/etmkuseretmk2/tarea_2_curso_2
+Environment=HOME=/var/www/clients/client1/web6/home/etmkuseretmk2
+Environment=PATH=/var/www/clients/client1/web6/home/etmkuseretmk2/.local/bin:/usr/local/bin:/usr/bin:/bin
+EnvironmentFile=/etc/t2c2.env
+ExecStartPre=/bin/sh -c "until curl -sf -o /dev/null http://127.0.0.1:2025/ok; do sleep 2; done"
+ExecStart=/var/www/clients/client1/web6/home/etmkuseretmk2/.local/bin/uv run python tools/configurar_fichas.py --vigilar
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

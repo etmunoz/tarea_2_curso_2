@@ -1,0 +1,23 @@
+# --8<-- encabezado-grupo
+# Archivo: deploy/systemd/t2c2-langgraph.service
+# Objetivo: Servicio systemd · langgraph dev con los 8 agentes locales (A2A nativo, :2025).
+# Grupo del curso: Fabio Durán - Gustavo Reyes - Ezequiel Muñoz
+# --8<-- fin-encabezado-grupo
+[Unit]
+Description=T2C2 - langgraph dev (8 agentes A2A, :2025)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=web6
+Group=client1
+WorkingDirectory=/var/www/clients/client1/web6/home/etmkuseretmk2/tarea_2_curso_2
+Environment=HOME=/var/www/clients/client1/web6/home/etmkuseretmk2
+Environment=PATH=/var/www/clients/client1/web6/home/etmkuseretmk2/.local/bin:/usr/local/bin:/usr/bin:/bin
+EnvironmentFile=/etc/t2c2.env
+ExecStart=/var/www/clients/client1/web6/home/etmkuseretmk2/.local/bin/uv run langgraph dev --no-browser --host 127.0.0.1 --port 2025
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

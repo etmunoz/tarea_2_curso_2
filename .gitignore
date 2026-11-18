@@ -1,7 +1,32 @@
-.venv/
-node_modules/
-__pycache__/
-*.sqlite
+# --8<-- encabezado-grupo
+# Archivo: .gitignore
+# Objetivo: Archivos y carpetas ignorados por git.
+# Grupo del curso: Fabio Durán - Gustavo Reyes - Ezequiel Muñoz
+# Creación: 20261110 1450
+# Última modificación: 20261112 1508
+# --8<-- fin-encabezado-grupo
+
+# entorno y claves
 .env
-logs/
+.venv/
+__pycache__/
+*.pyc
+# langgraph / notebooks
+.langgraph_api/
+.ipynb_checkpoints/
+# uv
+uv.lock.bak
+# SO / editores
 .DS_Store
+.idea/
+.vscode/
+
+# empaquetado de entrega
+dist/
+
+# BD SQLite generada (se reconstruye sola)
+data/*.sqlite
+logs/
+
+# Credenciales del coordinador: local + en el zip, NUNCA en git
+CLAVE-COORDINADOR.txt

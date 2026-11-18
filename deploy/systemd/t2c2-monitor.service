@@ -1,0 +1,23 @@
+# --8<-- encabezado-grupo
+# Archivo: deploy/systemd/t2c2-monitor.service
+# Objetivo: Servicio systemd · Monitor/backoffice de operación (:8798, solo 127.0.0.1).
+# Grupo del curso: Fabio Durán - Gustavo Reyes - Ezequiel Muñoz
+# --8<-- fin-encabezado-grupo
+[Unit]
+Description=T2C2 - Monitor/backoffice de operacion (:8798)
+After=network-online.target t2c2-api.service
+Wants=network-online.target
+
+[Service]
+User=web6
+Group=client1
+WorkingDirectory=/var/www/clients/client1/web6/home/etmkuseretmk2/tarea_2_curso_2
+Environment=HOME=/var/www/clients/client1/web6/home/etmkuseretmk2
+Environment=PATH=/var/www/clients/client1/web6/home/etmkuseretmk2/.local/bin:/usr/local/bin:/usr/bin:/bin
+EnvironmentFile=/etc/t2c2.env
+ExecStart=/var/www/clients/client1/web6/home/etmkuseretmk2/.local/bin/uv run python src/canales/monitor.py
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

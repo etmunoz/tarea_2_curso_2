@@ -7,7 +7,12 @@
 # --8<-- fin-encabezado-grupo
 
 """Pruebas de las herramientas del agente de Tomás (Maestro Reiki). Sin API key ni servidor."""
-from src.agente_reiki.herramientas import info_simbolo, posiciones_manos, principios_reiki
+from src.agente_reiki.herramientas import (
+    info_simbolo,
+    posiciones_manos,
+    principios_reiki,
+    terapias_complementarias,
+)
 
 
 def test_principios_son_cinco():
@@ -38,4 +43,22 @@ def test_info_simbolo_distancia():
 def test_tema_ajeno_se_rechaza():
     """Prueba: tema ajeno se rechaza."""
     r = info_simbolo.invoke({"nombre": "bitcoin"})
+    assert "nota" in r and "No tengo" in r["nota"]
+
+
+def test_terapias_objetivo_conocido():
+    """Prueba: recomienda terapias para un objetivo conocido."""
+    r = terapias_complementarias.invoke({"objetivo": "estrés"})
+    assert r["objetivo"] == "estres" and len(r["practicas"]) >= 2 and "nota" in r
+
+
+def test_terapias_sinonimo():
+    """Prueba: un sinónimo (ansiedad) mapea al objetivo canónico (estres)."""
+    r = terapias_complementarias.invoke({"objetivo": "tengo mucha ansiedad"})
+    assert r["objetivo"] == "estres"
+
+
+def test_terapias_objetivo_desconocido():
+    """Prueba: objetivo sin calce devuelve nota con los disponibles."""
+    r = terapias_complementarias.invoke({"objetivo": "programar en rust"})
     assert "nota" in r and "No tengo" in r["nota"]

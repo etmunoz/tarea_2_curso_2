@@ -62,6 +62,64 @@ NIVELES = {
     "iii": "Nivel III / Maestría (Shinpiden): símbolo maestro Dai Ko Myo, enseñar e iniciar.",
 }
 
+# Terapias holísticas complementarias basadas en Reiki, por objetivo de bienestar.
+# Es bienestar COMPLEMENTARIO: no diagnostica, no cura y no reemplaza la atención profesional.
+TERAPIAS = {
+    "estres": {
+        "practicas": [
+            "Autotratamiento de Reiki en pecho y plexo solar",
+            "Respiración abdominal 4-6 (inhalar 4 · exhalar 6)",
+            "Aromaterapia de lavanda (difusión suave)",
+            "Principio del día: «solo por hoy, no te preocupes»",
+        ],
+        "nota": "Para relajarte; si la ansiedad es intensa o persistente, consulta a un profesional.",
+    },
+    "sueno": {
+        "practicas": [
+            "Sesión breve de Reiki en nuca y frente",
+            "Sonoterapia suave (cuencos o música tranquila)",
+            "Rutina de sueño (sin pantallas, ambiente oscuro)",
+            "Diario de gratitud antes de dormir",
+        ],
+        "nota": "Higiene del sueño como apoyo; el insomnio sostenido lo ve un profesional de la salud.",
+    },
+    "animo": {
+        "practicas": [
+            "Reiki en el centro del pecho (zona del corazón)",
+            "Aromaterapia cítrica (naranja o bergamota)",
+            "Caminata consciente al aire libre con luz natural",
+            "Principios de gratitud y amabilidad (Gokai)",
+        ],
+        "nota": "Para acompañar el ánimo; ante tristeza persistente, busca apoyo profesional.",
+    },
+    "energia": {
+        "practicas": [
+            "Reiki en plexo solar y bajo vientre",
+            "Movimiento suave (yoga suave o estiramientos)",
+            "Exposición moderada a luz natural",
+            "Hidratación y descanso",
+        ],
+        "nota": "Para vitalidad cotidiana; el cansancio marcado conviene consultarlo.",
+    },
+    "tension": {
+        "practicas": [
+            "Posiciones de manos en hombros, zona media y lumbar",
+            "Estiramientos suaves y calor local",
+            "Respiración lenta mientras sueltas la zona",
+            "Pausa consciente (Gassho) para centrarte",
+        ],
+        "nota": "Para tensión leve; si el dolor es intenso o persistente, acude a un profesional.",
+    },
+}
+# Sinónimos → objetivo canónico (para que la recomendación encuentre el calce).
+SINONIMOS = {
+    "ansiedad": "estres", "relajacion": "estres", "calma": "estres",
+    "descanso": "sueno", "dormir": "sueno", "insomnio": "sueno",
+    "tristeza": "animo", "desanimo": "animo", "humor": "animo",
+    "vitalidad": "energia", "cansancio": "energia", "fatiga": "energia",
+    "dolor": "tension", "contractura": "tension", "rigidez": "tension",
+}
+
 
 def _buscar(catalogo: dict, consulta: str) -> str | None:
     """Objetivo: encontrar la clave de un catálogo que casa con la consulta (sin acentos).
@@ -124,4 +182,24 @@ def buscar_reiki(consulta: str) -> list[dict] | dict:
         return {"nota": f"No pude consultar el RAG: {exc}"}
 
 
-HERRAMIENTAS = [principios_reiki, posiciones_manos, info_simbolo, buscar_reiki]
+@tool
+def terapias_complementarias(objetivo: str) -> dict:
+    """Recomienda terapias holísticas complementarias basadas en Reiki para un objetivo de bienestar.
+    Objetivos: 'estrés/ansiedad', 'sueño/descanso', 'ánimo', 'energía/vitalidad', 'tensión corporal'.
+    Devuelve {objetivo, practicas:[...], nota}. Es bienestar COMPLEMENTARIO, NO consejo médico ni
+    diagnóstico. Si no reconoce el objetivo, sugiere los disponibles en una línea."""
+    clave = _buscar(TERAPIAS, objetivo)
+    if not clave:
+        q = _norm(objetivo)
+        for syn, canon in SINONIMOS.items():
+            if syn in q:
+                clave = canon
+                break
+    if not clave:
+        return {"nota": f"No tengo recomendaciones para «{objetivo}». "
+                        f"Objetivos: estrés, sueño, ánimo, energía, tensión corporal."}
+    datos = TERAPIAS[clave]
+    return {"objetivo": clave, "practicas": datos["practicas"], "nota": datos["nota"]}
+
+
+HERRAMIENTAS = [principios_reiki, posiciones_manos, info_simbolo, terapias_complementarias, buscar_reiki]

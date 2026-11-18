@@ -7,7 +7,7 @@
 
 # Fuentes
 
-Los documentos `nivel-1..4` son **síntesis original** (no copian texto con copyright).
+Los documentos `nivel-1..4` y `terapias-complementarias` son **síntesis original** (no copian texto con copyright).
 Se elaboraron a partir de información pública de estas fuentes; el profesor puede
 reemplazarlos o añadir sus propios PDFs en esta carpeta y recargar el RAG:
 

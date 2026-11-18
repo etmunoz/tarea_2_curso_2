@@ -22,29 +22,53 @@ reproducible. **Todo en español**, horarios en `America/Santiago`.
 ## Arquitectura
 
 ```
-[web chat / voz]  --login-->  BFF (:8797)  --X-API-Key-->  FastAPI (:8796)  -->  Coordinador
-                                                                                     |
-                                       (solo 127.0.0.1)  langgraph dev (:2025) --> 8 agentes locales
+[web chat + voz]            login por sesión (cookie HttpOnly+SameSite=Lax+Secure, 8 h;
+   | usuario/clave          clave inicial única + cambio obligatorio; anti-fuerza-bruta)
+   v
+ BFF (:8797) --X-API-Key + X-Usuario--> FastAPI (:8796) --> Coordinador (supervisor)
+  (API_KEY server-side)                   (401 sin API_KEY)        |
+                                (solo 127.0.0.1) langgraph dev (:2025) --> 8 agentes locales
+
+ Monitor (:8798)  <-- accesos/eventos/despachos --  Memoria (SQLite)
+ Almacén de config (config.sqlite) --> GOOGLE_API_KEY · API_KEY · SMTP_PASS · REDIS_URL
+ RAG de Reiki --> Redis cloud (RediSearch)
 ```
 
-- **8 agentes locales** renombrados `agente_<funcionalidad>`: machinelearning, mlbioinformatica,
-  bioinformatica, reiki, cocinachilena, **meteorologia** (clima REAL de Chile vía Open-Meteo + SQLite),
-  viajes y **administrador** (recepción: conoce y deriva al resto).
-- **Memoria** SQLite: historial, destinatarios (allowlist), despachos y accesos.
-- **Monitor** (:8798): accesos al gateway (200/401), despachos, allowlist e historial.
-- **RAG** de Reiki: local (`RAG_BACKEND=local`), conmutable a **Redis cloud** cuando se configure.
+- **8 agentes locales** `agente_<funcionalidad>`: machinelearning, mlbioinformatica, bioinformatica,
+  **reiki** (RAG), cocinachilena, **meteorologia** (clima REAL de Chile vía Open-Meteo + SQLite), viajes y
+  **administrador** (recepción: conoce y deriva al resto). El **coordinador** es un supervisor
+  (`guardia_entrada → supervisor → agente_local → guardia_salida`) con guardrails de entrada/salida y
+  ruteo **por turno** (la ventana de ruteo muestra solo la ruta del turno actual).
+- **Multiusuario:** login por sesión, un usuario por persona (**ezequiel = admin**; gustavo, fabio,
+  cristobal, jose). Claves con **PBKDF2+salt**, **clave inicial única** con **cambio obligatorio** al
+  primer ingreso, cookie **HttpOnly+SameSite=Lax+Secure** (caducidad 8 h), anti-fuerza-bruta
+  (6 intentos/5 min). Cada usuario tiene **flujo e historial propios**; el admin resetea claves en
+  `/usuarios`. Si el usuario no tiene correo registrado, la UI lo da de bienvenida y lo ayuda a registrarlo.
+- **RAG de Reiki en Redis cloud** (RediSearch), índice **`t2c2_duran_reyes_munoz_reiki`** (namespaceado
+  al grupo). Conmutable a backend local (`RAG_BACKEND`); la `REDIS_URL` se fija por el **almacén de
+  config** sin editar `/etc` (ver `deploy/set_redis_url.sh`).
+- **Memoria** SQLite: historial, destinatarios (allowlist), despachos, accesos y **eventos de usuario**
+  (login, logout, cambio de clave, reset).
+- **Almacén de config** (`config.sqlite`, `src/config/ajustes.py`): fija `GOOGLE_API_KEY`, `API_KEY`,
+  `SMTP_PASS`, `REDIS_URL` desde `/config` del monitor, **sin tocar el `.env`/`/etc`**. El
+  `.env`/EnvironmentFile **tiene prioridad** (`bootstrap.py` no lo pisa).
+- **Monitor** (:8798): accesos al gateway (200/401), despachos, allowlist, **eventos de usuario**,
+  indicador de **cuota de Gemini** y `/config`.
+- **Correo**: despacho a destinatarios de la **allowlist** (nunca auto-envío), con la **ruta** de los
+  agentes y el **gráfico del grafo** al pie.
 
 ## Requisitos
 
 - Python **3.13** y **`uv`**.
-- Un `.env` (ver `.env.example`): `GOOGLE_API_KEY` (Gemini), `API_KEY` (gateway), `WEB_USER/WEB_PASS`,
-  `A2A_BASE=http://127.0.0.1:2025`, `A2A_GRAFOS_LOCALES` (los 8 grafos), y opcional `SMTP_*`, `REDIS_URL`.
+- Un `.env` (ver `.env.example`): `GOOGLE_API_KEY` (Gemini), `API_KEY` (gateway),
+  `WEB_USUARIOS`/`WEB_ADMIN`/`CLAVE_INICIAL` (login multiusuario), `A2A_BASE=http://127.0.0.1:2025`,
+  `A2A_GRAFOS_LOCALES` (los 8 grafos), `MONITOR_*`, y opcional `SMTP_*`, `RAG_BACKEND`/`REDIS_URL`/`REDIS_INDEX`.
 
 ## Instalar y levantar (LOCAL)
 
 ```bash
 uv sync
-cp .env.example .env      # completar GOOGLE_API_KEY, API_KEY, WEB_USER/WEB_PASS…
+cp .env.example .env      # completar GOOGLE_API_KEY, API_KEY, WEB_USUARIOS/WEB_ADMIN/CLAVE_INICIAL…
 
 # 1) agentes (A2A nativo)
 uv run langgraph dev --no-browser --host 127.0.0.1 --port 2025

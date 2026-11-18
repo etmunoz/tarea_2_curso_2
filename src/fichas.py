@@ -19,10 +19,11 @@ FICHAS: dict[str, dict[str, str]] = {
     "agente_machinelearning": {
         "name": "Agente de Machine Learning",
         "description": (
-            "Ingeniería de IA y Data Science: recomienda qué técnica de machine learning usar para un "
-            "problema, qué métricas mirar y qué modelo elegir según el tipo de dato; consulta su catálogo "
-            "de modelos. No programa, no entrena modelos reales ni responde fuera de IA/Data Science. La "
-            "biología la deriva a agente_bioinformatica."
+            "Ingeniería de IA y Data Science (datos generales/tabulares): recomienda qué técnica de "
+            "machine learning usar para un problema, qué métricas mirar y qué modelo elegir según el tipo "
+            "de dato; consulta su catálogo de modelos. No programa ni entrena modelos reales. El ML "
+            "aplicado a datos biológicos lo deriva a agente_mlbioinformatica y la biología de fondo a "
+            "agente_bioinformatica."
         ),
     },
     "agente_mlbioinformatica": {
@@ -59,9 +60,10 @@ FICHAS: dict[str, dict[str, str]] = {
     "agente_cocinachilena": {
         "name": "Agente de Cocina Chilena",
         "description": (
-            "Cocina chilena: conoce recetas clásicas, muestra sus ingredientes y calcula cuánto cuesta "
-            "producir una receta (por ingrediente, total y por persona, en CLP). No responde fuera de la "
-            "cocina."
+            "Cocina chilena: conoce recetas clásicas, muestra ingredientes, calcula cuánto cuesta "
+            "producir una receta (por ingrediente, total y por persona, en CLP), recomienda recetas por "
+            "restricción (vegetariano, vegano, sin gluten, económica) y da una estimación nutricional "
+            "aproximada (kcal). No responde fuera de la cocina."
         ),
     },
     "agente_meteorologia": {
@@ -76,8 +78,8 @@ FICHAS: dict[str, dict[str, str]] = {
     "agente_viajes": {
         "name": "Agente de Viajes",
         "description": (
-            "Búsqueda de viajes: vuelos y hoteles (SCL, LIM, BOG, EZE) con precios en CLP. No gestiona "
-            "pagos ni seguros."
+            "Búsqueda de viajes: vuelos, hoteles y actividades (SCL, LIM, BOG, EZE) con precios en CLP "
+            "(datos de demostración). No gestiona pagos ni seguros."
         ),
     },
     "agente_administrador": {

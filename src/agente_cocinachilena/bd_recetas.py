@@ -192,3 +192,80 @@ def costear_receta(nombre: str, personas: int = 4) -> dict:
                 "detalle": detalle, "total_clp": round(total), "por_persona_clp": round(total / personas)}
     finally:
         con.close()
+
+
+# ── restricciones y nutrición (derivadas de los ingredientes; estimación, no asesoría) ──────────
+# Clasificación de ingredientes (no etiquetada a mano en cada receta: se infiere de estos conjuntos).
+CARNICOS = {"carne molida", "posta de vacuno", "trutro de pollo", "longaniza", "congrio", "vienesa"}
+ANIMALES = CARNICOS | {"huevo", "leche", "mayonesa", "manteca"}
+CON_GLUTEN = {"harina", "pan de completo", "pancutras", "vienesa"}
+# kcal aproximadas por 1 unidad del ingrediente (según su unidad: g, ml, unidad, diente). Estimación.
+KCAL: dict[str, float] = {
+    "harina": 3.6, "carne molida": 2.5, "posta de vacuno": 1.4, "trutro de pollo": 2.1,
+    "longaniza": 3.0, "congrio": 1.0, "cebolla": 40, "ajo": 4, "huevo": 78, "aceite": 8.8,
+    "aceitunas": 5, "pasas": 3.0, "choclo": 120, "albahaca": 0.2, "zapallo": 0.4, "porotos": 3.3,
+    "papa": 0.8, "zanahoria": 40, "tomate": 20, "ají verde": 15, "cilantro": 0.2,
+    "pan de completo": 180, "vienesa": 150, "palta": 240, "mayonesa": 6.8, "arroz": 3.6,
+    "lentejas": 3.5, "pancutras": 2.8, "leche": 0.6, "azúcar": 4.0, "huesillo": 90, "mote": 3.6,
+    "comino": 3.8, "vino tinto": 0.85, "manteca": 9.0, "polvos de hornear": 0.5, "poroto verde": 0.3,
+}
+
+
+def _resolver(nombre: str) -> str | None:
+    """Objetivo: resolver el nombre (exacto o parcial, sin distinguir mayúsculas) a una clave de RECETAS."""
+    if nombre in RECETAS:
+        return nombre
+    n = nombre.lower().strip()
+    return next((k for k in RECETAS if n in k.lower()), None)
+
+
+def clasificar(nombre: str) -> dict:
+    """Objetivo: marcar si una receta es vegetariana, vegana y/o sin gluten (según sus ingredientes)."""
+    real = _resolver(nombre)
+    if not real:
+        return {"nota": f"No tengo la receta «{nombre}»."}
+    ings = {ing for ing, _ in RECETAS[real][2]}
+    return {"receta": real, "vegetariano": not (ings & CARNICOS),
+            "vegano": not (ings & ANIMALES), "sin_gluten": not (ings & CON_GLUTEN)}
+
+
+def info_nutricional(nombre: str, personas: int = 4) -> dict:
+    """Objetivo: estimación nutricional APROXIMADA (kcal) de una receta para `personas`."""
+    real = _resolver(nombre)
+    if not real:
+        return {"nota": f"No tengo la receta «{nombre}». Usa listar_recetas para ver las disponibles."}
+    porciones, _desc, items = RECETAS[real]
+    factor = personas / (porciones or personas)
+    total = sum(KCAL.get(ing, 0) * cant * factor for ing, cant in items)
+    return {"receta": real, "personas": personas, "kcal_total_aprox": round(total),
+            "kcal_por_persona_aprox": round(total / personas),
+            "nota": "Estimación aproximada a partir de valores tipo; no es asesoría nutricional."}
+
+
+def recetas_por_restriccion(restriccion: str, personas: int = 4, umbral_clp: int = 1500) -> dict:
+    """Objetivo: recetas que cumplen una restricción: 'vegetariano', 'vegano', 'sin gluten' o
+    'economica' (costo por persona <= umbral_clp). Salida: {restriccion, recetas:[...]} o {nota}."""
+    r = restriccion.lower().strip()
+    es_veg = "vegetarian" in r
+    es_vegano = "vegan" in r
+    es_sg = "gluten" in r
+    es_eco = any(k in r for k in ("econom", "barat", "presupuesto"))
+    if not (es_veg or es_vegano or es_sg or es_eco):
+        return {"nota": "Restricciones que manejo: vegetariano, vegano, sin gluten, económica."}
+    salida = []
+    for nombre in RECETAS:
+        c = clasificar(nombre)
+        if es_vegano and not c["vegano"]:
+            continue
+        if es_veg and not c["vegetariano"]:
+            continue
+        if es_sg and not c["sin_gluten"]:
+            continue
+        por_persona = costear_receta(nombre, personas)["por_persona_clp"]
+        if es_eco and por_persona > umbral_clp:
+            continue
+        salida.append({"receta": nombre, "por_persona_clp": por_persona})
+    salida.sort(key=lambda x: x["por_persona_clp"])
+    if not salida:
+        return {"restriccion": r, "recetas": [], "nota": "No encontré recetas que cumplan esa restricción."}
+    return {"restriccion": r, "personas": personas, "recetas": salida}

@@ -42,3 +42,32 @@ def test_escala_por_personas():
 def test_receta_desconocida():
     """Prueba: receta desconocida."""
     assert "nota" in costear_receta.invoke({"nombre": "sushi"})
+
+
+def test_clasificar_vegetariano():
+    """Prueba: Pebre es vegetariano/vegano/sin gluten; Chorrillana no es vegetariana."""
+    from src.agente_cocinachilena import bd_recetas
+    assert bd_recetas.clasificar("Pebre")["vegetariano"] is True
+    assert bd_recetas.clasificar("Chorrillana")["vegetariano"] is False
+
+
+def test_recetas_por_restriccion_vegana():
+    """Prueba: la recomendación vegana no incluye recetas con carne/huevo/leche."""
+    from src.agente_cocinachilena import bd_recetas
+    r = bd_recetas.recetas_por_restriccion("vegano")
+    nombres = {x["receta"] for x in r["recetas"]}
+    assert nombres and "Chorrillana" not in nombres and "Leche asada" not in nombres
+
+
+def test_info_nutricional_aprox():
+    """Prueba: la estimación nutricional entrega kcal por persona y la nota de 'aprox'."""
+    from src.agente_cocinachilena import bd_recetas
+    r = bd_recetas.info_nutricional("Cazuela de vacuno", personas=4)
+    assert r["kcal_por_persona_aprox"] > 0 and "aproximada" in r["nota"].lower()
+
+
+def test_restriccion_desconocida():
+    """Prueba: una restricción no soportada devuelve nota con las válidas."""
+    from src.agente_cocinachilena import bd_recetas
+    r = bd_recetas.recetas_por_restriccion("kosher")
+    assert "nota" in r and "vegetariano" in r["nota"]

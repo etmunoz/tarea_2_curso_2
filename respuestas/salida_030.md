@@ -26,11 +26,13 @@
   Sopaipillas (403).
 - **Nutrición Cazuela de vacuno (4p)**: ~1879 kcal total, ~470 kcal/persona + nota de estimación.
 
-## 3. Pendiente / en vivo
+## 3. Verificación en vivo (gateway, tras reiniciar)
 
-- `sudo systemctl restart t2c2-langgraph` (tools nuevas). Ficha ya aplicada.
-- Verificación por el gateway (pedido por restricción ruteado a Cocina Chilena) → evidencias.
+- **"recetas vegetarianas y económicas"** → Agente de Cocina Chilena: Pebre $211, Arroz graneado $298…
+  (tool `recomendar_recetas`, ordenado por costo por persona).
+- **"calorías del pastel de choclo por persona"** → Agente de Cocina Chilena: ~686 kcal/persona con
+  nota de estimación aproximada (tool `info_nutricional`).
 
 ## 4. Estado
 
-- ✅ Código + prompt + ficha + tests; desplegado. Bitácora **030**.
+- ✅ Código + prompt + ficha + tests; desplegado y **verificado en producción**. Bitácora **030**.

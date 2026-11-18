@@ -26,12 +26,13 @@
   train y test)"*, trampa *"mezclar variantes de la misma proteína entre particiones"*.
 - `secuencias de proteinas` → partición por identidad de secuencia; trampa: fuga por homología.
 
-## 3. Pendiente / verificación en vivo
+## 3. Verificación en vivo (gateway, tras reiniciar)
 
-- `sudo systemctl restart t2c2-langgraph` (código del agente) y `t2c2-fichas` (ficha).
-- Verificar por el gateway que una pregunta de **pipeline bio-ML** rutea a **ML en Bioinformática** y
-  una de **ML general** a **Machine Learning** → evidencias.
+- **"pipeline de ML para clasificar secuencias de proteínas"** → **ML en Bioinformática**: embeddings
+  ESM-2/ProtT5 + Gradient Boosting (tool `recomendar_pipeline`).
+- **"overfitting en un modelo tabular"** → **Machine Learning**: regularización + early stopping + CV.
+- ⇒ La **separación** entre ambos agentes funciona (cada pregunta fue al agente correcto).
 
 ## 4. Estado
 
-- ✅ Código + prompt + ficha + tests; desplegado. Bitácora **029**.
+- ✅ Código + prompt + ficha + tests; desplegado y **verificado en producción**. Bitácora **029**.

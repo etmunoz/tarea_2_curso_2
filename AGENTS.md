@@ -34,6 +34,36 @@ Sistema multi-agente **A2A nativo** (LangGraph) con un **gateway FastAPI** como 
 8. **Config** (`src/config/`) · `ajustes.py` (almacén clave/valor en `config.sqlite`), `bootstrap.py`
    (carga al entorno **sin** pisar el `.env`/EnvironmentFile), `usuarios.py` (login), `estado.py` (cuota).
 
+## Flujo del coordinador
+
+El **supervisor** (nodo `enrutar`) es el que **rutea**: elige un agente del catálogo; el `administrador`
+es uno más de ese conjunto (recepción/orienta), **no** rutea.
+
+```mermaid
+flowchart TD
+    START([pregunta]) --> GE[guardia_entrada]
+    GE -->|ok| SUP{enrutar · SUPERVISOR<br/>elige 1 agente del catálogo}
+    GE -->|bloqueado| GS[guardia_salida]
+    SUP -->|elegido| CO[consultar]
+    SUP -->|ninguno| SA[sin_agente]
+    CO -->|A2A :2025| AG
+    CO --> GS
+    SA --> GS
+    GS --> END([respuesta])
+
+    subgraph AG[Agentes locales A2A - el supervisor elige uno]
+      direction LR
+      MET[meteorologia]
+      COC[cocinachilena]
+      REI[reiki · RAG]
+      MLG[machinelearning]
+      BIO[bioinformatica]
+      MLB[mlbioinformatica]
+      VIA[viajes]
+      ADM[administrador · recepción/orienta]
+    end
+```
+
 ## Reglas de arquitectura
 1. Todo agente es un grafo LangGraph con `messages` en el estado (requisito de A2A nativo).
 2. System prompts en `prompts.py` de cada paquete, **nunca inline**.

@@ -46,9 +46,12 @@ FICHAS: dict[str, dict[str, str]] = {
     "agente_reiki": {
         "name": "Agente de Reiki",
         "description": (
-            "Reiki (bienestar complementario): explica los cinco principios (Gokai), las posiciones de "
-            "manos, los símbolos y los niveles, con apoyo de búsqueda sobre documentos de Reiki. No da "
-            "consejo médico ni diagnósticos; para temas de salud deriva a un profesional."
+            "Reiki y bienestar complementario: explica los cinco principios (Gokai), las posiciones de "
+            "manos, los símbolos y los niveles, y RECOMIENDA terapias holísticas complementarias por "
+            "objetivo de bienestar (relajación y estrés, sueño, ánimo, energía, tensión corporal, duelo, "
+            "concentración y cefalea/dolor de cabeza tensional), con apoyo de búsqueda sobre documentos "
+            "de Reiki. Es apoyo de bienestar, NO consejo médico ni diagnóstico; ante enfermedades o "
+            "tratamientos deriva a un profesional."
         ),
     },
     "agente_cocinachilena": {

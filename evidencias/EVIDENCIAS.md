@@ -135,6 +135,17 @@ prompt actualizado. Reindexado en Redis: **18 fragmentos** (antes 9). Verificado
 - **Borde médico (hipertensión)** → **no** da consejo médico: *"no puede curar enfermedades ni
   reemplazar la medicación… sigue las indicaciones de tu médico, Reiki solo como apoyo"*. Guardrail OK.
 - Todas con `ruta: guardia_entrada → supervisor → agente_local → guardia_salida`.
+
+### Catálogo ampliado (registro 027) + arreglo de ruteo
+
+- **Duelo** → Reiki en el corazón + respiración/gratitud + diario de recuerdos (deriva a apoyo psicológico).
+- **Concentración** → Reiki frente/corona + respiración 2–3 min + menta/romero + pausas.
+- **Cefalea tensional** → manos en sienes/nuca/hombros + respiración + compresa tibia + hidratación
+  (deriva si es intenso/súbito/frecuente).
+- **Fix de ruteo:** "dolor de cabeza tensional" ruteaba a `ninguno` (el supervisor lo leía como médico);
+  se enriqueció la **ficha** del `agente_reiki` (`src/fichas.py`) con los objetivos de bienestar. Tras
+  aplicarla, rutea al Agente de Reiki incluso con la frase pelada *"Tengo dolor de cabeza tensional,
+  qué me recomiendas?"* (`elegido: Agente de Reiki`).
 - **Captura (GUI del Redis):** [`redis_reiki_indice.png`](redis_reiki_indice.png) — índice
   `t2c2_duran_reyes_munoz_reiki` con **9 keys** (HASH) en `nut-milk-xenic-58289.db.redis.io:10484`
   **DB 0**; campos `fuente`, `text`, `_index_name`, `embedding` (vector binario). No expone la clave.

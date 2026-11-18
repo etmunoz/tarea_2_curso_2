@@ -2,7 +2,7 @@
 > **Archivo:** `respuestas/salida_020.md`  
 > **Objetivo:** 020 · Respuesta — chat e historial por usuario; tutorial para usuarios nuevos  
 > **Grupo del curso:** Fabio Durán - Gustavo Reyes - Ezequiel Muñoz  
-> **Creación:** 20261117 2143 · **Última modificación:** 20261117 2143
+> **Creación:** 20261117 2143 · **Última modificación:** 20261117 2147
 <!--/encabezado-grupo-->
 
 # 020 · Respuesta — Chat/historial por usuario
@@ -31,7 +31,22 @@ inicial**, y ya no aparece la conversación de otra sesión.
 
 `web.py` **compila**.
 
-## 2. Estado
+## 2. Verificación (tras reiniciar `t2c2-web`) — ✅
 
-- ✅ Código publicado en web6; compila.
-- ⏳ Pendiente: **reiniciar `t2c2-web`** (sudo) y entrar como un usuario nuevo para ver el tutorial.
+Probado con un **usuario de prueba temporal** (creado y eliminado, sin tocar usuarios reales):
+
+```
+t2c2-web active
+POST /login (sin cambio obligatorio) -> 302 -> /
+GET / con sesión                      -> 200
+piezas en la página: iniciarUsuario, t2_thread_, t2_hist_, mdToHtml, onboarding, micbtn  (todas ✔)
+GET /api/yo -> {"usuario": "_vtest", "admin": false}
+```
+
+→ La página del chat sirve con la lógica **por usuario** (hilo/historial propios), el render Markdown y
+la bienvenida; la identidad viene de la sesión. Cada usuario entra a su propio chat; uno nuevo verá el
+tutorial.
+
+## 3. Estado
+
+- ✅ **Verificado en producción.** Bitácora **000–020** en el repo.

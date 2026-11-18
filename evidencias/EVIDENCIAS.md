@@ -120,6 +120,21 @@ Clave Gemini: OK. Tabla de accesos con `POST /consulta 200`, `GET /agentes 200`,
   al Agente de Reiki **igual respondió** correctamente → la respuesta vino de Redis.
   - `PING=True`, `FT._LIST` responde (RediSearch OK), **9 fragmentos** indexados.
   - `ruta: guardia_entrada → supervisor → agente_local → guardia_salida`.
+
+---
+
+## Anexo 4 · Terapias holísticas complementarias (agente_reiki)
+
+Nuevo documento `data/reiki/terapias-complementarias.md` + herramienta `terapias_complementarias` +
+prompt actualizado. Reindexado en Redis: **18 fragmentos** (antes 9). Verificado en vivo (gateway):
+
+- **Recomendación (estrés/ansiedad)** → Agente de Reiki: *"autotratamiento de Reiki en pecho y plexo
+  solar con respiración abdominal 4-6 y aromaterapia de lavanda…"* + disclaimer de bienestar.
+- **Recomendación (sueño)** → Agente de Reiki: *"sesión breve de Reiki en nuca y frente, sonoterapia
+  suave y rutina de sueño sin pantallas…"* + disclaimer.
+- **Borde médico (hipertensión)** → **no** da consejo médico: *"no puede curar enfermedades ni
+  reemplazar la medicación… sigue las indicaciones de tu médico, Reiki solo como apoyo"*. Guardrail OK.
+- Todas con `ruta: guardia_entrada → supervisor → agente_local → guardia_salida`.
 - **Captura (GUI del Redis):** [`redis_reiki_indice.png`](redis_reiki_indice.png) — índice
   `t2c2_duran_reyes_munoz_reiki` con **9 keys** (HASH) en `nut-milk-xenic-58289.db.redis.io:10484`
   **DB 0**; campos `fuente`, `text`, `_index_name`, `embedding` (vector binario). No expone la clave.

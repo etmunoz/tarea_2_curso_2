@@ -2,13 +2,15 @@
 > **Archivo:** `docs/ARQUITECTURA.md`  
 > **Objetivo:** Diagrama arquitectónico técnico de la app (vivo) + protocolo de mantención  
 > **Grupo del curso:** Fabio Durán - Gustavo Reyes - Ezequiel Muñoz  
-> **Creación:** 20261118 1300 · **Última modificación:** 20261118 1300
+> **Creación:** 20261118 1300 · **Última modificación:** 20261118 1325
 <!--/encabezado-grupo-->
 
 # Arquitectura técnica — Tarea 2 · Curso 2
 
 Documento **vivo**: refleja la complejidad actual del sistema y se actualiza con cada evolución.
-Última revisión de arquitectura: **registro 032** (viajes real).
+Última revisión de arquitectura: **registro 033** (diagrama vivo creado; refleja los agentes mejorados
+028–032: bioinformática/UniProt, ML-bio/pipelines, cocina, fichas, viajes real). Backlog en
+[`MEJORAS_FUTURAS.md`](MEJORAS_FUTURAS.md).
 
 ---
 

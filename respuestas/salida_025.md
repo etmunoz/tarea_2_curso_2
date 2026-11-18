@@ -32,4 +32,6 @@
 ## 3. Estado
 
 - ✅ `README.md`, `deploy/README-T2.md`, `AGENTS.md` al día. Solo documentación (sin tocar código).
+- ✅ **Diagrama Mermaid del flujo del coordinador** agregado al `README.md` (fiel al grafo real:
+  `START → guardia_entrada →(ok) enrutar →(consultar/sin_agente) … → guardia_salida → END`).
 - ✅ Desplegado a la VPS y commiteado/pusheado. Bitácora **000–025**.

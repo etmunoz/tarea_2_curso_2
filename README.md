@@ -57,6 +57,27 @@ reproducible. **Todo en español**, horarios en `America/Santiago`.
 - **Correo**: despacho a destinatarios de la **allowlist** (nunca auto-envío), con la **ruta** de los
   agentes y el **gráfico del grafo** al pie.
 
+### Flujo del coordinador
+
+```mermaid
+flowchart LR
+    START([inicio]) --> GE[guardia_entrada]
+    GE -->|ok| EN{enrutar}
+    GE -->|bloqueado| GS[guardia_salida]
+    EN -->|consultar| CO[consultar · agente local A2A]
+    EN -->|sin_agente| SA[sin_agente]
+    CO --> GS
+    SA --> GS
+    GS --> END([fin])
+```
+
+- **guardia_entrada** · guardrail de entrada: si detecta inyección o contenido fuera de alcance,
+  **bloquea** y salta directo a `guardia_salida`.
+- **enrutar** · el **supervisor** elige el agente local más adecuado; si ninguno aplica, va a `sin_agente`.
+- **consultar** · invoca al agente elegido por **A2A** (`:2025`) y acumula el paso en la `ruta`.
+- **guardia_salida** · guardrail de salida y respuesta final. La `ruta` se **corta por turno** en el
+  gateway antes de devolverla a la UI.
+
 ## Requisitos
 
 - Python **3.13** y **`uv`**.

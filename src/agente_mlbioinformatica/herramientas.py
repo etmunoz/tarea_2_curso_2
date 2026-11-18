@@ -83,6 +83,53 @@ MODELOS: dict[str, dict] = {
 }
 
 
+# tipo de dato biológico  →  pipeline de ML de punta a punta (lo distintivo de este agente)
+PIPELINES: dict[str, dict] = {
+    "secuencias de proteinas": {
+        "preprocesamiento": "limpiar y deduplicar; representar con embeddings de ESM-2/ProtT5 (sin alinear)",
+        "particion": "train/test por identidad de secuencia (clusters CD-HIT/MMseqs2 al 30-40 %), NO al azar",
+        "modelo": "clasificador ligero sobre los embeddings (regresión logística o gradient boosting)",
+        "metricas": ["F1 macro y por clase", "MCC", "desempeño por nivel de identidad con el train"],
+        "trampa": "fuga por homología: secuencias casi idénticas en train y test inflan las métricas",
+    },
+    "secuencias de adn": {
+        "preprocesamiento": "control de calidad (FastQC); baseline de k-mers o embeddings DNABERT/Nucleotide Transformer",
+        "particion": "por identidad/no solapamiento genómico; evita duplicados entre train y test",
+        "modelo": "k-mers + gradient boosting como baseline; modelo de lenguaje si hay datos",
+        "metricas": ["F1/ROC-AUC según la tarea", "PR-AUC si hay desbalance"],
+        "trampa": "regiones repetidas o casi idénticas filtradas entre particiones",
+    },
+    "expresion genica": {
+        "preprocesamiento": "normalizar, filtrar genes por varianza, corregir efecto de lote (ComBat/Harmony) DENTRO de cada fold",
+        "particion": "validación cruzada anidada (p >> n: miles de genes, pocas muestras)",
+        "modelo": "regresión logística L1/elastic net o random forest",
+        "metricas": ["F1 macro", "accuracy balanceada", "AUC"],
+        "trampa": "corregir el lote o seleccionar genes con TODO el dataset filtra información del test",
+    },
+    "variantes geneticas": {
+        "preprocesamiento": "anotar (conservación, frecuencia poblacional, impacto); escalar",
+        "particion": "agrupada por gen/proteína (la misma proteína no puede estar en train y test)",
+        "modelo": "gradient boosting sobre las anotaciones",
+        "metricas": ["ROC-AUC", "PR-AUC", "sensibilidad a especificidad fija", "calibración"],
+        "trampa": "mezclar variantes de la misma proteína entre particiones",
+    },
+    "estructuras de proteinas": {
+        "preprocesamiento": "construir el grafo de contactos; ampliar el set con estructuras predichas (AlphaFold DB)",
+        "particion": "por familia/plegamiento para evitar redundancia estructural",
+        "modelo": "redes de grafos (GNN) o embeddings estructurales",
+        "metricas": ["F1 macro", "ROC-AUC", "inspección estructural de los aciertos"],
+        "trampa": "estructuras redundantes (mismo plegamiento) repartidas entre train y test",
+    },
+    "imagenes de microscopia": {
+        "preprocesamiento": "normalizar por canal; aumentos (rotación/flip); control por placa/lote",
+        "particion": "por lote/placa para no filtrar el efecto técnico",
+        "modelo": "CNN preentrenada (ResNet/EfficientNet) o ViT con fine-tuning",
+        "metricas": ["F1 macro", "matriz de confusión", "AUC"],
+        "trampa": "fuga por lote: el modelo aprende la placa en vez de la biología",
+    },
+}
+
+
 def _buscar(catalogo: dict, consulta: str) -> str | None:
     """Devuelve la clave del catálogo que mejor casa con la consulta (o None).
 
@@ -99,7 +146,8 @@ def _buscar(catalogo: dict, consulta: str) -> str | None:
     contienen = [c for c in claves if q and q in c]
     if contienen:  # consulta corta y genérica: la primera del catálogo (el orden refleja lo más común)
         return claves[contienen[0]]
-    palabras = set(q.split())
+    _VACIAS = {"de", "del", "la", "el", "los", "las", "un", "una", "y", "o", "en", "con", "para"}
+    palabras = {w for w in q.split() if w not in _VACIAS and len(w) > 2}
     mejor = max(claves, key=lambda c: len(palabras & set(c.split())))
     if palabras & set(mejor.split()):
         return claves[mejor]
@@ -158,4 +206,19 @@ def consultar_modelos(consulta: str = "", tipo: str = "") -> list[dict]:
     return bd_modelos.consultar(consulta=consulta, tipo=tipo)
 
 
-HERRAMIENTAS = [recomendar_tecnica, metricas_recomendadas, elegir_modelo, consultar_modelos]
+@tool
+def recomendar_pipeline(tipo_de_dato: str) -> dict:
+    """Arma un PIPELINE de ML de punta a punta para un tipo de dato biológico: preprocesamiento,
+    estrategia de partición, modelo, métricas y la trampa típica a evitar. Es la herramienta
+    distintiva de este agente (ML aplicado a bioinformática).
+    Tipos: 'secuencias de proteinas', 'secuencias de adn', 'expresion genica', 'variantes geneticas',
+    'estructuras de proteinas', 'imagenes de microscopia'.
+    Devuelve {tipo, preprocesamiento, particion, modelo, metricas:[...], trampa}. Si no reconoce el
+    tipo, lo dice en una línea."""
+    clave = _buscar(PIPELINES, tipo_de_dato)
+    if not clave:
+        return {"nota": f"No tengo un pipeline catalogado para «{tipo_de_dato}». Tipos: {', '.join(PIPELINES)}."}
+    return {"tipo": clave, **PIPELINES[clave]}
+
+
+HERRAMIENTAS = [recomendar_pipeline, recomendar_tecnica, metricas_recomendadas, elegir_modelo, consultar_modelos]

@@ -28,10 +28,11 @@ FICHAS: dict[str, dict[str, str]] = {
     "agente_mlbioinformatica": {
         "name": "Agente de ML en Bioinformática",
         "description": (
-            "IA y Data Science para datos biológicos (secuencias, expresión génica, estructuras, "
-            "variantes): recomienda técnica de ML, métricas y modelo, cuidando la partición sin fuga por "
-            "homología; consulta su catálogo de modelos. No entrena ni ejecuta, ni interpreta la biología "
-            "de fondo (eso es de agente_bioinformatica)."
+            "IA y Data Science aplicada a datos biológicos (secuencias, expresión génica, estructuras, "
+            "variantes): arma PIPELINES de ML de punta a punta por tipo de dato (preprocesamiento, "
+            "partición sin fuga por homología, modelo, métricas y la trampa a evitar) y recomienda "
+            "técnica, métricas y modelo; consulta su catálogo de modelos. No entrena ni ejecuta, ni "
+            "interpreta la biología de fondo (eso es de agente_bioinformatica)."
         ),
     },
     "agente_bioinformatica": {

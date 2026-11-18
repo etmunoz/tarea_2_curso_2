@@ -33,6 +33,10 @@ REQUISITOS_FUNCIONALES = {
     "RF-02 Métricas": "Cuando la pregunta trate de evaluar o entrenar un modelo, consulta "
                       "metricas_recomendadas y nombra las métricas concretas que devuelve.",
     "RF-03 Modelo": "Para elegir un modelo según el tipo de dato biológico, usa elegir_modelo.",
+    "RF-03b Pipeline": "Si piden un flujo/pipeline completo para un tipo de dato biológico (secuencias "
+                       "de proteínas o ADN, expresión génica, variantes, estructuras, imágenes), usa "
+                       "recomendar_pipeline y entrega preprocesamiento, partición, modelo, métricas y la "
+                       "trampa a evitar.",
     "RF-04 Catálogo": "Si piden un modelo concreto, su código de ejemplo o sus librerías, usa "
                       "consultar_modelos (base SQLite) y responde con esos datos.",
     "RF-05 Plan de modelado": "Si te piden diseñar o mejorar un flujo que incluya entrenar un modelo, "

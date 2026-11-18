@@ -107,3 +107,16 @@ Clave Gemini: OK. Tabla de accesos con `POST /consulta 200`, `GET /agentes 200`,
 - **Eventos al monitor:** login, logout, cambio_clave, reset (sección "Eventos de usuario"). Verificado: evento `gustavo·login` registrado.
 - **Autogestión de correo:** si el usuario no tiene correo, la UI lo da de bienvenida y le ayuda a registrarlo (allowlist).
 - **Salidas formateadas (Markdown):** negritas, listas, títulos y código renderizados en el chat.
+
+---
+
+## Anexo 3 · RAG de Reiki en Redis cloud
+
+- **Backend migrado a Redis** (RediSearch), índice **`t2c2_duran_reyes_munoz_reiki`** (namespaceado al
+  grupo; el Redis es compartido del curso). DB lógica `0`.
+- **Config sin sudo:** `REDIS_URL` guardada en el almacén `config.sqlite` vía `deploy/set_redis_url.sh`
+  (lectura **oculta**, nunca en el chat ni en `/etc`). `rag.py` la resuelve desde el almacén.
+- **Verificación concluyente:** con `logs/reiki_rag.json` (artefacto local) movido a `.bak`, la consulta
+  al Agente de Reiki **igual respondió** correctamente → la respuesta vino de Redis.
+  - `PING=True`, `FT._LIST` responde (RediSearch OK), **9 fragmentos** indexados.
+  - `ruta: guardia_entrada → supervisor → agente_local → guardia_salida`.

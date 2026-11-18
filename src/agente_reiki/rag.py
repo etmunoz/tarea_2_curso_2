@@ -37,10 +37,46 @@ from dotenv import load_dotenv
 load_dotenv()
 
 RAIZ = Path(__file__).resolve().parent.parent.parent
-BACKEND = os.environ.get("RAG_BACKEND", "local").lower()
+
+
+def _config_store(clave: str) -> str:
+    """Lee una clave del almacén de config (config.sqlite). web6 lo puede escribir sin sudo,
+    así que es la vía para fijar REDIS_URL cuando no se puede editar /etc/t2c2.env."""
+    try:
+        from src.config import ajustes
+
+        return (ajustes.get(clave) or "").strip()
+    except Exception:  # noqa: BLE001 - si el almacén no existe, se ignora
+        return ""
+
+
+def _es_placeholder(url: str) -> bool:
+    """El EnvironmentFile trae un REDIS_URL de ejemplo; no cuenta como URL real."""
+    return (not url) or ("usuario:password" in url) or ("host:puerto" in url)
+
+
+def _resolver_redis_url() -> str:
+    """REDIS_URL real: primero el almacén de config, luego el entorno (si no es el
+    placeholder), por último localhost."""
+    store = _config_store("REDIS_URL")
+    if not _es_placeholder(store):
+        return store
+    env = os.environ.get("REDIS_URL", "").strip()
+    if not _es_placeholder(env):
+        return env
+    return "redis://localhost:6379"
+
+
+REDIS_URL = _resolver_redis_url()
+# backend 'redis' si hay una URL real configurada (almacén o entorno) o si RAG_BACKEND lo fuerza.
+BACKEND = (
+    "redis"
+    if (REDIS_URL != "redis://localhost:6379" or os.environ.get("RAG_BACKEND", "local").strip().lower() == "redis")
+    else os.environ.get("RAG_BACKEND", "local").strip().lower()
+)
 LOCAL_FILE = Path(os.environ.get("RAG_LOCAL_FILE", RAIZ / "logs" / "reiki_rag.json"))
-REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379")
-REDIS_INDEX = os.environ.get("REDIS_INDEX", "reiki")
+# Redis compartido del curso: el indice se namespacea al grupo para no colisionar con otros equipos.
+REDIS_INDEX = _config_store("REDIS_INDEX") or os.environ.get("REDIS_INDEX") or "t2c2_duran_reyes_munoz_reiki"
 CARPETA_DOCS = Path(os.environ.get("REIKI_DOCS", RAIZ / "data" / "reiki"))
 
 

@@ -23,7 +23,7 @@ _RAIZ = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__
 DB = os.environ.get("CONFIG_DB", os.path.join(_RAIZ, "logs", "config.sqlite"))
 _TZ = ZoneInfo("America/Santiago")
 
-PERMITIDAS = ("GOOGLE_API_KEY", "API_KEY", "SMTP_PASS")
+PERMITIDAS = ("GOOGLE_API_KEY", "API_KEY", "SMTP_PASS", "REDIS_URL", "RAG_BACKEND", "REDIS_INDEX")
 DDL = "CREATE TABLE IF NOT EXISTS config (clave TEXT PRIMARY KEY, valor TEXT, ts TEXT);"
 
 

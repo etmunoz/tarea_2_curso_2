@@ -136,6 +136,19 @@ prompt actualizado. Reindexado en Redis: **18 fragmentos** (antes 9). Verificado
   reemplazar la medicación… sigue las indicaciones de tu médico, Reiki solo como apoyo"*. Guardrail OK.
 - Todas con `ruta: guardia_entrada → supervisor → agente_local → guardia_salida`.
 
+## Anexo 7 · Viajes como asistente de destino real
+
+Verificado en producción (gateway), tras reiniciar:
+
+- **Destino + cambio** ("moneda de Perú y 50.000 CLP en soles") → **Agente de Viajes**: PEN; 50.000 CLP ≈
+  171,05 PEN (cambio real, open.er-api.com).
+- **Clima mundial** ("clima en Buenos Aires para el viaje") → **Agente de Viajes**: 22 °C, mayormente
+  despejado (Open-Meteo). **Clima en Valdivia** → **Agente de Meteorología** (Chile).
+- `info_destino("Cusco")` (en vivo): Perú, America/Lima, pobl. 428.450 + capital/moneda/idiomas.
+- **Afinamiento de ruteo**: se distinguió clima mundial (viajes) vs clima de Chile (meteorología).
+
+---
+
 ## Anexo 6 · ML-bioinformática diferenciado + Cocina (restricciones/nutrición)
 
 Verificado en producción (gateway), tras reiniciar:

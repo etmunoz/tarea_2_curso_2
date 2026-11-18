@@ -69,19 +69,21 @@ FICHAS: dict[str, dict[str, str]] = {
     "agente_meteorologia": {
         "name": "Agente de Meteorología",
         "description": (
-            "Pronóstico del clima para ciudades de Chile: el tiempo de hoy y de los próximos siete días "
-            "(temperaturas en °C y condiciones), con historial de pronósticos y comparación de lo "
-            "pronosticado con lo observado. No responde fuera de la meteorología ni para ciudades sin "
-            "datos. Horas en America/Santiago."
+            "Pronóstico del clima para ciudades de CHILE únicamente: el tiempo de hoy y de los próximos "
+            "siete días (temperaturas en °C y condiciones), con historial de pronósticos y comparación de "
+            "lo pronosticado con lo observado. Para clima de ciudades de otros países, deriva a "
+            "agente_viajes. No responde fuera de la meteorología. Horas en America/Santiago."
         ),
     },
     "agente_viajes": {
         "name": "Agente de Viajes",
         "description": (
             "Planificación de viajes con datos REALES del destino (sin API key): país, capital, moneda, "
-            "idiomas y zona horaria (info_destino), tipo de cambio y conversión a/desde CLP, clima del "
-            "destino y un resumen del lugar (Wikipedia). Además una estimación DEMO de vuelos, hoteles y "
-            "actividades (datos de ejemplo). No gestiona pagos, seguros ni visas."
+            "idiomas y zona horaria (info_destino), tipo de cambio y conversión a/desde CLP, el CLIMA de "
+            "una ciudad de CUALQUIER país del mundo para el viaje (clima_destino) y un resumen del lugar "
+            "(Wikipedia). Además una estimación DEMO de vuelos, hoteles y actividades (datos de ejemplo). "
+            "Para clima fuera de Chile, este es el agente (meteorología es solo Chile). No gestiona pagos, "
+            "seguros ni visas."
         ),
     },
     "agente_administrador": {

@@ -27,11 +27,20 @@
 - `clp_por_unidad("USD")` ≈ **998,6 CLP**. `convertir(50000, CLP, PEN)` ≈ **171,05 PEN**.
 - `resumen("Cusco")` → extracto real de Wikipedia.
 
-## 3. Pendiente / en vivo
+## 3. Verificación en vivo (gateway, tras reiniciar)
 
-- `sudo systemctl restart t2c2-langgraph` (tools nuevas). Ficha ya aplicada.
-- Verificación por el gateway (consulta de destino ruteada al Agente de Viajes) → evidencias.
+- **"moneda de Perú y 50.000 CLP en su moneda"** → Agente de Viajes: Sol peruano (PEN); 50.000 CLP ≈
+  **171,05 PEN** (cambio real).
+- **"clima en Buenos Aires para el viaje"** → Agente de Viajes: 22 °C, mayormente despejado, máximas
+  26–28 °C (clima real mundial).
+- **"clima en Valdivia"** → Agente de Meteorología (Chile) — la separación quedó bien.
+
+### Afinamiento de ruteo (hallazgo en verificación)
+
+"clima en Buenos Aires" iba a `ninguno` (el supervisor asociaba "clima" solo con meteorología = Chile).
+Se afinaron ambas fichas: **viajes** = clima de cualquier país del mundo; **meteorología** = solo Chile
+y deriva el resto a viajes. Tras aplicarlas, el ruteo quedó correcto.
 
 ## 4. Estado
 
-- ✅ Código + prompt + ficha + tests; desplegado. Bitácora **032**.
+- ✅ Código + prompt + ficha + tests; desplegado y **verificado en producción**. Bitácora **032**.

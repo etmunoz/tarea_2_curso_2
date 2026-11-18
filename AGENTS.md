@@ -17,7 +17,8 @@ Sistema multi-agente **A2A nativo** (LangGraph) con un **gateway FastAPI** como 
 1. **8 agentes locales** (`src/agente_<funcionalidad>/`), cada uno un grafo LangGraph servido por
    `langgraph dev` (A2A nativo, `:2025`): `machinelearning`, `mlbioinformatica`, `bioinformatica`,
    `reiki` (RAG), `cocinachilena`, `meteorologia` (clima REAL de Chile, Open-Meteo + SQLite), `viajes` y
-   `administrador` (recepción: conoce y deriva al resto). Los grafos se registran en `langgraph.json`.
+   `administrador` (recepción: da la bienvenida, responde preguntas meta y *sugiere* a qué agente
+   preguntar; **no** rutea ni invoca a otros agentes). Los grafos se registran en `langgraph.json`.
 2. **Coordinador** (`src/coordinador/`) · supervisor `StateGraph`:
    `guardia_entrada → supervisor → (agente_local | sin_agente) → guardia_salida`. El estado acumula
    `ruta`; el gateway la **corta por turno** antes de devolverla. Checkpointer `InMemorySaver`.

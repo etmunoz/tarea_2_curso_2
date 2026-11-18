@@ -36,9 +36,13 @@ reproducible. **Todo en español**, horarios en `America/Santiago`.
 
 - **8 agentes locales** `agente_<funcionalidad>`: machinelearning, mlbioinformatica, bioinformatica,
   **reiki** (RAG), cocinachilena, **meteorologia** (clima REAL de Chile vía Open-Meteo + SQLite), viajes y
-  **administrador** (recepción: conoce y deriva al resto). El **coordinador** es un supervisor
-  (`guardia_entrada → supervisor → agente_local → guardia_salida`) con guardrails de entrada/salida y
-  ruteo **por turno** (la ventana de ruteo muestra solo la ruta del turno actual).
+  **administrador** (recepción: da la bienvenida, responde preguntas meta —"¿qué agentes hay?", "ayuda"—
+  y *sugiere* al usuario a qué agente preguntar; **no** invoca a otros agentes).
+- **Quién rutea:** el **supervisor** vive en el **coordinador** (nodo `enrutar`), **no** en el
+  administrador. El supervisor lee el catálogo y **elige un agente** del conjunto (el administrador es
+  uno más de ese conjunto); luego `consultar` lo invoca por **A2A**. El coordinador es un `StateGraph`
+  (`guardia_entrada → enrutar → consultar | sin_agente → guardia_salida`) con guardrails de
+  entrada/salida y ruteo **por turno** (la ventana de ruteo muestra solo la ruta del turno actual).
 - **Multiusuario:** login por sesión, un usuario por persona (**ezequiel = admin**; gustavo, fabio,
   cristobal, jose). Claves con **PBKDF2+salt**, **clave inicial única** con **cambio obligatorio** al
   primer ingreso, cookie **HttpOnly+SameSite=Lax+Secure** (caducidad 8 h), anti-fuerza-bruta
@@ -60,21 +64,37 @@ reproducible. **Todo en español**, horarios en `America/Santiago`.
 ### Flujo del coordinador
 
 ```mermaid
-flowchart LR
-    START([inicio]) --> GE[guardia_entrada]
-    GE -->|ok| EN{enrutar}
+flowchart TD
+    START([pregunta]) --> GE[guardia_entrada]
+    GE -->|ok| SUP{enrutar · SUPERVISOR<br/>elige 1 agente del catálogo}
     GE -->|bloqueado| GS[guardia_salida]
-    EN -->|consultar| CO[consultar · agente local A2A]
-    EN -->|sin_agente| SA[sin_agente]
+    SUP -->|elegido| CO[consultar]
+    SUP -->|ninguno| SA[sin_agente]
+    CO -->|A2A :2025| AG
     CO --> GS
     SA --> GS
-    GS --> END([fin])
+    GS --> END([respuesta])
+
+    subgraph AG[Agentes locales A2A - el supervisor elige uno]
+      direction LR
+      MET[meteorologia]
+      COC[cocinachilena]
+      REI[reiki · RAG]
+      MLG[machinelearning]
+      BIO[bioinformatica]
+      MLB[mlbioinformatica]
+      VIA[viajes]
+      ADM[administrador · recepción/orienta]
+    end
 ```
 
 - **guardia_entrada** · guardrail de entrada: si detecta inyección o contenido fuera de alcance,
   **bloquea** y salta directo a `guardia_salida`.
-- **enrutar** · el **supervisor** elige el agente local más adecuado; si ninguno aplica, va a `sin_agente`.
+- **enrutar (supervisor)** · es **el que rutea**: lee el catálogo y **elige un** agente (el administrador
+  es uno más); si ninguno aplica, va a `sin_agente`.
 - **consultar** · invoca al agente elegido por **A2A** (`:2025`) y acumula el paso en la `ruta`.
+- **administrador** · agente de **recepción**: orienta y *sugiere* a qué agente preguntar; **no** rutea ni
+  invoca a otros agentes (eso lo hace el supervisor).
 - **guardia_salida** · guardrail de salida y respuesta final. La `ruta` se **corta por turno** en el
   gateway antes de devolverla a la UI.
 

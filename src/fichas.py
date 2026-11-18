@@ -78,8 +78,10 @@ FICHAS: dict[str, dict[str, str]] = {
     "agente_viajes": {
         "name": "Agente de Viajes",
         "description": (
-            "Búsqueda de viajes: vuelos, hoteles y actividades (SCL, LIM, BOG, EZE) con precios en CLP "
-            "(datos de demostración). No gestiona pagos ni seguros."
+            "Planificación de viajes con datos REALES del destino (sin API key): país, capital, moneda, "
+            "idiomas y zona horaria (info_destino), tipo de cambio y conversión a/desde CLP, clima del "
+            "destino y un resumen del lugar (Wikipedia). Además una estimación DEMO de vuelos, hoteles y "
+            "actividades (datos de ejemplo). No gestiona pagos, seguros ni visas."
         ),
     },
     "agente_administrador": {

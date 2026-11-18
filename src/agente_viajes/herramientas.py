@@ -1,13 +1,21 @@
 # --8<-- encabezado-grupo
 # Archivo: src/agente_viajes/herramientas.py
-# Objetivo: Herramientas del agente de viajes. Datos simulados: en producción serían APIs reales (Amadeus, Booking...).
+# Objetivo: Herramientas del agente de viajes: datos REALES de destino (sin API key) + estimador demo.
 # Grupo del curso: Fabio Durán - Gustavo Reyes - Ezequiel Muñoz
 # Creación: 20261110 1514
-# Última modificación: 20261111 2049
+# Última modificación: 20261118 1240
 # --8<-- fin-encabezado-grupo
 
-"""Herramientas del agente de viajes. Datos simulados: en producción serían APIs reales (Amadeus, Booking...)."""
+"""Herramientas del agente de viajes.
+
+REALES (APIs públicas sin API key): `info_destino`, `tipo_cambio`, `convertir_moneda`,
+`clima_destino`, `resumen_destino`. DEMO (datos de ejemplo, no precios reales): `buscar_vuelos`,
+`buscar_hoteles`, `buscar_actividades` — se declaran como estimación de demostración.
+"""
 from langchain_core.tools import tool
+
+from src.agente_meteorologia import openmeteo
+from src.agente_viajes import clientes
 
 VUELOS = {
     ("SCL", "LIM"): [{"aerolinea": "LATAM", "sale": "08:10", "llega": "10:05", "precio_clp": 189990},
@@ -35,25 +43,99 @@ ACTIVIDADES = {
 
 
 @tool
+def info_destino(ciudad: str) -> dict:
+    """Datos del destino: ciudad, país, región, zona horaria, coordenadas y población EN VIVO
+    (Open-Meteo Geocoding, sin API key); capital, moneda (ISO) e idiomas desde una tabla de referencia
+    incluida. Devuelve un dict con esos campos, o una nota si no ubica la ciudad."""
+    try:
+        geo = clientes.geocodificar(ciudad)
+        if not geo:
+            return {"nota": f"No ubiqué la ciudad «{ciudad}»."}
+        pais = clientes.pais_info(geo["cc"]) if geo.get("cc") else None
+        datos = {"ciudad": geo["nombre"], "pais": geo["pais"], "region": geo.get("region"),
+                 "lat": geo["lat"], "lon": geo["lon"], "zona_horaria": geo["timezone"],
+                 "poblacion": geo.get("poblacion")}
+        if pais:
+            datos.update({"capital": pais["capital"], "moneda": pais["moneda_codigo"],
+                          "idiomas": pais["idiomas"]})
+        return datos
+    except Exception as exc:  # noqa: BLE001
+        return {"nota": f"No pude obtener datos del destino ({type(exc).__name__})."}
+
+
+@tool
+def tipo_cambio(moneda: str) -> dict:
+    """Tipo de cambio REAL: cuántos pesos chilenos (CLP) equivale 1 unidad de `moneda` (código ISO,
+    p. ej. USD, PEN, ARS, EUR). Fuente pública sin API key. Devuelve {moneda, clp_por_unidad} o nota."""
+    try:
+        clp = clientes.clp_por_unidad(moneda)
+    except Exception as exc:  # noqa: BLE001
+        return {"nota": f"No pude obtener el tipo de cambio ({type(exc).__name__})."}
+    if clp is None:
+        return {"nota": f"No tengo tipo de cambio para «{moneda}». Usa un código ISO (USD, PEN, ARS…)."}
+    return {"moneda": moneda.upper(), "clp_por_unidad": round(clp, 2)}
+
+
+@tool
+def convertir_moneda(monto: float, desde: str, hacia: str) -> dict:
+    """Convierte un `monto` de la moneda `desde` a la moneda `hacia` con tasa REAL (códigos ISO, p. ej.
+    CLP, USD, PEN). Fuente pública sin API key. Devuelve {monto, desde, hacia, tasa, resultado} o nota."""
+    try:
+        r = clientes.convertir(monto, desde, hacia)
+    except Exception as exc:  # noqa: BLE001
+        return {"nota": f"No pude convertir ({type(exc).__name__})."}
+    return r or {"nota": f"No pude convertir de «{desde}» a «{hacia}» (revisa los códigos ISO)."}
+
+
+@tool
+def clima_destino(ciudad: str, dias: int = 3) -> dict:
+    """Clima REAL del destino (hoy + próximos días) para saber qué llevar. Ubica la ciudad y consulta
+    Open-Meteo (sin API key). Devuelve {ciudad, actual, dias:[...]} o una nota."""
+    try:
+        geo = clientes.geocodificar(ciudad)
+        if not geo:
+            return {"nota": f"No ubiqué la ciudad «{ciudad}»."}
+        p = openmeteo.pronostico(geo["lat"], geo["lon"], dias=dias)
+        return {"ciudad": geo["nombre"], "pais": geo["pais"], **p}
+    except Exception as exc:  # noqa: BLE001
+        return {"nota": f"No pude obtener el clima del destino ({type(exc).__name__})."}
+
+
+@tool
+def resumen_destino(ciudad: str) -> dict:
+    """Resumen REAL del destino (descripción breve) desde Wikipedia en español (sin API key).
+    Devuelve {titulo, resumen, url} o una nota si no hay artículo."""
+    try:
+        r = clientes.resumen(ciudad)
+    except Exception as exc:  # noqa: BLE001
+        return {"nota": f"No pude obtener el resumen ({type(exc).__name__})."}
+    return r or {"nota": f"No encontré un resumen de «{ciudad}» en Wikipedia."}
+
+
+@tool
 def buscar_vuelos(origen: str, destino: str, fecha: str) -> list[dict]:
-    """Busca vuelos entre dos aeropuertos (códigos IATA, ej. SCL, LIM, BOG, EZE) para una fecha AAAA-MM-DD.
-    Devuelve aerolínea, horarios y precio en CLP. Lista vacía si no hay ruta."""
-    return [dict(v, origen=origen.upper(), destino=destino.upper(), fecha=fecha) for v in VUELOS.get((origen.upper(), destino.upper()), [])]
+    """DEMO (datos de ejemplo, NO precios reales). Vuelos entre dos aeropuertos (IATA: SCL, LIM, BOG, EZE)
+    para una fecha AAAA-MM-DD: aerolínea, horarios y precio CLP. Preséntalo como estimación de ejemplo."""
+    return [dict(v, origen=origen.upper(), destino=destino.upper(), fecha=fecha, fuente="demo")
+            for v in VUELOS.get((origen.upper(), destino.upper()), [])]
 
 
 @tool
 def buscar_hoteles(ciudad: str, noches: int = 1) -> list[dict]:
-    """Busca hoteles en una ciudad (código IATA: LIM, BOG, EZE). Devuelve hotel, zona, estrellas, precio por noche y total en CLP."""
-    return [dict(h, noches=noches, total_clp=h["noche_clp"] * noches) for h in HOTELES.get(ciudad.upper(), [])]
+    """DEMO (datos de ejemplo, NO precios reales). Hoteles en una ciudad (IATA: LIM, BOG, EZE): hotel,
+    zona, estrellas, precio por noche y total CLP. Preséntalo como estimación de ejemplo."""
+    return [dict(h, noches=noches, total_clp=h["noche_clp"] * noches, fuente="demo")
+            for h in HOTELES.get(ciudad.upper(), [])]
 
 
 @tool
 def buscar_actividades(ciudad: str) -> list[dict]:
-    """Busca actividades y panoramas en una ciudad (código IATA: LIM, BOG, EZE).
-    Devuelve actividad, tipo, duración en horas y precio en CLP. Lista vacía si no hay."""
-    return list(ACTIVIDADES.get(ciudad.upper(), []))
+    """DEMO (datos de ejemplo). Actividades y panoramas en una ciudad (IATA: LIM, BOG, EZE): actividad,
+    tipo, duración en horas y precio CLP. Preséntalo como sugerencias de ejemplo."""
+    return [dict(a, fuente="demo") for a in ACTIVIDADES.get(ciudad.upper(), [])]
 
 
-# El agente de viajes nativo sigue siendo vuelos + hoteles; `buscar_actividades`
-# la usa el agente de actividades del swarm (no se agrega aquí para no cambiarlo).
-HERRAMIENTAS = [buscar_vuelos, buscar_hoteles]
+HERRAMIENTAS = [
+    info_destino, tipo_cambio, convertir_moneda, clima_destino, resumen_destino,  # reales
+    buscar_vuelos, buscar_hoteles, buscar_actividades,                            # demo
+]

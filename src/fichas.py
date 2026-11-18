@@ -37,10 +37,11 @@ FICHAS: dict[str, dict[str, str]] = {
     "agente_bioinformatica": {
         "name": "Agente de Bioinformática",
         "description": (
-            "Bioinformática: explica conceptos (alineamientos, FASTA/FASTQ, UniProt/NCBI), compara "
-            "herramientas y bases de datos con criterios claros y diseña pipelines paso a paso. No ejecuta "
-            "análisis ni consulta bases en vivo, y no da consejo médico. El machine learning lo deriva a "
-            "agente_mlbioinformatica."
+            "Bioinformática: CONSULTA UniProt EN VIVO datos de una proteína o gen (p. ej. TP53, BRCA1, "
+            "insulina, accession P04637) devolviendo accession, función, longitud, organismo y URL; "
+            "además explica conceptos (alineamientos, FASTA/FASTQ, UniProt/NCBI), compara herramientas y "
+            "bases de datos y diseña pipelines paso a paso. No ejecuta análisis ni da consejo médico. El "
+            "machine learning lo deriva a agente_mlbioinformatica."
         ),
     },
     "agente_reiki": {

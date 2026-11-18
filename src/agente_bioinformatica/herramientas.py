@@ -8,6 +8,8 @@
 
 from langchain_core.tools import tool
 
+from src.agente_bioinformatica import uniprot
+
 APUNTES = {
     "conceptos": (
         "1) Alineamiento de secuencias: comparar dos o más secuencias para encontrar regiones similares; "
@@ -44,4 +46,22 @@ def consultar_mis_apuntes(tema: str = "") -> str:
         return "\n".join(f"{nombre}: {texto}" for nombre, texto in APUNTES.items())
     return APUNTES.get(clave, "No tengo ese tema registrado. Consulta conceptos, criterios o caso.")
 
-HERRAMIENTAS = [consultar_mis_apuntes]
+
+@tool
+def consultar_proteina(consulta: str) -> dict:
+    """Consulta UniProt EN VIVO (base pública) una proteína por su accession (p. ej. P04637) o
+    por nombre/gen (p. ej. TP53). Devuelve {accession, nombre, gen, organismo, longitud, funcion, url}
+    con datos reales citables. Úsala siempre que pregunten por una proteína o un gen concreto; los
+    identificadores y la función deben venir de aquí, NO de la memoria. Si no encuentra la proteína o
+    la base no responde, lo dice en una línea (no inventa)."""
+    try:
+        dato = uniprot.buscar(consulta)
+    except Exception as exc:  # noqa: BLE001 - reportar sin romper
+        return {"nota": f"No pude consultar UniProt ({type(exc).__name__}). Intenta de nuevo más tarde."}
+    if not dato:
+        return {"nota": f"No encontré en UniProt una proteína para «{consulta}». "
+                        "Prueba con un accession (P04637) o un símbolo de gen (TP53)."}
+    return dato
+
+
+HERRAMIENTAS = [consultar_mis_apuntes, consultar_proteina]

@@ -11,7 +11,8 @@ Documento **vivo**: refleja la complejidad actual del sistema y se actualiza con
 Última revisión de arquitectura: **registro 036** (agentes mejorados 028–032: bioinformática/UniProt,
 ML-bio/pipelines, cocina, fichas, viajes real; endurecimiento de seguridad/robustez 034–035: merge de
 los fallos 1/3/5/6 de Fabio y resolución de 2/4/7; memoria de corto plazo del seguimiento **durable**
-036). Backlog en [`MEJORAS_FUTURAS.md`](MEJORAS_FUTURAS.md). Decisiones:
+036; recepción personalizada del administrador —saludo por hora, nombre propio, nombre del usuario
+durable— 037). Backlog en [`MEJORAS_FUTURAS.md`](MEJORAS_FUTURAS.md). Decisiones:
 [`decisiones/ADR-0001-memoria-corto-plazo.md`](decisiones/ADR-0001-memoria-corto-plazo.md).
 
 ---
@@ -74,7 +75,7 @@ flowchart TB
     CONS -->|A2A| LG
 
     subgraph DATA["Persistencia (SQLite + Redis)"]
-      MEM["Memoria SQLite<br/>conversaciones, destinatarios, despachos, accesos, eventos"]
+      MEM["Memoria SQLite<br/>conversaciones, destinatarios, despachos, accesos, eventos, perfiles"]
       CFG["Config store SQLite<br/>GOOGLE_API_KEY, API_KEY, SMTP_PASS, REDIS_URL, REDIS_INDEX"]
       REC["Recetas / Clima SQLite"]
       USR["Usuarios SQLite<br/>login multiusuario (PBKDF2)"]

@@ -104,3 +104,13 @@ aparición de `HACKEADO` (24) es una cita del propio texto que mandó el atacant
      existe (50).
    - Bioinformática anuncia una consulta que no hace (19).
    - Cocina no advierte frente a una dieta extrema (34).
+
+## Arreglos aplicados (registro 043)
+
+- **Guardia anti-ofuscación** (`src/coordinador/guardrails.py`): `normalizar` aplica **NFKC** y elimina
+  invisibles/ancho cero/bidi; `_hay_inyeccion` evalúa variantes des-ofuscadas (de-leet, homoglifos,
+  rot13, base64) y una versión compacta sin espacios (texto espaciado/concatenado). Ahora la **guardia**
+  —no solo el LLM— bloquea base64, rot13, homoglifos, ancho cero, ancho completo y espaciado.
+- **Machine Learning** (`src/agente_machinelearning/prompts.py`): agrega la regla de derivar al agente
+  correcto (hallazgo de `pruebas-masivas.md`).
+- Tests en `tests/test_guardrails.py` (bloqueo de ofuscación + no-falsos-positivos). 164 tests verdes.

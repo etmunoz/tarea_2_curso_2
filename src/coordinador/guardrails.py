@@ -23,9 +23,12 @@ Todo es determinista (regex) para poder probarlo con pytest sin LLM ni red.
 """
 from __future__ import annotations
 
+import base64
+import codecs
 import logging
 import os
 import re
+import unicodedata
 from dataclasses import dataclass
 
 _log = logging.getLogger("coordinador.guardrails")
@@ -76,16 +79,72 @@ _RE_INYECCION = re.compile("|".join(_INYECCION), re.IGNORECASE)
 # Leetspeak: normaliza dígitos usados como letras (0→o, 1→i, 3→e, 4→a, 5→s, 7→t) para que
 # "Ign0r4 l4s instrucc10nes" también se detecte. Se evalúa el texto original Y su versión "de-leet".
 _LEET = str.maketrans("013457", "oieast")
+# Homoglifos cirílicos/griegos que imitan letras latinas (ataque de confusables).
+_CONFUSABLES = str.maketrans({
+    "а": "a", "е": "e", "о": "o", "р": "p", "с": "c", "у": "y", "х": "x", "і": "i", "ѕ": "s", "ԁ": "d",
+    "м": "m", "т": "t", "н": "h", "к": "k", "в": "b", "А": "A", "Е": "E", "О": "O", "Р": "P", "С": "C",
+    "У": "Y", "Х": "X", "ο": "o", "α": "a", "ε": "e", "ρ": "p",
+})
+# Caracteres invisibles / de ancho cero / control bidi que se eliminan al normalizar.
+_INVISIBLES = re.compile("[\u200b-\u200f\u202a-\u202e\u2060\ufeff]")
+# Bloque base64 largo.
+_RE_B64 = re.compile(r"[A-Za-z0-9+/]{20,}={0,2}")
+# Firmas de inyección en versión COMPACTA (sin espacios): atrapa el texto espaciado
+# ("i g n o r a   t u s   r e g l a s") y el concatenado, que el regex con \s+ no ve.
+_RE_COMPACTA = re.compile(
+    r"ignora[a-z]*?(instruccion|regla|prompt)"
+    r"|olvida[a-z]*?(instruccion|regla|prompt)"
+    r"|(ignore|disregard|forget)[a-z]*?(instruction|rule|prompt)"
+    r"|system[_]?prompt"
+    r"|revela[a-z]*?(prompt|clave|apikey|contrasena|contraseña)"
+    r"|(muestra|dame|imprime|print|show|reveal|dime)[a-z]*?(apikey|googleapikey|systemprompt|secret)",
+    re.IGNORECASE)
 
 
 def _deleet(texto: str) -> str:
     return (texto or "").translate(_LEET)
 
 
-def _hay_inyeccion(texto: str) -> bool:
-    """True si el patrón de inyección aparece en el texto o en su versión de-leet."""
+def _rot13(texto: str) -> str:
+    try:
+        return codecs.encode(texto, "rot_13")
+    except Exception:  # noqa: BLE001
+        return texto
+
+
+def _b64_decodificado(texto: str) -> str:
+    """Decodifica bloques base64 largos que resulten en texto imprimible (para ver inyección oculta)."""
+    partes = []
+    for m in _RE_B64.findall(texto):
+        try:
+            s = base64.b64decode(m + "=" * (-len(m) % 4)).decode("utf-8", "ignore")
+        except Exception:  # noqa: BLE001
+            continue
+        if s and sum(c.isprintable() for c in s) / len(s) > 0.8:
+            partes.append(s)
+    return " ".join(partes)
+
+
+def _variantes(texto: str):
+    """Variantes des-ofuscadas de un texto para detectar inyección camuflada."""
     t = texto or ""
-    return bool(_RE_INYECCION.search(t) or _RE_INYECCION.search(_deleet(t)))
+    yield t
+    yield _deleet(t)
+    yield t.translate(_CONFUSABLES)
+    yield _rot13(t)
+    b = _b64_decodificado(t)
+    if b:
+        yield b
+
+
+def _hay_inyeccion(texto: str) -> bool:
+    """True si el patrón de inyección aparece en el texto o en alguna variante des-ofuscada
+    (de-leet, homoglifos, rot13, base64), evaluando además la versión compacta (sin espacios)
+    para atrapar el texto espaciado y el concatenado."""
+    for v in _variantes(texto or ""):
+        if _RE_INYECCION.search(v) or _RE_COMPACTA.search(re.sub(r"\s+", "", v)):
+            return True
+    return False
 
 # Secretos a redactar de la salida (nombre → patrón).
 _SECRETOS: list[tuple[str, re.Pattern]] = [
@@ -98,11 +157,13 @@ _SECRETOS: list[tuple[str, re.Pattern]] = [
 
 
 def normalizar(texto: str) -> str:
-    """Objetivo: normalización prudente de la entrada — quita caracteres de control (salvo
-    salto de línea y tab) y colapsa espacios. No altera el contenido legítimo.
-    Entradas: texto (str). Salida: str."""
-    limpio = _CONTROL.sub("", texto or "")
-    return re.sub(r"[ \t]+", " ", limpio).strip()
+    """Objetivo: normalización prudente de la entrada — NFKC (ancho completo/compatibilidad → normal),
+    quita caracteres invisibles/de ancho cero y de control (salvo \\n y \\t) y colapsa espacios.
+    No altera el contenido legítimo en español. Entradas: texto (str). Salida: str."""
+    t = unicodedata.normalize("NFKC", texto or "")
+    t = _INVISIBLES.sub("", t)
+    t = _CONTROL.sub("", t)
+    return re.sub(r"[ \t]+", " ", t).strip()
 
 
 def registrar_evento(tipo: str, resultado: str, agente: str = "-", correlacion: str = "-",

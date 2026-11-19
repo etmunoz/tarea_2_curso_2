@@ -14,8 +14,11 @@
 ## 1. Confirmación de nombre
 
 El administrador usa el login como nombre tentativo pero lo **confirma la primera vez** y recién lo
-guarda; si ya hay `nombre` en el perfil, no pregunta. Solo cambio de prompt. (Verificación en vivo tras
-`restart t2c2-langgraph`.)
+guarda; si ya hay `nombre` en el perfil, no pregunta. Solo cambio de prompt.
+
+**Verificado en vivo** (usuario `fabio`, sin nombre guardado): saludo → *"¡Buenas!… (Por cierto, Fabio,
+¿te llamo así o prefieres otro nombre?)"* (confirma, no asume); «sí, así está bien» → *"Perfecto,
+guardado"* → `perfil = {nombre:'Fabio'}`. Perfil de prueba limpiado luego.
 
 ## 2. Health check post-hardening (todo OK)
 

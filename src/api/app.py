@@ -153,7 +153,8 @@ def consulta(c: Consulta, x_usuario: str | None = Header(default=None, alias="X-
         agente_previo = ""
     try:
         res = _coordinador().invoke(
-            {"messages": [HumanMessage(content=c.pregunta)], "agente_previo": agente_previo}, cfg)
+            {"messages": [HumanMessage(content=c.pregunta)], "agente_previo": agente_previo,
+             "usuario": (x_usuario or "")}, cfg)
     except Exception as e:  # noqa: BLE001
         if estado.es_cuota(str(e)):
             estado.set_gemini(False, "cuota/tokens agotados")

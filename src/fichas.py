@@ -89,10 +89,11 @@ FICHAS: dict[str, dict[str, str]] = {
     "agente_administrador": {
         "name": "Agente Administrador",
         "description": (
-            "Recepción y orientación del sistema de agentes: conoce las habilidades de todos los demás y, "
-            "en español, da la bienvenida, dice qué agentes hay, qué hace cada uno y a quién conviene "
-            "preguntarle según la necesidad. No resuelve la consulta especializada él mismo: orienta y "
-            "deriva."
+            "Recepción y orientación del sistema de agentes (se llama «tarea2curso2»): da la bienvenida "
+            "saludando según la hora de Santiago, recuerda el nombre del usuario (y lo pregunta si no lo "
+            "sabe), conoce las habilidades de todos los demás y dice qué agentes hay y a quién conviene "
+            "preguntarle. También atiende saludos, cortesías y despedidas. No resuelve la consulta "
+            "especializada él mismo: orienta y deriva."
         ),
     },
 }

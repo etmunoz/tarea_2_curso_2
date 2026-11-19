@@ -42,6 +42,9 @@ CREATE TABLE IF NOT EXISTS accesos (
 CREATE TABLE IF NOT EXISTS eventos (
   id INTEGER PRIMARY KEY AUTOINCREMENT, usuario TEXT, evento TEXT NOT NULL, ts TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS perfiles (
+  usuario TEXT PRIMARY KEY, nombre TEXT, ts TEXT NOT NULL
+);
 """
 
 
@@ -72,6 +75,28 @@ def ultimo_agente(sesion: str) -> str | None:
         r = c.execute("SELECT agente FROM conversaciones WHERE sesion=? AND rol='asistente' "
                       "AND agente IS NOT NULL AND agente<>'' ORDER BY rowid DESC LIMIT 1", (sesion,)).fetchone()
     return r[0] if r else None
+
+
+# --- Perfil del usuario (nombre preferido; memoria DURABLE del administrador) ---
+def guardar_nombre(usuario: str, nombre: str) -> None:
+    """Objetivo: recordar el nombre preferido de un usuario (login)."""
+    u, n = (usuario or "").strip(), (nombre or "").strip()
+    if not u or not n:
+        return
+    with _conn() as c:
+        c.execute("INSERT INTO perfiles (usuario, nombre, ts) VALUES (?,?,?) "
+                  "ON CONFLICT(usuario) DO UPDATE SET nombre=excluded.nombre, ts=excluded.ts",
+                  (u, n, _ahora()))
+
+
+def obtener_nombre(usuario: str) -> str | None:
+    """Objetivo: nombre preferido guardado de un usuario (login). Salida: str | None."""
+    u = (usuario or "").strip()
+    if not u:
+        return None
+    with _conn() as c:
+        r = c.execute("SELECT nombre FROM perfiles WHERE usuario=?", (u,)).fetchone()
+    return r[0] if r and r[0] else None
 
 
 def historial(sesion: str, limite: int = 50) -> list[dict]:

@@ -70,6 +70,7 @@ class Estado(TypedDict):
     bloqueado: bool
     ruta: Annotated[list[str], operator.add]
     agente_previo: str  # agente del turno anterior (memoria durable); lo setea el gateway por turno
+    usuario: str        # login del usuario (lo setea el gateway); se pasa como contexto al administrador
 
 
 def _responder_local(graph_name: str, pregunta: str, thread: str) -> str:
@@ -214,8 +215,16 @@ def consultar(estado: Estado, config: RunnableConfig) -> dict:
     thread = (config or {}).get("configurable", {}).get("thread_id") or "sin-hilo"
     clave = (thread, elegido.nombre)
     _ctx.setdefault(clave, a2a.nuevo_context_id())
+    # Solo al administrador (recepción) se le pasa el login del usuario como CONTEXTO CONFIABLE del
+    # sistema, para que salude por su nombre. Se limpia cualquier marcador que el usuario haya intentado
+    # inyectar (anti-spoofing); el resto de agentes reciben la pregunta tal cual.
+    pregunta_envio = pregunta
+    if elegido.graph == "agente_administrador":
+        usuario = (estado.get("usuario") or "").strip()
+        limpio = re.sub(r"\[usuario_identificado:[^\]]*\]", "", pregunta, flags=re.IGNORECASE).strip()
+        pregunta_envio = f"[usuario_identificado: {usuario}]\n{limpio}" if usuario else limpio
     try:
-        bruto = elegido.preguntar(pregunta, _ctx[clave])
+        bruto = elegido.preguntar(pregunta_envio, _ctx[clave])
     except a2a.ErrorA2A:
         # FALLBACK LOCAL: si el agente es REMOTO (túnel) y su túnel no responde, pero tenemos una
         # RÉPLICA LOCAL en proceso del mismo grafo, respondemos con ella (marcando 'fallback_local').

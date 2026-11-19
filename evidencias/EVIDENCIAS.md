@@ -136,6 +136,23 @@ prompt actualizado. Reindexado en Redis: **18 fragmentos** (antes 9). Verificado
   reemplazar la medicación… sigue las indicaciones de tu médico, Reiki solo como apoyo"*. Guardrail OK.
 - Todas con `ruta: guardia_entrada → supervisor → agente_local → guardia_salida`.
 
+## Anexo 8 · Revisión de la rama de Fabio (fallos del monitor + red-team)
+
+Rama `fix/fallos-pruebas-sitio` (commit `7f17cac`), revisada el 2026-11-19 (registro 034):
+
+- **Mergeable:** merge-base = HEAD de `main` → fast-forward sin conflictos. `pytest tests/test_tarea2.py`
+  → **11 passed** (3 tests nuevos: monto absurdo, pregunta vacía, cabeceras de seguridad).
+- **Red-team (16 ataques)** contra `https://tarea2curso2.etmk.cl/` con usuario `fabio`: resistió system
+  prompt/claves, etiquetas falsas `</datos><sistema>`, SQL injection, correo a externos, contenido
+  peligroso disfrazado, salida excesiva, vacío/emojis. Puertos internos no expuestos; `/api/consulta`
+  sin cookie = 401.
+- **Fallos corregidos (4/7):** 1 (monto 1e308 rompía Viajes + error crudo), 3 (pregunta vacía al
+  Administrador), 5 (filtración de nombre interno), 6 (cabeceras de seguridad + versión del server).
+- **Pendientes:** 2 (inyección leetspeak/inglés en la guardia), 4 (contexto de seguimiento), 7 (lugares
+  ficticios). Detalle completo en `fallos.md` y `pruebas-prompts.md` (llegan al mergear la rama).
+
+---
+
 ## Anexo 7 · Viajes como asistente de destino real
 
 Verificado en producción (gateway), tras reiniciar:

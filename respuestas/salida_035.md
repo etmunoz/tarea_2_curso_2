@@ -47,10 +47,13 @@ importantes fueron resistidos). Artefactos reproducibles reubicados a
 - `pytest tests/test_guardrails.py` → **12 passed** (incluye leetspeak/inglés y el no-falso-positivo).
 - Fallos 4 y 7 (dependen del LLM) → verificación en vivo tras reiniciar.
 
-## 4. HSTS (fallo 6) — pendiente en el proxy
+## 4. HSTS (fallo 6) — aplicado y verificado
 
-El HSTS no va en el código sino en el **proxy inverso** (ISPConfig). Se documentó el directivo exacto
-en [`../deploy/README-T2.md`](../deploy/README-T2.md) para aplicarlo en el website del proxy.
+El HSTS va en el **proxy inverso** (ISPConfig), no en el código. Se agregó
+`Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"` en las Directivas de
+Apache del website (documentado en [`../deploy/README-T2.md`](../deploy/README-T2.md)). **Verificado el
+2026-11-19:** `curl -sI https://tarea2curso2.etmk.cl/login` →
+`strict-transport-security: max-age=31536000; includeSubDomains`. Fallo 6 **cerrado al 100%**.
 
 ## 5. Estado
 

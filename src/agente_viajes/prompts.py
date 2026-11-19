@@ -26,4 +26,8 @@ Reglas:
   tipo_cambio; para el tiempo usa clima_destino; para describir el lugar usa resumen_destino.
 - Responde en español, de tú, breve y concreto con lo que devolvieron las herramientas.
 - Si falta un dato (ciudad, fecha, noches, moneda), pregúntalo en una frase.
+- Lugares inexistentes o ambiguos: la búsqueda de ciudad devuelve SIEMPRE la coincidencia más parecida,
+  aunque el lugar no exista. Si el país/ubicación que devolvió `info_destino`/`clima_destino` no calza
+  con lo que pidió la persona (p. ej. «Narnia» → un pueblo de Bangladesh), NO lo des por cierto: di qué
+  encontraste y pide confirmación («Encontré "X" en País, ¿te refieres a ese lugar?»).
 - No gestionas pagos, seguros ni visas; si lo piden, dilo y no inventes."""

@@ -97,6 +97,23 @@ def _ultimo_texto(messages: list) -> str:
     return ""
 
 
+def _historial_breve(messages: list, n: int = 4) -> str:
+    """Objetivo: los últimos turnos (SIN el mensaje actual) como contexto para el supervisor, para que
+    las preguntas de seguimiento mantengan el agente del turno anterior. Salida: str (o '')."""
+    prev = messages[:-1] if messages else []
+    lineas = []
+    for m in prev[-n:]:
+        contenido = getattr(m, "content", None) if not isinstance(m, dict) else m.get("content")
+        rol = getattr(m, "type", None) if not isinstance(m, dict) else m.get("role", "")
+        if not contenido:
+            continue
+        if isinstance(contenido, list):
+            contenido = " ".join(p.get("text", "") for p in contenido if isinstance(p, dict))
+        etiqueta = "Usuario" if rol in ("human", "user") else "Asistente"
+        lineas.append(f"{etiqueta}: {str(contenido)[:200]}")
+    return "\n".join(lineas)
+
+
 def guardia_entrada(estado: Estado) -> dict:
     """Objetivo (nodo): guardrail de ENTRADA. Frena preguntas vacías, demasiado largas o con
     patrones de inyección/jailbreak ANTES de llamar al LLM o a un agente.
@@ -134,9 +151,14 @@ def enrutar(estado: Estado) -> dict:
     Salida: dict — {elegido, motivo, ruta:['supervisor']}."""
     pregunta = _ultimo_texto(estado["messages"])
     catalogo = construir_catalogo()
+    historial = _historial_breve(estado["messages"])
+    humano = f"Catálogo de agentes:\n{texto_catalogo(catalogo)}\n\n"
+    if historial:
+        humano += f"<historial>\n{historial}\n</historial>\n\n"
+    humano += f"Pregunta del usuario:\n{pregunta}"
     d = modelo.with_structured_output(Decision).invoke([
         SystemMessage(content=SYSTEM_SUPERVISOR),
-        HumanMessage(content=f"Catálogo de agentes:\n{texto_catalogo(catalogo)}\n\nPregunta del usuario:\n{pregunta}"),
+        HumanMessage(content=humano),
     ])
     elegido = _normalizar_elegido(d.agente, catalogo)
     return {"elegido": elegido, "motivo": d.motivo, "ruta": ["supervisor"]}

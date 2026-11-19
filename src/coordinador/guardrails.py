@@ -66,8 +66,26 @@ _INYECCION = [
     r"revela(r|me)?\s+(tu|el|la)\s+(system\s*prompt|prompt|clave|api[_\s-]?key|contrase[nñ]a)",
     r"eres\s+ahora\b|ahora\s+eres\b",
     r"</?(system|assistant|user)>",
+    # inglés ampliado: "disregard prior rules", "ignore previous prompt", etc.
+    r"(ignore|disregard|forget)\s+(all\s+|any\s+)?(the\s+)?(previous|prior)\s+(instructions?|rules?|prompts?)",
+    # exfiltración de secretos / variables de entorno (ES + EN)
+    r"(print|reveal|show|dame|mu[eé]stra(me)?|imprime|dime|revela(me)?)\b[^\n]{0,40}(api[_\s-]?key|google[_\s-]?api[_\s-]?key|environment\s+variable|variable\s+de\s+entorno|secret)",
 ]
 _RE_INYECCION = re.compile("|".join(_INYECCION), re.IGNORECASE)
+
+# Leetspeak: normaliza dígitos usados como letras (0→o, 1→i, 3→e, 4→a, 5→s, 7→t) para que
+# "Ign0r4 l4s instrucc10nes" también se detecte. Se evalúa el texto original Y su versión "de-leet".
+_LEET = str.maketrans("013457", "oieast")
+
+
+def _deleet(texto: str) -> str:
+    return (texto or "").translate(_LEET)
+
+
+def _hay_inyeccion(texto: str) -> bool:
+    """True si el patrón de inyección aparece en el texto o en su versión de-leet."""
+    t = texto or ""
+    return bool(_RE_INYECCION.search(t) or _RE_INYECCION.search(_deleet(t)))
 
 # Secretos a redactar de la salida (nombre → patrón).
 _SECRETOS: list[tuple[str, re.Pattern]] = [
@@ -111,7 +129,7 @@ def revisar_entrada(texto) -> Veredicto:
     if len(t) > LIMITE_ENTRADA:
         return Veredicto(False, f"entrada demasiado larga ({len(t)} > {LIMITE_ENTRADA})",
                          "Tu mensaje es demasiado largo para procesarlo; resúmelo, por favor.")
-    if _RE_INYECCION.search(t):
+    if _hay_inyeccion(t):
         return Veredicto(False, "patrón de inyección/jailbreak detectado",
                          "Esa solicitud intenta cambiar mis instrucciones y no puedo procesarla. "
                          "Puedo ayudarte con una pregunta normal para alguno de los agentes.")
@@ -151,8 +169,8 @@ def revisar_salida(texto: str) -> tuple[str, dict]:
 
 def es_instruccion_remota(texto: str) -> bool:
     """Objetivo: detectar si un texto (p. ej. de un agente remoto) intenta dar instrucciones.
-    Entradas: texto (str). Salida: bool — True si parece inyección."""
-    return bool(_RE_INYECCION.search(texto or ""))
+    Entradas: texto (str). Salida: bool — True si parece inyección (incluye leetspeak)."""
+    return _hay_inyeccion(texto)
 
 
 def sanear_respuesta_remota(texto: str) -> tuple[str, dict]:

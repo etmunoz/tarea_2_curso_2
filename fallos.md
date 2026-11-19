@@ -32,10 +32,16 @@ Los puertos 2025/8796/8797/8798 no están expuestos y `/api/consulta` sin cookie
 | 5 | ✅ | Los prompts derivan por el nombre del catálogo: «Agente de Bioinformática» (`src/agente_mlbioinformatica/prompts.py`) y «Agente de ML en Bioinformática» (`src/agente_bioinformatica/prompts.py`) | — (cambio de prompt; verificar en vivo) |
 | 6 | ✅ (parcial) | `Handler` en `src/canales/web.py` envía `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff` y `Referrer-Policy: same-origin` en toda respuesta, y la cabecera `Server` pasa a `t2c2`. **Pendiente:** HSTS en el proxy inverso (`Strict-Transport-Security: max-age=31536000`) | `test_web_cabeceras_seguridad` |
 
-### Propuestas pendientes
-- **2 · Guardia de entrada:** antes de aplicar `_RE_INYECCION` en `revisar_entrada`, traducir números a letras (`str.maketrans("013457", "oieast")`) y sumar patrones en inglés (`ignore|disregard … previous|prior instructions|rules`, `system prompt`). Además, agregar `es_inyeccion: bool` a la `Decision` del supervisor (no requiere llamadas extra al LLM).
-- **4 · Seguimiento:** pasar al supervisor (`enrutar`) los últimos 2–3 turnos entre `<historial>…</historial>` (como dato, regla 4) e indicar en `SYSTEM_SUPERVISOR` que mantenga el agente del turno anterior ante preguntas cortas de seguimiento.
-- **7 · Lugares ficticios:** en el prompt de `src/agente_viajes/`, pedir confirmación cuando el país encontrado no es el esperado («Encontré Narnia, Bangladesh, ¿es esa?»).
+### Propuestas — RESUELTAS (registro 035)
+- **2 · Guardia de entrada:** ✅ `revisar_entrada` ahora evalúa el texto y su versión **de-leet**
+  (`str.maketrans("013457","oieast")`), y `_RE_INYECCION` suma patrones en inglés
+  (`ignore|disregard|forget … previous|prior instructions|rules|prompts`) y de exfiltración
+  (`… api key / environment variable / variable de entorno`). Tests `test_entrada_inyeccion_leetspeak_e_ingles`
+  y `test_entrada_con_digitos_normal_no_se_bloquea`.
+- **4 · Seguimiento:** ✅ `enrutar` pasa los últimos turnos en `<historial>…</historial>` (como dato) y
+  `SYSTEM_SUPERVISOR` mantiene el agente del turno anterior ante preguntas cortas de seguimiento.
+- **7 · Lugares ficticios:** ✅ el prompt de `agente_viajes` pide confirmación cuando el lugar encontrado
+  no calza con lo pedido («Encontré "X" en País, ¿te refieres a ese lugar?»).
 
 ## No probado
 Voz (STT/TTS), envío real de correo, monitor y `/usuarios` (requieren admin).

@@ -39,9 +39,11 @@ Ideas acordadas pero **no implementadas** aún. Al tomar una, dejar su registro 
 - **Propuesta:** usar un checkpointer persistente nativo (`SqliteSaver`/`PostgresSaver`) para que TODO el
   estado del hilo (mensajes + ruta) sobreviva reinicios sin lógica aparte.
 - **Bloqueo actual:** `langgraph-checkpoint-sqlite` (2.0.11) pinnea `langgraph-checkpoint` 2.x, mientras
-  nuestro `langgraph` 1.x usa checkpoint 4.3.1. Requeriría **subir langgraph a 2.x**, lo que toca todo el
+  nuestro `langgraph` 1.2 usa checkpoint 4.3.1. Requeriría **subir langgraph a 2.x**, lo que toca todo el
   runtime A2A (`langgraph-api`/`langgraph dev`, `cli`, `sdk`, `swarm`): migración deliberada y probada,
   no un cambio menor. Dejar para cuando se justifique.
+- **Decisión formal:** [`decisiones/ADR-0001-memoria-corto-plazo.md`](decisiones/ADR-0001-memoria-corto-plazo.md)
+  (por qué NO `SqliteSaver` y qué usamos en su lugar).
 
 ## 4. Meteorología: índices adicionales
 

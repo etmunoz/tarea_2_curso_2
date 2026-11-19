@@ -136,6 +136,29 @@ prompt actualizado. Reindexado en Redis: **18 fragmentos** (antes 9). Verificado
   reemplazar la medicación… sigue las indicaciones de tu médico, Reiki solo como apoyo"*. Guardrail OK.
 - Todas con `ruta: guardia_entrada → supervisor → agente_local → guardia_salida`.
 
+## Anexo 9 · Memoria de corto plazo: por qué NO `SqliteSaver` y qué usamos
+
+Decisión formal en [`../docs/decisiones/ADR-0001-memoria-corto-plazo.md`](../docs/decisiones/ADR-0001-memoria-corto-plazo.md)
+(registro 036).
+
+- **Matriz de versiones (VPS, 2026-11-19):** `langgraph==1.2.20`, `langgraph-checkpoint==4.3.1`,
+  `langgraph-api==0.17.1`, `langgraph-sdk==0.4.14`, `langgraph-cli==0.4.42`, `langgraph-swarm==0.1.0`.
+- **Incompatibilidad:** instalar `langgraph-checkpoint-sqlite` (2.0.11) **degradó** el core:
+  ```
+  - langgraph-checkpoint==4.3.1
+  + langgraph-checkpoint==2.1.2
+  + langgraph-checkpoint-sqlite==2.0.11
+  ```
+  (el saver SQLite pinnea checkpoint 2.x; nuestro langgraph 1.2 usa 4.3.1). Habría roto el runtime.
+- **Revert verificado:** `langgraph-checkpoint 2.1.2 → 4.3.1`; `curl …/salud` = **200** (runtime sano).
+- **Decisión:** NO usar `SqliteSaver` ni subir langgraph a 2.x (tocaría todo el runtime A2A). Se usa
+  `InMemorySaver` (estado intra-proceso) **+** store `memoria` SQLite para el agente del turno anterior.
+- **Durabilidad verificada (en vivo):** turno 1 → Agente de Viajes; `ultimo_agente("ezequiel:durab1")`
+  devuelve **"Agente de Viajes"** desde el **SQLite en disco**; «¿y en Santiago?» → sigue en **Viajes**.
+  Como el origen está en disco, el seguimiento sobrevive a reinicios (el `InMemorySaver` no).
+
+---
+
 ## Anexo 8 · Revisión de la rama de Fabio (fallos del monitor + red-team)
 
 Rama `fix/fallos-pruebas-sitio` (commit `7f17cac`), revisada el 2026-11-19 (registro 034):

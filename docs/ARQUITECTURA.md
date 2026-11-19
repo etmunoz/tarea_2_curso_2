@@ -8,10 +8,11 @@
 # Arquitectura técnica — Tarea 2 · Curso 2
 
 Documento **vivo**: refleja la complejidad actual del sistema y se actualiza con cada evolución.
-Última revisión de arquitectura: **registro 035** (agentes mejorados 028–032: bioinformática/UniProt,
-ML-bio/pipelines, cocina, fichas, viajes real; + endurecimiento de seguridad/robustez 034–035: merge de
-los fallos 1/3/5/6 de Fabio y resolución de 2 (guardia anti-leetspeak/inglés), 4 (contexto de
-seguimiento) y 7 (lugares ficticios)). Backlog en [`MEJORAS_FUTURAS.md`](MEJORAS_FUTURAS.md).
+Última revisión de arquitectura: **registro 036** (agentes mejorados 028–032: bioinformática/UniProt,
+ML-bio/pipelines, cocina, fichas, viajes real; endurecimiento de seguridad/robustez 034–035: merge de
+los fallos 1/3/5/6 de Fabio y resolución de 2/4/7; memoria de corto plazo del seguimiento **durable**
+036). Backlog en [`MEJORAS_FUTURAS.md`](MEJORAS_FUTURAS.md). Decisiones:
+[`decisiones/ADR-0001-memoria-corto-plazo.md`](decisiones/ADR-0001-memoria-corto-plazo.md).
 
 ---
 

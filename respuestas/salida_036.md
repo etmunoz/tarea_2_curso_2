@@ -25,19 +25,23 @@
 - «voy a viajar a Lima, ¿qué moneda?» → **Viajes**; «¿y en Santiago?» → **Viajes** (CLP);
   «¿y el clima allá?» → **Viajes**. El seguimiento ya se mantiene en el agente correcto.
 
-## 3. Sobre langgraph (consulta del usuario)
+## 3. Decisión documentada: NO `SqliteSaver` / NO subir langgraph
 
-- `SqliteSaver` requiere `langgraph-checkpoint-sqlite`, **incompatible** con langgraph 1.x (pinnea
-  checkpoint 2.x vs nuestra 4.3.1). El intento de instalarlo **degradó** `langgraph-checkpoint`; se
-  **revirtió** a 4.3.1 y se verificó que el runtime quedó sano (`/salud` 200).
-- **No** se sube langgraph (tocaría todo el runtime A2A). Queda como backlog
-  (`docs/MEJORAS_FUTURAS.md` §3). La durabilidad se logró con el store propio.
+Esta decisión quedó formalizada en un **ADR**:
+[`../docs/decisiones/ADR-0001-memoria-corto-plazo.md`](../docs/decisiones/ADR-0001-memoria-corto-plazo.md).
+- `SqliteSaver` requiere `langgraph-checkpoint-sqlite`, **incompatible** con langgraph 1.2 (pinnea
+  checkpoint 2.x vs nuestra 4.3.1). El intento **degradó** `langgraph-checkpoint`; se **revirtió** a
+  4.3.1 y se verificó el runtime sano (`/salud` 200). Evidencia: `evidencias/EVIDENCIAS.md` (Anexo 9).
+- **No** se sube langgraph a 2.x (tocaría todo el runtime A2A). Backlog: `docs/MEJORAS_FUTURAS.md` §3.
+- **Qué usamos:** `InMemorySaver` (estado intra-proceso) + store `memoria` SQLite (`agente_previo`) para
+  el seguimiento durable.
 
-## 4. Pendiente de activación
+## 4. Verificación de durabilidad (en vivo)
 
-- `sudo systemctl restart t2c2-api` (coordinador). Verificación: seguimiento que **sobrevive a un
-  reinicio** entre turnos (lee el agente del store).
+- Turno 1 → **Agente de Viajes**; `ultimo_agente("ezequiel:durab1")` = **"Agente de Viajes"** (leído del
+  **SQLite en disco**); «¿y en Santiago?» → **Viajes**. El origen en disco ⇒ sobrevive reinicios.
 
 ## 5. Estado
 
-- ✅ Fallo 4 robusto + memoria durable; revert de langgraph verificado. Bitácora **036**.
+- ✅ Fallo 4 robusto + memoria de corto plazo **durable** y **verificada**; decisión formalizada en
+  **ADR-0001**; revert de langgraph verificado. Bitácora **036**.

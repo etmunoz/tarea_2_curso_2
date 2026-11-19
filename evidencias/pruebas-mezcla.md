@@ -48,3 +48,17 @@ la bloqueó la guardia).
    los prompts de cada especialista para sugerir el agente del catálogo.
 3. **Ruteo de 5**: con «métrica de machine learning» como intención, el supervisor eligió Cocina por la
    palabra «cazuela». Es discutible; con el hallazgo 2 resuelto bastaría con la derivación.
+
+## Verificación en vivo tras el merge (registro 042 · 2026-11-19)
+
+Mergeados los arreglos de prompts (registro 041) y re-corridos los 4 casos ⚠️ por el gateway:
+
+| # | Antes | Ahora (verificado) |
+|---|---|---|
+| 2 | inventaba precio del plato | «No tengo el dato del costo… te sugiero el **Agente de Cocina Chilena**» ✅ |
+| 7 | inventaba tarifa de reiki | «Sobre el costo de una sesión de reiki, no tengo ese dato… acudir al **agente de Reiki**» + clima real de Cusco ✅ |
+| 6 | no derivaba el clima | da la receta y «el pronóstico… corresponde consultarlo con el agente de **Meteorología**» ✅ |
+| 5 | iba a Cocina por «cazuela» | rutea a **Machine Learning** (por la intención «métrica de ML») ✅ |
+
+Resultado: **viajes ya no inventa precios** y los **especialistas derivan** al agente correcto. Sin
+errores ni caídas. 162 tests verdes tras el merge.

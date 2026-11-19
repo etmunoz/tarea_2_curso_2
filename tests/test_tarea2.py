@@ -109,3 +109,43 @@ def test_correo(tmp_path, monkeypatch):
     bd.registrar_destinatario("dest@etmk.cl", "Dest")
     res2 = correo.enviar("dest@etmk.cl", "A", "q", "r", ["supervisor"], "agente_meteorologia")
     assert res2["ok"] is False and "no configurado" in res2["error"]
+
+
+def test_convertir_rechaza_monto_absurdo(monkeypatch):
+    # fallo 1 (fallos.md): 1e308 CLP rompía al Agente de Viajes con TypeError
+    from src.agente_viajes import clientes
+    monkeypatch.setattr(clientes, "_get", lambda *a, **k: {"result": "success", "rates": {"USD": 0.001}})
+    assert clientes.convertir(float("inf"), "CLP", "USD") is None
+    assert clientes.convertir(1e308, "CLP", "USD") is None
+    assert clientes.convertir(1000, "CLP", "USD")["resultado"] == 1.0
+
+
+def test_consulta_rechaza_pregunta_vacia():
+    # fallo 3 (fallos.md): una pregunta vacía llegaba al Administrador
+    import pytest
+    from pydantic import ValidationError
+    from src.api.app import Consulta
+    for vacia in ("", "   "):
+        with pytest.raises(ValidationError):
+            Consulta(pregunta=vacia)
+    assert Consulta(pregunta="  hola ").pregunta == "hola"
+
+
+def test_web_cabeceras_seguridad(tmp_path, monkeypatch):
+    # fallo 6 (fallos.md): faltaban X-Frame-Options/nosniff y se veía la versión de Python
+    import threading
+    import urllib.request
+    from http.server import ThreadingHTTPServer
+    monkeypatch.setenv("USUARIOS_DB", str(tmp_path / "u.sqlite"))
+    monkeypatch.setenv("MEMORIA_DB", str(tmp_path / "m.sqlite"))
+    from src.canales import web
+    srv = ThreadingHTTPServer(("127.0.0.1", 0), web.Handler)
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    try:
+        with urllib.request.urlopen(f"http://127.0.0.1:{srv.server_port}/login") as r:
+            h = r.headers
+        assert h["X-Frame-Options"] == "DENY"
+        assert h["X-Content-Type-Options"] == "nosniff"
+        assert "Python" not in h["Server"]
+    finally:
+        srv.shutdown()

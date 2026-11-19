@@ -18,6 +18,7 @@ El acceso a red (`_get`) está aislado para poder testear el parseo con JSON de 
 from __future__ import annotations
 
 import json
+import math
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -103,6 +104,8 @@ def clp_por_unidad(moneda: str) -> float | None:
 def convertir(monto: float, desde: str, hacia: str) -> dict | None:
     """Objetivo: convertir `monto` de la moneda `desde` a la moneda `hacia` con tasa real.
     Salida: {monto, desde, hacia, tasa, resultado} o None."""
+    if not math.isfinite(monto) or abs(monto) > 1e15:  # montos absurdos (1e308, inf) rompían el agente
+        return None
     d = _get(f"{FX}/{desde.upper()}")
     if d.get("result") != "success":
         return None

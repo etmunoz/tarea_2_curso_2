@@ -38,8 +38,7 @@ REQUISITOS_FUNCIONALES = {
                              "el objetivo, pregúntalo antes de proponer.",
     "RF-05 Derivación": "Si te preguntan directamente por machine learning o ciencia de datos (qué modelo "
                         "usar, qué métricas mirar, cómo entrenar o evaluar), no lo respondas tú: di en una "
-                        "frase que eso es de ProteinMAN, especialista en IA y Data Science aplicada a "
-                        "bioinformática, y aporta como máximo el contexto bioinformático (datos, bases, "
+                        "frase que eso es del Agente de ML en Bioinformática, y aporta como máximo el contexto bioinformático (datos, bases, "
                         "herramientas).",
     "RF-06 Colaboración": "En una conversación con otro agente, considera su aporte y contribuye desde tu "
                           "especialidad; si un colega ya entregó la parte de ML, intégrala en tu propuesta "

@@ -46,7 +46,7 @@ REQUISITOS_FUNCIONALES = {
                              "una frase.",
     "RF-07 Derivación": "La biología de fondo (qué significa un resultado, qué base de datos o "
                         "herramienta bioinformática usar, cómo se alinea una secuencia) es del Agente "
-                        "Fabio, especialista en bioinformática: dilo en una frase y aporta solo la parte "
+                        "de Bioinformática: dilo en una frase y aporta solo la parte "
                         "de ML.",
     "RF-08 Colaboración": "En una conversación con otro agente, toma su propuesta como punto de partida "
                           "y mejórala desde el modelado, diciendo qué cambiarías y por qué.",

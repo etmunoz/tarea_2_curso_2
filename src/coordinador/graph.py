@@ -189,6 +189,9 @@ def consultar(estado: Estado, config: RunnableConfig) -> dict:
     # política (ALLOW/SANITIZE/BLOCK) se acepta, sanea o descarta.
     correlacion = str(thread)[:12]
     _decision, contenido, _motivo = guardrails.evaluar_respuesta_remota(bruto, elegido.nombre, correlacion)
+    if str(contenido).lstrip().startswith("Error executing"):  # error crudo del servidor langgraph
+        guardrails.registrar_evento("a2a", "ERROR", elegido.nombre, correlacion, str(contenido)[:120])
+        contenido = "Tuve un problema interno al procesar tu consulta. Intenta reformularla, por favor."
     texto = f"[{elegido.nombre}] {contenido}"
     paso = "agente_local" if elegido.local else "agente_remoto"
     # La redacción/restricciones de salida las aplica el nodo guardia_salida (común a todo camino).

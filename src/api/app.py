@@ -21,7 +21,9 @@ import os
 import uuid
 
 from fastapi import Depends, FastAPI, Header
-from pydantic import BaseModel
+from typing import Annotated
+
+from pydantic import BaseModel, StringConstraints
 
 from src.api.seguridad import verificar_api_key
 from src.config import estado
@@ -56,7 +58,7 @@ def _coordinador():
 
 
 class Consulta(BaseModel):
-    pregunta: str
+    pregunta: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]  # vacía -> 422
     sesion: str | None = None
 
 

@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import operator
 import os
+import re
 from typing import Annotated, TypedDict
 
 from dotenv import load_dotenv
@@ -145,12 +146,39 @@ def _normalizar_elegido(agente: str, catalogo: list) -> str:
     return "ninguno"
 
 
+# Preguntas de seguimiento muy cortas ("¿y en Santiago?", "y el precio?", "y allá?").
+_RE_SEGUIMIENTO = re.compile(r"^\s*¿?\s*y\s+\w", re.IGNORECASE)
+
+
+def _agente_previo(messages: list, nombres: list[str]) -> str | None:
+    """Objetivo: nombre del último agente que respondió (marca '[Agente de X]' en un AIMessage), si
+    está en el catálogo. Sirve para que un seguimiento corto mantenga ese agente. Salida: str | None."""
+    for m in reversed(messages[:-1] if messages else []):
+        rol = getattr(m, "type", None) if not isinstance(m, dict) else m.get("role", "")
+        if rol not in ("ai", "assistant"):
+            continue
+        contenido = getattr(m, "content", None) if not isinstance(m, dict) else m.get("content")
+        if isinstance(contenido, list):
+            contenido = " ".join(p.get("text", "") for p in contenido if isinstance(p, dict))
+        mt = re.match(r"\s*\[([^\]]+)\]", contenido or "")
+        if mt and mt.group(1) in nombres:
+            return mt.group(1)
+    return None
+
+
 def enrutar(estado: Estado) -> dict:
     """Objetivo (nodo): el supervisor decide a qué agente mandar la pregunta leyendo el catálogo.
-    Entradas: estado (Estado) con los messages.
-    Salida: dict — {elegido, motivo, ruta:['supervisor']}."""
+    Ante una pregunta de SEGUIMIENTO corta, mantiene (de forma determinista) el agente del turno
+    anterior. Entradas: estado (Estado) con los messages. Salida: {elegido, motivo, ruta:['supervisor']}."""
     pregunta = _ultimo_texto(estado["messages"])
     catalogo = construir_catalogo()
+    nombres = [a.nombre for a in catalogo]
+    # Seguimiento corto ("¿y en Santiago?"): no re-rutear por palabras sueltas; seguir con el agente previo.
+    if len(pregunta.split()) <= 6 and _RE_SEGUIMIENTO.match(pregunta):
+        previo = _agente_previo(estado["messages"], nombres)
+        if previo:
+            return {"elegido": previo, "motivo": "Seguimiento del turno anterior: mantengo el mismo agente.",
+                    "ruta": ["supervisor"]}
     historial = _historial_breve(estado["messages"])
     humano = f"Catálogo de agentes:\n{texto_catalogo(catalogo)}\n\n"
     if historial:

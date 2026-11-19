@@ -33,11 +33,15 @@
 | texto espaciado | firmas compactas sobre la versión sin espacios |
 | leetspeak / inglés | ya existían (registro 035) |
 
-## 3. Pendiente de activación
+## 3. Verificación en vivo (gateway, tras reiniciar)
 
-- `sudo systemctl restart t2c2-api t2c2-langgraph` (guardia/coordinador + agente ML). Verificación en
-  vivo: los 7 casos de ofuscación quedan bloqueados por `guardia_entrada` y el agente de ML deriva.
+- **Guardia anti-ofuscación:** base64, rot13, homoglifos cirílicos, ancho cero y texto espaciado →
+  `ruta: guardia_entrada:bloqueado → guardia_salida` (**bloqueados por la guardia, no por el LLM**).
+- **Sin falsos positivos:** "¿cuánto cuesta una cazuela para 4 personas?" → Agente de Cocina Chilena.
+- **ML deriva:** "¿qué accuracy tiene un random forest para elegir la mejor posición de reiki?" →
+  «Eso no es de IA ni Data Science, pregúntale al **agente de Reiki**».
 
 ## 4. Estado
 
-- ✅ Guardia reforzada + ML deriva; 164 tests verdes; desplegado. Bitácora **043**.
+- ✅ Guardia reforzada + ML deriva; 164 tests verdes; desplegado y **verificado en producción**.
+  Bitácora **043**.

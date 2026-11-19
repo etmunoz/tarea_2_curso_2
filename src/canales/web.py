@@ -404,6 +404,15 @@ def _pagina_admin(usuario):
 
 
 class Handler(BaseHTTPRequestHandler):
+    server_version = "t2c2"  # no revelar BaseHTTP/Python en la cabecera Server
+    sys_version = ""
+
+    def end_headers(self):
+        self.send_header("X-Frame-Options", "DENY")
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("Referrer-Policy", "same-origin")
+        super().end_headers()
+
     def _html(self, code, body, ctype="text/html; charset=utf-8", cookie=None):
         if isinstance(body, str):
             body = body.encode()

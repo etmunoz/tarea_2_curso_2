@@ -149,3 +149,17 @@ def test_web_cabeceras_seguridad(tmp_path, monkeypatch):
         assert "Python" not in h["Server"]
     finally:
         srv.shutdown()
+
+
+def test_ultimo_agente_memoria_durable(tmp_path, monkeypatch):
+    # memoria de corto plazo durable: el seguimiento lee el agente del ultimo turno del store
+    monkeypatch.setenv("MEMORIA_DB", str(tmp_path / "m.sqlite"))
+    import importlib
+    from src.memoria import bd as memoria
+    importlib.reload(memoria)
+    hilo = "ezequiel:sesionX"
+    memoria.guardar_mensaje(hilo, "usuario", "voy a Lima, que moneda?")
+    memoria.guardar_mensaje(hilo, "asistente", "[Agente de Viajes] Sol peruano", agente="Agente de Viajes")
+    memoria.guardar_mensaje(hilo, "usuario", "y en Santiago?")
+    assert memoria.ultimo_agente(hilo) == "Agente de Viajes"
+    assert memoria.ultimo_agente("hilo:inexistente") is None

@@ -145,8 +145,15 @@ def consulta(c: Consulta, x_usuario: str | None = Header(default=None, alias="X-
         prev = len((getattr(st, "values", {}) or {}).get("ruta", []))
     except Exception:  # noqa: BLE001
         prev = 0
+    # Memoria de corto plazo DURABLE: el agente del turno anterior se lee del store persistente
+    # (sobrevive reinicios, a diferencia del checkpointer en memoria) para que el seguimiento no se corte.
     try:
-        res = _coordinador().invoke({"messages": [HumanMessage(content=c.pregunta)]}, cfg)
+        agente_previo = memoria.ultimo_agente(hilo) or ""
+    except Exception:  # noqa: BLE001
+        agente_previo = ""
+    try:
+        res = _coordinador().invoke(
+            {"messages": [HumanMessage(content=c.pregunta)], "agente_previo": agente_previo}, cfg)
     except Exception as e:  # noqa: BLE001
         if estado.es_cuota(str(e)):
             estado.set_gemini(False, "cuota/tokens agotados")

@@ -31,6 +31,18 @@ Ideas acordadas pero **no implementadas** aún. Al tomar una, dejar su registro 
 - Que el Agente Administrador ayude activamente a **registrar el correo** del usuario y dé el tutorial
   inicial (hoy ese flujo vive en la UI del chat; el administrador solo orienta).
 
-## 3. Meteorología: índices adicionales
+## 3. Checkpointer persistente nativo de LangGraph (coordinador)
+
+- **Hoy:** el coordinador compila con `InMemorySaver` (memoria de corto plazo del hilo en RAM, se pierde
+  al reiniciar). El seguimiento ("¿y en Santiago?") ya es **durable** porque el agente del turno anterior
+  se lee del store `memoria` SQLite (registro 036), así que esto no es urgente.
+- **Propuesta:** usar un checkpointer persistente nativo (`SqliteSaver`/`PostgresSaver`) para que TODO el
+  estado del hilo (mensajes + ruta) sobreviva reinicios sin lógica aparte.
+- **Bloqueo actual:** `langgraph-checkpoint-sqlite` (2.0.11) pinnea `langgraph-checkpoint` 2.x, mientras
+  nuestro `langgraph` 1.x usa checkpoint 4.3.1. Requeriría **subir langgraph a 2.x**, lo que toca todo el
+  runtime A2A (`langgraph-api`/`langgraph dev`, `cli`, `sdk`, `swarm`): migración deliberada y probada,
+  no un cambio menor. Dejar para cuando se justifique.
+
+## 4. Meteorología: índices adicionales
 
 - UV, calidad del aire y alertas (Open-Meteo los ofrece sin key) como datos extra del pronóstico.

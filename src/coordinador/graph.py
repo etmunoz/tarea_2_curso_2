@@ -69,6 +69,7 @@ class Estado(TypedDict):
     origen: str
     bloqueado: bool
     ruta: Annotated[list[str], operator.add]
+    agente_previo: str  # agente del turno anterior (memoria durable); lo setea el gateway por turno
 
 
 def _responder_local(graph_name: str, pregunta: str, thread: str) -> str:
@@ -173,10 +174,12 @@ def enrutar(estado: Estado) -> dict:
     pregunta = _ultimo_texto(estado["messages"])
     catalogo = construir_catalogo()
     nombres = [a.nombre for a in catalogo]
-    # Seguimiento corto ("¿y en Santiago?"): no re-rutear por palabras sueltas; seguir con el agente previo.
+    # Seguimiento corto ("¿y en Santiago?"): no re-rutear por palabras sueltas; seguir con el agente
+    # previo. Fuente DURABLE: 'agente_previo' lo pone el gateway desde el store SQLite (sobrevive
+    # reinicios); como respaldo, se infiere de los mensajes del hilo en memoria.
     if len(pregunta.split()) <= 6 and _RE_SEGUIMIENTO.match(pregunta):
-        previo = _agente_previo(estado["messages"], nombres)
-        if previo:
+        previo = (estado.get("agente_previo") or "").strip() or _agente_previo(estado["messages"], nombres)
+        if previo and previo in nombres:
             return {"elegido": previo, "motivo": "Seguimiento del turno anterior: mantengo el mismo agente.",
                     "ruta": ["supervisor"]}
     historial = _historial_breve(estado["messages"])

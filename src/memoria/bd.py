@@ -65,6 +65,15 @@ def guardar_mensaje(sesion: str, rol: str, contenido: str, agente: str | None = 
                   (sesion, rol, contenido, agente, _ahora()))
 
 
+def ultimo_agente(sesion: str) -> str | None:
+    """Objetivo: agente del último turno 'asistente' de la sesión (memoria de corto plazo DURABLE,
+    para que un seguimiento mantenga el agente aunque se reinicie el servicio). Salida: str | None."""
+    with _conn() as c:
+        r = c.execute("SELECT agente FROM conversaciones WHERE sesion=? AND rol='asistente' "
+                      "AND agente IS NOT NULL AND agente<>'' ORDER BY rowid DESC LIMIT 1", (sesion,)).fetchone()
+    return r[0] if r else None
+
+
 def historial(sesion: str, limite: int = 50) -> list[dict]:
     """Objetivo: últimos turnos de una sesión, en orden cronológico."""
     with _conn() as c:

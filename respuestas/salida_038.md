@@ -23,11 +23,14 @@
     combinándola con la franja horaria.
 - Tests: **15 passed** (nombre/idioma/saludo por separado).
 
-## 2. Pendiente de activación
+## 2. Verificación en vivo (gateway, tras reiniciar)
 
-- `sudo systemctl restart t2c2-langgraph` (agente administrador). Verificación en vivo:
-  saludo replicado, cambio de idioma consistente y persistencia del idioma entre turnos/sesiones.
+- **Saludo replicado:** «wena!…» → «¡**Wena**, Fabio! …¡buenos días!».
+- **Idioma consistente:** «can we switch to English?» → respuesta en inglés sin mezclar.
+- **Persistencia:** `obtener_perfil("fabio") = {idioma:'inglés', saludo:'wena!'}`; sesión nueva «hey» →
+  «**Hey**! Good morning, Fabio…» (sigue en inglés). Evidencia: `evidencias/EVIDENCIAS.md` (Anexo 11).
+  Perfil de prueba de `fabio` limpiado luego (usuario real).
 
 ## 3. Estado
 
-- ✅ Implementado, desplegado; tests verdes. Bitácora **038**.
+- ✅ Implementado, desplegado; tests verdes; **verificado en producción**. Bitácora **038**.

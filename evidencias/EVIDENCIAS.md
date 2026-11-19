@@ -136,6 +136,21 @@ prompt actualizado. Reindexado en Redis: **18 fragmentos** (antes 9). Verificado
   reemplazar la medicación… sigue las indicaciones de tu médico, Reiki solo como apoyo"*. Guardrail OK.
 - Todas con `ruta: guardia_entrada → supervisor → agente_local → guardia_salida`.
 
+## Anexo 11 · Idioma preferido y forma de saludar (Administrador)
+
+Verificado en producción (usuario `fabio`), 2026-11-19:
+
+- **Replica el saludo propio:** «wena! como estai?» → «¡**Wena**, Fabio! Todo bien por acá, ¡buenos
+  días!» (estilo del usuario + franja horaria).
+- **Cambio de idioma consistente:** «can we switch to English?» → «Of course, Fabio! …» (en inglés, sin
+  mezclar).
+- **Persistencia durable:** `obtener_perfil("fabio")` = `{nombre:None, idioma:'inglés', saludo:'wena!'}`
+  en disco. En una **sesión nueva** «hey» → «**Hey**! Good morning, Fabio…» (sigue en inglés + replica
+  el saludo). Por defecto sería español; se adoptó inglés por preferencia.
+- Perfil de prueba de `fabio` **limpiado** tras verificar (es un usuario real).
+
+---
+
 ## Anexo 10 · Recepción personalizada (Agente Administrador)
 
 Verificado en producción (gateway), 2026-11-19:

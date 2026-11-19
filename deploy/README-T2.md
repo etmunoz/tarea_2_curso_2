@@ -71,8 +71,13 @@ Los subdominios `*.etmk.cl` ya resuelven (wildcard). Por **cada** subdominio:
    RewriteEngine On
    RewriteCond %{HTTPS} off
    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+   # HSTS (fallo 6 de evidencias/fallos.md): forzar HTTPS en el navegador por 1 año.
+   Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
    ```
    (así `http://` nunca llega en claro al backend; la cookie de sesión y la API_KEY viajan cifradas).
+   Las demás cabeceras de seguridad (`X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`) y el
+   `Server: t2c2` ya los pone el BFF en `src/canales/web.py`; **HSTS** es lo único que debe ir aquí, en el
+   proxy (requiere el módulo `headers` de Apache, habitualmente activo en ISPConfig).
 
 El **login del sitio** es **por sesión** (no Basic Auth): usuarios de `WEB_USUARIOS` con clave propia
 (hash PBKDF2+salt), `CLAVE_INICIAL` única con cambio obligatorio y cookie `Secure`. El **monitor** usa

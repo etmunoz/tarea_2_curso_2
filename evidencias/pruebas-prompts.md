@@ -1,5 +1,5 @@
 <!--encabezado-grupo-->
-> **Archivo:** `pruebas-prompts.md`  
+> **Archivo:** `evidencias/pruebas-prompts.md`  
 > **Objetivo:** Prompts usados para probar el sitio desplegado (funcionales y red-team)  
 > **Grupo del curso:** Fabio Durán - Gustavo Reyes - Ezequiel Muñoz  
 > **Creación:** 20261119

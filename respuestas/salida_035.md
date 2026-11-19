@@ -2,16 +2,34 @@
 > **Archivo:** `respuestas/salida_035.md`  
 > **Objetivo:** 035 · Respuesta — fallos 2, 4 y 7 resueltos  
 > **Grupo del curso:** Fabio Durán - Gustavo Reyes - Ezequiel Muñoz  
-> **Creación:** 20261119 0920 · **Última modificación:** 20261119 0920
+> **Creación:** 20261119 0920 · **Última modificación:** 20261119 0945
 <!--/encabezado-grupo-->
 
 # 035 · Respuesta — Fallos 2, 4 y 7
 
 **Prompt:** [`../prompts_ejecutados/prompt_035.md`](../prompts_ejecutados/prompt_035.md)
 
+## Contexto — datos de los fallos y de las pruebas
+
+Origen: prueba del sitio desplegado por **Fabio** (2026-11-19, usuario `fabio`): **10 funcionales** +
+**16 red-team** vía `POST /api/consulta`. Se detectaron **7 fallos** (ninguno crítico; los ataques
+importantes fueron resistidos). Artefactos reproducibles reubicados a
+[`../evidencias/fallos.md`](../evidencias/fallos.md) y
+[`../evidencias/pruebas-prompts.md`](../evidencias/pruebas-prompts.md).
+
+| # | Sev | Fallo | Resuelto en |
+|---|---|---|---|
+| 1 | Media | `1e308 CLP` rompía Viajes (`TypeError`) + mostraba error crudo | merge Fabio (034) |
+| 2 | Media | Guardia ciega a leetspeak e inglés ampliado | **035** |
+| 3 | Baja | Pregunta vacía llegaba al Administrador | merge Fabio (034) |
+| 4 | Baja | Perdía contexto en seguimiento | **035** |
+| 5 | Baja | Filtraba nombre interno («Agente Fabio»/«ProteinMAN») | merge Fabio (034) |
+| 6 | Baja | Faltaban cabeceras de seguridad + versión del server | merge Fabio (034); HSTS → proxy |
+| 7 | Baja | Ubicaba lugares ficticios sin avisar | **035** |
+
 ---
 
-## 1. Qué se hizo
+## 1. Qué se hizo (fallos 2, 4, 7)
 
 | Fallo | Fix | Verificación |
 |---|---|---|
@@ -21,21 +39,20 @@
 
 ## 2. Merge previo (rama de Fabio)
 
-`fix/fallos-pruebas-sitio` mergeada a `main` (`77c9ef6`) con los fallos **1/3/5/6** y el red-team
-(`fallos.md`, `pruebas-prompts.md`). 24 tests verdes tras el merge.
+`fix/fallos-pruebas-sitio` mergeada a `main` (`77c9ef6`) con los fallos **1/3/5/6** y el red-team.
+24 tests verdes tras el merge.
 
 ## 3. Verificación (local)
 
 - `pytest tests/test_guardrails.py` → **12 passed** (incluye leetspeak/inglés y el no-falso-positivo).
 - Fallos 4 y 7 (dependen del LLM) → verificación en vivo tras reiniciar.
 
-## 4. Pendiente de activación
+## 4. HSTS (fallo 6) — pendiente en el proxy
 
-- `sudo systemctl restart t2c2-langgraph t2c2-api` (coordinador/guardrails viven en el gateway;
-  prompts de agentes en langgraph).
-- Verificar en vivo: leetspeak bloqueado; "voy a Lima…/¿y en Santiago?" mantiene Viajes; "clima en
-  Narnia" pide confirmación.
+El HSTS no va en el código sino en el **proxy inverso** (ISPConfig). Se documentó el directivo exacto
+en [`../deploy/README-T2.md`](../deploy/README-T2.md) para aplicarlo en el website del proxy.
 
 ## 5. Estado
 
-- ✅ Fallos 2/4/7 implementados; `fallos.md` actualizado. Bitácora **035**.
+- ✅ Fallos 2/4/7 implementados; `evidencias/fallos.md` actualizado; artefactos reubicados a
+  `evidencias/`. Bitácora **035**.

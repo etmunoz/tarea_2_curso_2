@@ -149,7 +149,8 @@ Rama `fix/fallos-pruebas-sitio` (commit `7f17cac`), revisada el 2026-11-19 (regi
 - **Fallos corregidos (4/7):** 1 (monto 1e308 rompía Viajes + error crudo), 3 (pregunta vacía al
   Administrador), 5 (filtración de nombre interno), 6 (cabeceras de seguridad + versión del server).
 - **Pendientes:** 2 (inyección leetspeak/inglés en la guardia), 4 (contexto de seguimiento), 7 (lugares
-  ficticios). Detalle completo en `fallos.md` y `pruebas-prompts.md` (llegan al mergear la rama).
+  ficticios). Detalle completo en [`fallos.md`](fallos.md) y [`pruebas-prompts.md`](pruebas-prompts.md)
+  (reubicados a `evidencias/`). Los 2/4/7 se resolvieron en el registro 035.
 
 ---
 

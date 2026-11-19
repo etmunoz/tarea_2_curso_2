@@ -1,5 +1,5 @@
 <!--encabezado-grupo-->
-> **Archivo:** `fallos.md`  
+> **Archivo:** `evidencias/fallos.md`  
 > **Objetivo:** Fallos detectados al probar el sitio desplegado (funcional + red-team)  
 > **Grupo del curso:** Fabio Durán - Gustavo Reyes - Ezequiel Muñoz  
 > **Creación:** 20261119

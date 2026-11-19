@@ -136,6 +136,23 @@ prompt actualizado. Reindexado en Redis: **18 fragmentos** (antes 9). Verificado
   reemplazar la medicación… sigue las indicaciones de tu médico, Reiki solo como apoyo"*. Guardrail OK.
 - Todas con `ruta: guardia_entrada → supervisor → agente_local → guardia_salida`.
 
+## Anexo 12 · Health check post-hardening (2026-11-19)
+
+Tras el hardening de la máquina (por ataques), se verificó que todo sigue OK:
+
+- **Servicios systemd:** `t2c2-langgraph, -fichas, -api, -web, -monitor` → **active** (5/5).
+- **Puertos internos (127.0.0.1):** langgraph :2025/ok **200**, api :8796/salud **200**,
+  web :8797/login **200**, monitor :8798 **401** (protegido).
+- **Público (HTTPS/proxy):** `tarea2curso2/login` **200**, `monitortarea2curso2` **401** (protegido),
+  `/api/consulta` sin cookie **401**, **HSTS** presente.
+- **Egress externo:** Gemini (alcanzable), Open-Meteo (geo+forecast), UniProt, open.er-api, Wikipedia
+  → **200**; **Redis ping True** (backend redis).
+- **End-to-end por el gateway (6 agentes reales):** meteorología (Valdivia 14,2 °C), bioinformática
+  (UniProt en vivo), reiki (Redis RAG), viajes (cambio real), cocina y administrador → **OK**.
+- Conclusión: el hardening **no bloqueó** puertos internos ni el egress a los servicios externos.
+
+---
+
 ## Anexo 11 · Idioma preferido y forma de saludar (Administrador)
 
 Verificado en producción (usuario `fabio`), 2026-11-19:

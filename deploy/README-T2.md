@@ -84,6 +84,31 @@ El **login del sitio** es **por sesión** (no Basic Auth): usuarios de `WEB_USUA
 `MONITOR_USER`/`MONITOR_PASS`. Los agentes (`:2025`) y el gateway (`:8796`) **no** se publican: solo
 127.0.0.1. Tras desplegar el RAG a Redis, reiniciar con `sudo systemctl restart t2c2-langgraph`.
 
+## Red / hardening (egress permitido)
+
+La máquina tuvo hardening por ataques. Para que un endurecimiento futuro **no rompa** el sistema, estos
+son los accesos que necesita. Verificado operativo el 2026-11-19 (ver `evidencias/EVIDENCIAS.md`, Anexo 12).
+
+**Entrante (inbound):** solo **80/443** públicos (proxy ISPConfig → fuerza HTTPS). Los servicios
+(`:2025`, `:8796`, `:8797`, `:8798`) escuchan **solo en 127.0.0.1**; no deben exponerse.
+
+**Saliente (egress) — destinos HTTPS (443) que el sistema DEBE poder alcanzar:**
+
+| Servicio | Host(s) | Usado por |
+|---|---|---|
+| Gemini (LLM + embeddings) | `generativelanguage.googleapis.com` | supervisor y agentes; RAG de Reiki |
+| Open-Meteo | `geocoding-api.open-meteo.com`, `api.open-meteo.com`, `archive-api.open-meteo.com` | meteorología, viajes |
+| UniProt | `rest.uniprot.org` | bioinformática |
+| Tipo de cambio | `open.er-api.com` | viajes |
+| Wikipedia | `es.wikipedia.org` | viajes |
+| Redis cloud (RediSearch) | el host:puerto del `REDIS_URL` (p. ej. `…redis.io:10484`, **no** 443) | RAG de Reiki |
+
+- **Correo (SMTP):** `SMTP_HOST=localhost:587` → es **local** (Postfix de la máquina), no requiere egress externo.
+- **DNS saliente** debe estar permitido para resolver esos hosts.
+- Si se agrega un firewall de **egress por defecto-deny**, hay que **allowlistear** los hosts de arriba
+  (y el puerto no estándar del Redis). Un bloqueo se nota como *timeout/conexión rechazada* en el agente
+  correspondiente (no un 4xx).
+
 ## Detener / reiniciar
 
 ```bash

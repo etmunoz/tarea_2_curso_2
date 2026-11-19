@@ -136,6 +136,29 @@ prompt actualizado. Reindexado en Redis: **18 fragmentos** (antes 9). Verificado
   reemplazar la medicación… sigue las indicaciones de tu médico, Reiki solo como apoyo"*. Guardrail OK.
 - Todas con `ruta: guardia_entrada → supervisor → agente_local → guardia_salida`.
 
+## Anexo 13 · Índice de evidencias (resumen · registro 040)
+
+Mapa de toda la evidencia de la Tarea 2 (ver resumen en `respuestas/salida_040.md`):
+
+| Tema | Dónde |
+|---|---|
+| Chat web (diseño T1), ruteo por turno, correo | Anexo · Chat web |
+| Multiusuario, sesiones y seguridad | Anexo 2 |
+| RAG de Reiki en Redis cloud | Anexo 3 · captura `redis_reiki_indice.png` |
+| Reiki: terapias complementarias (+ catálogo ampliado) | Anexo 4 |
+| Bioinformática real (UniProt) | Anexo 5 |
+| ML-bioinformática (pipelines) + Cocina (restricciones/nutrición) | Anexo 6 |
+| Viajes como asistente de destino real | Anexo 7 |
+| Revisión y merge de la rama de Fabio (fallos + red-team) | Anexo 8 · `fallos.md` · `pruebas-prompts.md` |
+| Memoria de corto plazo: NO SqliteSaver (decisión) | Anexo 9 · `docs/decisiones/ADR-0001-memoria-corto-plazo.md` |
+| Recepción personalizada (administrador) | Anexo 10 |
+| Idioma preferido y forma de saludar | Anexo 11 |
+| Health check post-hardening | Anexo 12 |
+| Inyección de prompt (pruebas iniciales) | `inyeccion_prompt.md` |
+| Arquitectura técnica (diagrama vivo) | `docs/ARQUITECTURA.md` |
+
+---
+
 ## Anexo 12 · Health check post-hardening (2026-11-19)
 
 Tras el hardening de la máquina (por ataques), se verificó que todo sigue OK:

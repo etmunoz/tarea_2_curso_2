@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS eventos (
   id INTEGER PRIMARY KEY AUTOINCREMENT, usuario TEXT, evento TEXT NOT NULL, ts TEXT NOT NULL
 );
 CREATE TABLE IF NOT EXISTS perfiles (
-  usuario TEXT PRIMARY KEY, nombre TEXT, ts TEXT NOT NULL
+  usuario TEXT PRIMARY KEY, nombre TEXT, idioma TEXT, saludo TEXT, ts TEXT NOT NULL
 );
 """
 
@@ -57,6 +57,12 @@ def _conn() -> sqlite3.Connection:
     c = sqlite3.connect(DB)
     c.row_factory = sqlite3.Row
     c.executescript(DDL)
+    # Migración tolerante: agrega columnas nuevas de 'perfiles' si la BD es anterior (idempotente).
+    for col in ("idioma", "saludo"):
+        try:
+            c.execute(f"ALTER TABLE perfiles ADD COLUMN {col} TEXT")
+        except sqlite3.OperationalError:
+            pass  # la columna ya existe
     return c
 
 
@@ -77,26 +83,43 @@ def ultimo_agente(sesion: str) -> str | None:
     return r[0] if r else None
 
 
-# --- Perfil del usuario (nombre preferido; memoria DURABLE del administrador) ---
-def guardar_nombre(usuario: str, nombre: str) -> None:
-    """Objetivo: recordar el nombre preferido de un usuario (login)."""
-    u, n = (usuario or "").strip(), (nombre or "").strip()
-    if not u or not n:
+# --- Perfil del usuario (nombre/idioma/saludo; memoria DURABLE del administrador) ---
+_CAMPOS_PERFIL = ("nombre", "idioma", "saludo")
+
+
+def guardar_perfil(usuario: str, **campos) -> None:
+    """Objetivo: recordar preferencias del usuario (login). Campos: nombre, idioma, saludo.
+    Solo actualiza los campos provistos y no vacíos; crea la fila si no existe."""
+    u = (usuario or "").strip()
+    datos = {k: v.strip() for k, v in campos.items()
+             if k in _CAMPOS_PERFIL and isinstance(v, str) and v.strip()}
+    if not u or not datos:
         return
     with _conn() as c:
-        c.execute("INSERT INTO perfiles (usuario, nombre, ts) VALUES (?,?,?) "
-                  "ON CONFLICT(usuario) DO UPDATE SET nombre=excluded.nombre, ts=excluded.ts",
-                  (u, n, _ahora()))
+        c.execute("INSERT OR IGNORE INTO perfiles (usuario, ts) VALUES (?, ?)", (u, _ahora()))
+        sets = ", ".join(f"{k}=?" for k in datos) + ", ts=?"
+        c.execute(f"UPDATE perfiles SET {sets} WHERE usuario=?", (*datos.values(), _ahora(), u))
+
+
+def obtener_perfil(usuario: str) -> dict:
+    """Objetivo: preferencias del usuario (login). Salida: {nombre, idioma, saludo} (valores o None)."""
+    u = (usuario or "").strip()
+    if not u:
+        return {k: None for k in _CAMPOS_PERFIL}
+    with _conn() as c:
+        r = c.execute("SELECT nombre, idioma, saludo FROM perfiles WHERE usuario=?", (u,)).fetchone()
+    return {k: (r[k] if r and r[k] else None) for k in _CAMPOS_PERFIL}
+
+
+# Compatibilidad: helpers de nombre sobre el perfil.
+def guardar_nombre(usuario: str, nombre: str) -> None:
+    """Objetivo: recordar el nombre preferido (atajo de guardar_perfil)."""
+    guardar_perfil(usuario, nombre=nombre)
 
 
 def obtener_nombre(usuario: str) -> str | None:
-    """Objetivo: nombre preferido guardado de un usuario (login). Salida: str | None."""
-    u = (usuario or "").strip()
-    if not u:
-        return None
-    with _conn() as c:
-        r = c.execute("SELECT nombre FROM perfiles WHERE usuario=?", (u,)).fetchone()
-    return r[0] if r and r[0] else None
+    """Objetivo: nombre preferido guardado (atajo de obtener_perfil). Salida: str | None."""
+    return obtener_perfil(usuario)["nombre"]
 
 
 def historial(sesion: str, limite: int = 50) -> list[dict]:

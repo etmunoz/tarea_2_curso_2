@@ -10,8 +10,8 @@ import importlib
 
 from src.agente_administrador.herramientas import (
     _franja,
-    nombre_usuario,
-    recordar_nombre,
+    preferencias_usuario,
+    recordar_preferencias,
     saludo_hora,
 )
 
@@ -31,12 +31,17 @@ def test_saludo_hora_estructura():
     assert ":" in r["hora"] and "-" in r["fecha"]
 
 
-def test_recordar_y_obtener_nombre(tmp_path, monkeypatch):
-    """Prueba: el nombre preferido se guarda y se recupera (memoria durable por usuario)."""
+def test_perfil_nombre_idioma_saludo(tmp_path, monkeypatch):
+    """Prueba: nombre, idioma y saludo se guardan/recuperan por usuario (durable), por separado."""
     monkeypatch.setenv("MEMORIA_DB", str(tmp_path / "m.sqlite"))
     from src.memoria import bd
     importlib.reload(bd)
-    assert recordar_nombre.invoke({"usuario": "ezequiel", "nombre": "Eze"})["ok"] is True
-    assert nombre_usuario.invoke({"usuario": "ezequiel"})["nombre"] == "Eze"
-    r = nombre_usuario.invoke({"usuario": "gustavo"})
-    assert r["nombre"] is None and "nota" in r
+    # guarda solo nombre
+    assert recordar_preferencias.invoke({"usuario": "ezequiel", "nombre": "Eze"})["ok"] is True
+    # luego idioma y saludo, sin pisar el nombre
+    recordar_preferencias.invoke({"usuario": "ezequiel", "idioma": "inglés", "saludo": "wena"})
+    p = preferencias_usuario.invoke({"usuario": "ezequiel"})
+    assert p["nombre"] == "Eze" and p["idioma"] == "inglés" and p["saludo"] == "wena"
+    # usuario sin perfil: todo None (idioma None ⇒ español por defecto)
+    vacio = preferencias_usuario.invoke({"usuario": "gustavo"})
+    assert vacio["nombre"] is None and vacio["idioma"] is None and vacio["saludo"] is None

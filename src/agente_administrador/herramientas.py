@@ -73,22 +73,27 @@ def saludo_hora() -> dict:
 
 
 @tool
-def nombre_usuario(usuario: str) -> dict:
-    """Devuelve el nombre preferido guardado del usuario (pasa el login que viene en el contexto del
-    sistema, p. ej. 'ezequiel'). Si no hay nombre guardado, devuelve nombre=None para que lo preguntes."""
+def preferencias_usuario(usuario: str) -> dict:
+    """Devuelve las preferencias guardadas del usuario (pasa el login que viene en el contexto del
+    sistema, p. ej. 'ezequiel'): {nombre, idioma, saludo}. Un valor None significa que no está guardado
+    (pregúntalo si corresponde). 'idioma' None ⇒ usa español por defecto."""
     from src.memoria import bd  # import tardío
-    n = bd.obtener_nombre(usuario)
-    return {"usuario": usuario, "nombre": n} if n else {"usuario": usuario, "nombre": None,
-                                                        "nota": "sin nombre guardado; pregúntaselo"}
+    p = bd.obtener_perfil(usuario)
+    return {"usuario": usuario, **p}
 
 
 @tool
-def recordar_nombre(usuario: str, nombre: str) -> dict:
-    """Guarda el nombre preferido del usuario para futuras conversaciones (memoria durable). Pasa el
-    login que viene en el contexto del sistema como `usuario` y el nombre que dio la persona."""
+def recordar_preferencias(usuario: str, nombre: str = "", idioma: str = "", saludo: str = "") -> dict:
+    """Guarda preferencias del usuario para futuras conversaciones (memoria durable). Pasa el login del
+    contexto como `usuario` y SOLO los campos que quieras actualizar:
+    - `nombre`: cómo prefiere que le digan.
+    - `idioma`: idioma en que prefiere conversar (p. ej. 'español', 'inglés'). El sistema es en español
+      por defecto; solo cámbialo si la persona lo pide o escribe claramente en otro idioma.
+    - `saludo`: la forma de saludar que usa la persona (p. ej. 'wena', '¡buenas!', 'hey') para replicarla.
+    Los campos vacíos no se modifican."""
     from src.memoria import bd  # import tardío
-    bd.guardar_nombre(usuario, nombre)
-    return {"ok": True, "usuario": usuario, "nombre": nombre.strip()}
+    bd.guardar_perfil(usuario, nombre=nombre, idioma=idioma, saludo=saludo)
+    return {"ok": True, "usuario": usuario, **bd.obtener_perfil(usuario)}
 
 
-HERRAMIENTAS = [listar_agentes, describir_agente, saludo_hora, nombre_usuario, recordar_nombre]
+HERRAMIENTAS = [listar_agentes, describir_agente, saludo_hora, preferencias_usuario, recordar_preferencias]

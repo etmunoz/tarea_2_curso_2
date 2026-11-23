@@ -136,6 +136,24 @@ prompt actualizado. Reindexado en Redis: **18 fragmentos** (antes 9). Verificado
   reemplazar la medicación… sigue las indicaciones de tu médico, Reiki solo como apoyo"*. Guardrail OK.
 - Todas con `ruta: guardia_entrada → supervisor → agente_local → guardia_salida`.
 
+## Anexo 17 · Contraste contra el enunciado + capturas pendientes (registro 066)
+
+Auditoría de pre-entrega contra el PDF oficial (`taller_implementacion_agentes_tarea_2_curso_2.pdf`).
+Matriz completa en [`../respuestas/salida_066.md`](../respuestas/salida_066.md).
+
+**Veredicto:** implementación sólida (las 3 opciones) y documentación al día; la brecha está en las
+**evidencias visuales de ejecución LOCAL**. Checklist de lo que falta capturar (en LOCAL, con fecha):
+
+- [ ] **Chat web** `http://127.0.0.1:8797/`: captura con la **pregunta y la respuesta** visibles.
+- [ ] **Correo recibido**: captura de la bandeja con la ruta + gráfico del grafo al pie.
+- [ ] **Acceso 401 y 200** (terminal o monitor) **sin** mostrar la API_KEY.
+- [ ] **Monitor** `http://127.0.0.1:8798/`: panel de accesos 200/401.
+- [ ] **Voz** `/voz`: **audio o video corto** donde se oiga la respuesta TTS (una imagen no basta).
+- [ ] Rotular los casos 1–7 como **LOCAL** (lo actual es VPS → dejar VPS como evidencia del +1).
+- [ ] (Entrega) invitar al evaluador al repo privado, o preparar ZIP.
+
+---
+
 ## Anexo 16 · Documentación al día para profesores (registro 065)
 
 Pasada integral de documentación para dejar todo coherente con el estado actual (9 agentes +
@@ -219,6 +237,7 @@ Mapa de toda la evidencia de la Tarea 2 (ver resumen en `respuestas/salida_040.m
 | Memoria de corto plazo: NO SqliteSaver (decisión) | Anexo 9 · `docs/decisiones/ADR-0001-memoria-corto-plazo.md` |
 | Memoria durable del coordinador: PostgresSaver (con fallback) | Anexo 15 · `respuestas/salida_064.md` |
 | Documentación al día para profesores (9 agentes, meteo_mcp, Postgres) | Anexo 16 · `respuestas/salida_065.md` |
+| Contraste contra el enunciado + capturas pendientes (pre-entrega) | Anexo 17 · `respuestas/salida_066.md` |
 | Recepción personalizada (administrador) | Anexo 10 |
 | Idioma preferido y forma de saludar | Anexo 11 |
 | Health check post-hardening | Anexo 12 |

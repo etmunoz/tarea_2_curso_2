@@ -9,6 +9,31 @@
 Evolución del Taller 1: los agentes A2A se conectan a **canales de uso reales**, todo **LOCAL** y
 reproducible. **Todo en español**, horarios en `America/Santiago`.
 
+## Integrantes y aportes
+
+| Integrante | Aporte principal |
+|---|---|
+| **Ezequiel Muñoz** | Arquitectura e integración: coordinador/supervisor, gateway FastAPI, canal web + voz (BFF), correo, monitor, memoria SQLite, seguridad/guardrails, RAG de Reiki en Redis, despliegue systemd+HTTPS y memoria durable `PostgresSaver` del coordinador. |
+| **Gustavo Reyes** | Agente `meteo_mcp` (clima mundial vía **MCP** de Meteosource) y el adaptador MCP `src/integraciones/mcp_langchain.py`. |
+| **Fabio Durán** | Pruebas adversariales / red-team y guardrails **anti-ofuscación** (ver `evidencias/fallos.md`, `pruebas-prompts.md`, `pruebas-masivas.md`, `pruebas-mezcla.md`, `pruebas-ofuscacion.md`, `inyeccion_prompt.md`). |
+
+> Repartición según lo trabajado y registrado en ramas/bitácora; el equipo puede ajustar el detalle.
+
+## Opción elegida (y qué reutilizamos del Taller 1)
+
+El enunciado pide **al menos una** implementación; nosotros entregamos **las tres**:
+
+1. **Servicio FastAPI** — gateway único a los agentes, protegido por `API_KEY` (acceso permitido/rechazado
+   demostrable). Resuelve: exponer el sistema multi-agente A2A con acceso controlado y fidelidad de datos.
+2. **Canal web con frontend de chat** (propio, distinto de WhatsApp Web) — chat con login multiusuario que
+   habla con FastAPI server-side. Resuelve: atención conversacional real a usuarios.
+3. **Integración avanzada: voz (Etapa A)** — STT (Web Speech API, `es-CL`) → agentes → TTS. Resuelve:
+   interacción hablada con el sistema.
+
+**Reutilizado del Taller 1:** los agentes A2A, el coordinador/supervisor, los guardrails, el canal web,
+el correo, el monitor y el despliegue systemd+Apache+HTTPS. El Taller 2 los **conecta a formas de uso
+reales y reproducibles en local**.
+
 ## Las 3 implementaciones
 
 1. **Servicio FastAPI** — gateway **único** a los agentes, protegido por **`API_KEY`** (header

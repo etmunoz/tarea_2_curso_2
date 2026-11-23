@@ -27,17 +27,21 @@ reproducible. **Todo en español**, horarios en `America/Santiago`.
    v
  BFF (:8797) --X-API-Key + X-Usuario--> FastAPI (:8796) --> Coordinador (supervisor)
   (API_KEY server-side)                   (401 sin API_KEY)        |
-                                (solo 127.0.0.1) langgraph dev (:2025) --> 8 agentes locales
+                                (solo 127.0.0.1) langgraph dev (:2025) --> 9 agentes locales
 
  Monitor (:8798)  <-- accesos/eventos/despachos --  Memoria (SQLite)
  Almacén de config (config.sqlite) --> GOOGLE_API_KEY · API_KEY · SMTP_PASS · REDIS_URL
- RAG de Reiki --> Redis cloud (RediSearch)
+ RAG de Reiki     --> Redis cloud (RediSearch)
+ Coordinador      --> Postgres (checkpointer durable del hilo, opcional si PG_DSN)
 ```
 
-- **8 agentes locales** `agente_<funcionalidad>`: machinelearning, mlbioinformatica, bioinformatica,
-  **reiki** (RAG), cocinachilena, **meteorologia** (clima REAL de Chile vía Open-Meteo + SQLite), viajes y
+- **9 agentes locales** `agente_<funcionalidad>`: machinelearning, mlbioinformatica, bioinformatica,
+  **reiki** (RAG), cocinachilena, **meteorologia** (clima REAL de Chile vía Open-Meteo + SQLite), viajes,
   **administrador** (recepción: da la bienvenida, responde preguntas meta —"¿qué agentes hay?", "ayuda"—
-  y *sugiere* al usuario a qué agente preguntar; **no** invoca a otros agentes).
+  y *sugiere* al usuario a qué agente preguntar; **no** invoca a otros agentes) y **meteo_mcp** (clima
+  **mundial** vía un **MCP** de Meteosource, con **respaldo keyless Open-Meteo** si el MCP no está —
+  patrón "Clima resiliente en dos niveles"). Reparto del clima: `meteorologia` = verificación y Chile,
+  `meteo_mcp` = mundo, `viajes` deriva el clima a `meteo_mcp`.
 - **Quién rutea:** el **supervisor** vive en el **coordinador** (nodo `enrutar`), **no** en el
   administrador. El supervisor lee el catálogo y **elige un agente** del conjunto (el administrador es
   uno más de ese conjunto); luego `consultar` lo invoca por **A2A**. El coordinador es un `StateGraph`
@@ -75,9 +79,10 @@ flowchart TD
     SA --> GS
     GS --> END([respuesta])
 
-    subgraph AG[Agentes locales A2A - el supervisor elige uno]
+    subgraph AG[9 agentes locales A2A - el supervisor elige uno]
       direction LR
-      MET[meteorologia]
+      MET[meteorologia · Chile/verificación]
+      MCP[meteo_mcp · clima mundial MCP]
       COC[cocinachilena]
       REI[reiki · RAG]
       MLG[machinelearning]
@@ -87,6 +92,10 @@ flowchart TD
       ADM[administrador · recepción/orienta]
     end
 ```
+
+> **Memoria del coordinador:** el estado del hilo usa `PostgresSaver` cuando hay `PG_DSN` (durable,
+> sobrevive reinicios) y cae a `InMemorySaver` si Postgres no está (ver
+> [`docs/decisiones/ADR-0001`](docs/decisiones/ADR-0001-memoria-corto-plazo.md)).
 
 - **guardia_entrada** · guardrail de entrada: si detecta inyección o contenido fuera de alcance,
   **bloquea** y salta directo a `guardia_salida`.
@@ -103,7 +112,10 @@ flowchart TD
 - Python **3.13** y **`uv`**.
 - Un `.env` (ver `.env.example`): `GOOGLE_API_KEY` (Gemini), `API_KEY` (gateway),
   `WEB_USUARIOS`/`WEB_ADMIN`/`CLAVE_INICIAL` (login multiusuario), `A2A_BASE=http://127.0.0.1:2025`,
-  `A2A_GRAFOS_LOCALES` (los 8 grafos), `MONITOR_*`, y opcional `SMTP_*`, `RAG_BACKEND`/`REDIS_URL`/`REDIS_INDEX`.
+  `A2A_GRAFOS_LOCALES` (los **9** grafos), `MONITOR_*`, y opcional `SMTP_*`,
+  `RAG_BACKEND`/`REDIS_URL`/`REDIS_INDEX` (RAG de Reiki), el token del MCP de clima
+  (`MCP_SERVER_METEOSOURCE`/`URL_METEO_MCP`/`MCP_BEARER_TOKEN_ENV_VAR`; si falta, `meteo_mcp` usa el
+  respaldo Open-Meteo) y `PG_DSN` (checkpointer Postgres del coordinador; si falta, usa memoria volátil).
 
 ## Instalar y levantar (LOCAL)
 

@@ -136,6 +136,25 @@ prompt actualizado. Reindexado en Redis: **18 fragmentos** (antes 9). Verificado
   reemplazar la medicación… sigue las indicaciones de tu médico, Reiki solo como apoyo"*. Guardrail OK.
 - Todas con `ruta: guardia_entrada → supervisor → agente_local → guardia_salida`.
 
+## Anexo 16 · Documentación al día para profesores (registro 065)
+
+Pasada integral de documentación para dejar todo coherente con el estado actual (9 agentes +
+meteo_mcp, PostgresSaver, RAG en Redis) de cara a la revisión académica.
+
+- **Actualizados:** `README.md`, `AGENTS.md`, `deploy/README-T2.md`, `deploy/CHECKLIST-ACTIVACION.md`,
+  `deploy/t2c2.env.example`, `.env.example`, `docs/MEJORAS_FUTURAS.md`, `docs/decisiones/ADR-0001`
+  (y `docs/ARQUITECTURA.md` ya venía de 064).
+- **Correcciones de fondo:** "8 agentes" → **9** en todos lados; `meteo_mcp` agregado a textos,
+  diagramas Mermaid y a `A2A_GRAFOS_LOCALES` del `deploy/t2c2.env.example` (estaba sin él); checkpointer
+  documentado como **PostgresSaver/InMemorySaver**; `chown root:web6` → **`root:client1`** (coherente y
+  correcto) en `deploy/`.
+- **Backlog depurado:** el checkpointer persistente pasó a ✅ HECHO (064); nuevos pendientes: durabilidad
+  de hilos de los agentes (`langgraph up`) y hardening `listen_addresses='localhost'` en Postgres.
+- **Verificación:** 0 rezagos de "8 agentes/grafos"; `subgraph`/`end` balanceados en los 3 diagramas.
+- **Detalle:** `respuestas/salida_065.md`.
+
+---
+
 ## Anexo 15 · Memoria durable del coordinador — PostgresSaver (registro 064)
 
 El coordinador pasa de `InMemorySaver` (estado del hilo en RAM, se pierde al reiniciar) a
@@ -199,6 +218,7 @@ Mapa de toda la evidencia de la Tarea 2 (ver resumen en `respuestas/salida_040.m
 | Revisión y merge de la rama de Fabio (fallos + red-team) | Anexo 8 · `fallos.md` · `pruebas-prompts.md` |
 | Memoria de corto plazo: NO SqliteSaver (decisión) | Anexo 9 · `docs/decisiones/ADR-0001-memoria-corto-plazo.md` |
 | Memoria durable del coordinador: PostgresSaver (con fallback) | Anexo 15 · `respuestas/salida_064.md` |
+| Documentación al día para profesores (9 agentes, meteo_mcp, Postgres) | Anexo 16 · `respuestas/salida_065.md` |
 | Recepción personalizada (administrador) | Anexo 10 |
 | Idioma preferido y forma de saludar | Anexo 11 |
 | Health check post-hardening | Anexo 12 |

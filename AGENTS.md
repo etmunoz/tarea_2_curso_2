@@ -2,7 +2,7 @@
 > **Archivo:** `AGENTS.md`  
 > **Objetivo:** Guía de arquitectura y reglas de trabajo de la Tarea 2 · Curso 2 (sistema multi-agente A2A)  
 > **Grupo del curso:** Fabio Durán - Gustavo Reyes - Ezequiel Muñoz  
-> **Creación:** 20261110 1514 · **Última modificación:** 20261117 2305
+> **Creación:** 20261110 1514 · **Última modificación:** 20261123 1730
 <!--/encabezado-grupo-->
 
 # AGENTS.md · Tarea 2 · Curso 2
@@ -14,14 +14,18 @@ Sistema multi-agente **A2A nativo** (LangGraph) con un **gateway FastAPI** como 
 
 ## Piezas
 
-1. **8 agentes locales** (`src/agente_<funcionalidad>/`), cada uno un grafo LangGraph servido por
-   `langgraph dev` (A2A nativo, `:2025`): `machinelearning`, `mlbioinformatica`, `bioinformatica`,
-   `reiki` (RAG), `cocinachilena`, `meteorologia` (clima REAL de Chile, Open-Meteo + SQLite), `viajes` y
-   `administrador` (recepción: da la bienvenida, responde preguntas meta y *sugiere* a qué agente
-   preguntar; **no** rutea ni invoca a otros agentes). Los grafos se registran en `langgraph.json`.
+1. **9 agentes locales** (`src/agente_<funcionalidad>/`, + `src/agente_meteo_mcp/`), cada uno un grafo
+   LangGraph servido por `langgraph dev` (A2A nativo, `:2025`): `machinelearning`, `mlbioinformatica`,
+   `bioinformatica`, `reiki` (RAG), `cocinachilena`, `meteorologia` (clima REAL de Chile, Open-Meteo +
+   SQLite), `viajes`, `administrador` (recepción: da la bienvenida, responde preguntas meta y *sugiere* a
+   qué agente preguntar; **no** rutea ni invoca a otros agentes) y `meteo_mcp` (clima **mundial** vía un
+   **MCP** de Meteosource con guardia propia y 3 tools; **respaldo keyless Open-Meteo** si el MCP no está).
+   El adaptador MCP vive en `src/integraciones/mcp_langchain.py`. Los grafos se registran en `langgraph.json`.
 2. **Coordinador** (`src/coordinador/`) · supervisor `StateGraph`:
    `guardia_entrada → supervisor → (agente_local | sin_agente) → guardia_salida`. El estado acumula
-   `ruta`; el gateway la **corta por turno** antes de devolverla. Checkpointer `InMemorySaver`.
+   `ruta`; el gateway la **corta por turno** antes de devolverla. Checkpointer: **`PostgresSaver`** si hay
+   `PG_DSN` (memoria durable del hilo), si no **`InMemorySaver`** (ver ADR-0001); el `agente_previo` del
+   seguimiento es durable vía store SQLite en cualquier caso.
 3. **Gateway FastAPI** (`src/api/app.py`, `:8796`) · **único** acceso a los agentes, protegido por
    **`API_KEY`** (header `X-API-Key`; 401 sin clave). Namespacea el hilo por `usuario:sesion`.
 4. **Canal web / BFF** (`src/canales/web.py`, `:8797`) · chat con diseño del Taller 1 (aurora, Chat +
@@ -51,9 +55,10 @@ flowchart TD
     SA --> GS
     GS --> END([respuesta])
 
-    subgraph AG[Agentes locales A2A - el supervisor elige uno]
+    subgraph AG[9 agentes locales A2A - el supervisor elige uno]
       direction LR
-      MET[meteorologia]
+      MET[meteorologia · Chile/verificación]
+      MCP[meteo_mcp · clima mundial MCP]
       COC[cocinachilena]
       REI[reiki · RAG]
       MLG[machinelearning]
@@ -86,8 +91,10 @@ flowchart TD
 ```
 tarea_2_curso_2/
 ├── README.md  AGENTS.md  CONVENCIONES.md  langgraph.json  pyproject.toml  requirements.txt  .env.example
-├── src/agente_<funcionalidad>/   graph.py  herramientas.py  prompts.py        ← 8 agentes A2A (+ reiki/rag.py)
-├── src/coordinador/              supervisor (guardias + ruteo)
+├── src/agente_<funcionalidad>/   graph.py  herramientas.py  prompts.py        ← 9 agentes A2A (+ reiki/rag.py)
+│   └── src/agente_meteo_mcp/     meteo_mcp (MCP Meteosource + respaldo Open-Meteo)
+├── src/integraciones/            mcp_langchain.py (adaptador MCP → StructuredTool)
+├── src/coordinador/              supervisor (guardias + ruteo; checkpointer Postgres/InMemory)
 ├── src/api/app.py                gateway FastAPI protegido por API_KEY
 ├── src/canales/                  web.py (BFF) · correo.py · monitor.py · grafo_imagen.py
 ├── src/memoria/                  SQLite (conversaciones, allowlist, despachos, accesos, eventos)

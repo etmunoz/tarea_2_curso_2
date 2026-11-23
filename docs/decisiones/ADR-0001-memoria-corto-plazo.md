@@ -20,7 +20,7 @@ compila con `InMemorySaver`, que guarda el estado del hilo (mensajes + `ruta`) *
 Problema: ese estado **se pierde en cada reinicio** del servicio (y reiniciamos seguido en los
 despliegues), y no sería consistente si `t2c2-api` corriera con varios workers.
 
-> Nota: los **8 agentes** corren bajo `langgraph dev` (`langgraph-api`), que tiene su **propia**
+> Nota: los **9 agentes** corren bajo `langgraph dev` (`langgraph-api`), que tiene su **propia**
 > persistencia de hilos. Esta decisión aplica SOLO al grafo del coordinador, que no usa ese runtime.
 
 ## Opción evaluada y DESCARTADA — `SqliteSaver` de LangGraph
@@ -55,7 +55,7 @@ Se **revirtió de inmediato** (`langgraph-checkpoint 2.1.2 → 4.3.1`) y se veri
 (`/salud` = 200). Evidencia completa en `evidencias/EVIDENCIAS.md` (Anexo 9).
 
 **¿Y subir LangGraph a 2.x para habilitarlo?** Descartado por ahora: tocaría **todo el runtime A2A**
-(`langgraph-api`/`langgraph dev` que sirve los 8 agentes, `langgraph-cli`, `langgraph-sdk`,
+(`langgraph-api`/`langgraph dev` que sirve los 9 agentes, `langgraph-cli`, `langgraph-sdk`,
 `langgraph-swarm`), además del coordinador. Es una migración mayor, deliberada y que exige re-probar
 todo el sistema; no se justifica solo por el checkpointer. Queda como **backlog**
 (`docs/MEJORAS_FUTURAS.md` §3).

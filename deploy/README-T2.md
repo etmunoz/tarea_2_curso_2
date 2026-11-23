@@ -14,7 +14,7 @@ web1 (Tarea 1) y web5 (lucecitaOS).
 
 | Servicio | Puerto | Rol |
 |---|---|---|
-| `t2c2-langgraph` | 2025 | `langgraph dev` con los 8 agentes locales (A2A nativo). Base de todo. |
+| `t2c2-langgraph` | 2025 | `langgraph dev` con los **9** agentes locales (A2A nativo, incluye `meteo_mcp`). Base de todo. |
 | `t2c2-fichas` | — | Vigilante: re-aplica las fichas (agent cards) cuando langgraph las borra. |
 | `t2c2-api` | 8796 | Gateway **FastAPI** protegido por **API_KEY**. Único acceso a los agentes. |
 | `t2c2-web` | 8797 | Frontend **BFF** (chat + voz integrada, login por sesión); añade API_KEY + X-Usuario server-side. |
@@ -23,10 +23,24 @@ web1 (Tarea 1) y web5 (lucecitaOS).
 ## Requisitos previos
 
 - **`/etc/t2c2.env`** con los secretos (ver `deploy/t2c2.env.example`): `GOOGLE_API_KEY`, `API_KEY`,
-  `WEB_USUARIOS`/`WEB_ADMIN`/`CLAVE_INICIAL` (login multiusuario), `MONITOR_*`, y (para correo) `SMTP_*`.
-  Sin `GOOGLE_API_KEY` los agentes no responden. Alternativa sin editar `/etc`: fijar `GOOGLE_API_KEY`,
-  `API_KEY`, `SMTP_PASS` y `REDIS_URL` por el **almacén de config** (`/config` del monitor, o
-  `deploy/set_redis_url.sh` para la `REDIS_URL`).
+  `WEB_USUARIOS`/`WEB_ADMIN`/`CLAVE_INICIAL` (login multiusuario), `A2A_GRAFOS_LOCALES` (los **9** grafos,
+  incluye `meteo_mcp`), `MONITOR_*`, y (para correo) `SMTP_*`. Sin `GOOGLE_API_KEY` los agentes no
+  responden. Alternativa sin editar `/etc`: fijar `GOOGLE_API_KEY`, `API_KEY`, `SMTP_PASS` y `REDIS_URL`
+  por el **almacén de config** (`/config` del monitor, o `deploy/set_redis_url.sh` para la `REDIS_URL`).
+- **Opcionales (van en `/etc/t2c2.env`, nunca en el repo ni en el chat):**
+  - **MCP de clima** (`meteo_mcp`): `MCP_SERVER_METEOSOURCE`, `URL_METEO_MCP`, `MCP_BEARER_TOKEN_ENV_VAR`
+    (token de pago de Meteosource). Si faltan, `meteo_mcp` responde igual con el **respaldo keyless
+    Open-Meteo**. Recuerda incluir `meteo_mcp` en `A2A_GRAFOS_LOCALES` o el coordinador no lo verá.
+  - **Memoria durable del coordinador**: `PG_DSN=postgresql://t2c2:***@localhost:5432/t2c2`. Con él, el
+    coordinador usa `PostgresSaver` (el estado del hilo sobrevive reinicios); sin él (o si Postgres
+    falla), cae a `InMemorySaver` sin romperse. Crear rol/base dedicados y rotar la clave en el VPS:
+    ```bash
+    sudo -u postgres psql -c "CREATE ROLE t2c2 LOGIN PASSWORD 'rotar';"
+    sudo -u postgres psql -c "CREATE DATABASE t2c2 OWNER t2c2;"
+    # luego rotar la clave a una aleatoria y escribir PG_DSN en /etc/t2c2.env (sin pasarla por el chat)
+    ```
+    Tras dejar `PG_DSN`, `sudo systemctl restart t2c2-api`; el log muestra `[coordinador] checkpointer:
+    postgres` en la primera `/consulta`. Ver [`../docs/decisiones/ADR-0001-memoria-corto-plazo.md`](../docs/decisiones/ADR-0001-memoria-corto-plazo.md).
 - **Swap** recomendado antes de dejar todo corriendo (la RAM está ajustada; ver evaluación de la VPS,
   registro 001). Revisar también `clamd` (≈966 MB).
 

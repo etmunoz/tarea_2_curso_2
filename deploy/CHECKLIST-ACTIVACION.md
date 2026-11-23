@@ -24,8 +24,14 @@
 - [ ] Instalarlo en /etc (como administrator):
   ```bash
   sudo cp /var/www/clients/client1/web6/home/etmkuseretmk2/t2c2.env.borrador /etc/t2c2.env
-  sudo chown root:web6 /etc/t2c2.env && sudo chmod 640 /etc/t2c2.env
+  sudo chown root:client1 /etc/t2c2.env && sudo chmod 640 /etc/t2c2.env   # grupo client1: web6 lo lee
   ```
+- [ ] (Opcional) **MCP de clima** `meteo_mcp`: pegar `MCP_SERVER_METEOSOURCE`, `URL_METEO_MCP`,
+  `MCP_BEARER_TOKEN_ENV_VAR` (token de pago) e incluir `meteo_mcp` en `A2A_GRAFOS_LOCALES`. Sin esto,
+  `meteo_mcp` usa el respaldo keyless Open-Meteo.
+- [ ] (Opcional) **Memoria durable del coordinador**: crear rol/base `t2c2` en Postgres, rotar la clave
+  en el VPS y dejar `PG_DSN=postgresql://t2c2:***@localhost:5432/t2c2` (ver `deploy/README-T2.md`). Sin
+  esto, el coordinador usa `InMemorySaver`.
 
 ## 2. Servicios systemd
 - [ ] Instalar y recargar:

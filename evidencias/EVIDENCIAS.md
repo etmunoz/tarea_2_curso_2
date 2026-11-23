@@ -166,8 +166,12 @@ Montaje **local reproducible** en el Mac y batería de evidencia real, rotulada 
 - **Seguridad + recorrido + memoria:** [`backend_local.md`](backend_local.md) — 401/200 sin exponer la
   clave; `POST /consulta` con ruta A2A y datos reales; `[coordinador] checkpointer: postgres` con un
   **PostgreSQL local** (tabla `checkpoints` con filas > 0; fallback a InMemorySaver verificado).
-- **UI web local** `127.0.0.1:8797`: chat con respuesta etiquetada `[agente_meteorologia]` + panel de
-  ruteo del coordinador — verificado en vivo; la captura la aporta el equipo.
+- **UI web local** `127.0.0.1:8797`: **7 capturas** del chat documentadas in extenso (pedido → ruteo →
+  respuesta, con panel del coordinador) en [`ui/README.md`](ui/README.md), cada una con pie de foto de 5
+  campos. Incluyen: cobertura Chile (meteorología), **seguimiento que re-rutea a `meteo_mcp` (Barcelona,
+  registro 068)**, resiliencia ante fallo de Open-Meteo (mensaje claro, sin éxito falso) + recuperación,
+  cambio de tema a Cocina, guardrail de Reiki (no médico) y restricción vegana con costeo. Los PNG los
+  guarda el equipo en `evidencias/ui/` con los nombres indicados.
 - **Montaje:** claves copiadas del VPS al `.env` local sin pasar por el chat (GOOGLE_API_KEY + REDIS_URL
   real del almacén de config); Postgres 16 por Homebrew (nativo). Detalle: `respuestas/salida_067.md`.
 
@@ -277,6 +281,7 @@ Mapa de toda la evidencia de la Tarea 2 (ver resumen en `respuestas/salida_040.m
 | Contraste contra el enunciado + capturas pendientes (pre-entrega) | Anexo 17 · `respuestas/salida_066.md` |
 | Evidencia LOCAL — todos los agentes (9/9), seguridad y memoria | Anexo 18 · `evidencias/agentes_local.md` · `backend_local.md` |
 | Seguimiento inteligente (re-ruteo al cambiar de dominio) | Anexo 19 · `respuestas/salida_068.md` |
+| Capturas del canal web (7, con pies de foto de 5 campos) | `evidencias/ui/README.md` |
 | Recepción personalizada (administrador) | Anexo 10 |
 | Idioma preferido y forma de saludar | Anexo 11 |
 | Health check post-hardening | Anexo 12 |

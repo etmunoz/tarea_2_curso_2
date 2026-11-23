@@ -96,4 +96,13 @@ FICHAS: dict[str, dict[str, str]] = {
             "especializada él mismo: orienta y deriva."
         ),
     },
+    "meteo_mcp": {
+        "name": "meteo_mcp",
+        "description": (
+            "Pronóstico meteorológico en español mediante las herramientas en vivo de Meteosource: "
+            "primero ubica ciudades con search_places y luego consulta get_forecast o "
+            "get_weather_history usando place_id. "
+            "No responde temas ajenos a la meteorología ni inventa datos que el servidor no entregue."
+        ),
+    },
 }

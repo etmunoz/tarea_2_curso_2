@@ -73,11 +73,12 @@ def test_bd_clima(tmp_path, monkeypatch):
     assert bd_clima.observado_guardado("santiago", "2026-11-07")[1] == 26.1
 
 
-def test_fichas_ocho_agentes():
+def test_fichas_nueve_agentes():
     from src.fichas import FICHAS
-    assert len(FICHAS) == 8
+    assert len(FICHAS) == 9
     for g in ("agente_machinelearning", "agente_meteorologia", "agente_administrador"):
         assert g in FICHAS and FICHAS[g]["name"] and FICHAS[g]["description"]
+    assert "meteo_mcp" in FICHAS
 
 
 def test_administrador_tools():
@@ -85,7 +86,7 @@ def test_administrador_tools():
     lista = h.listar_agentes.invoke({})
     ids = {a["agente"] for a in lista}
     assert "agente_administrador" not in ids  # no se lista a sí mismo
-    assert "agente_reiki" in ids and len(lista) == 7
+    assert "agente_reiki" in ids and "meteo_mcp" in ids and len(lista) == 8
     d = h.describir_agente.invoke({"nombre": "agente_reiki"})
     assert d["agente"] == "agente_reiki"
     assert "error" in h.describir_agente.invoke({"nombre": "agente_inexistente"})

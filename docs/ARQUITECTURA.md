@@ -8,7 +8,7 @@
 # Arquitectura técnica — Tarea 2 · Curso 2
 
 Documento **vivo**: refleja la complejidad actual del sistema y se actualiza con cada evolución.
-Última revisión de arquitectura: **registro 036** (agentes mejorados 028–032: bioinformática/UniProt,
+Última revisión de arquitectura: **registro 059** (agentes mejorados 028–032: bioinformática/UniProt,
 ML-bio/pipelines, cocina, fichas, viajes real; endurecimiento de seguridad/robustez 034–035: merge de
 los fallos 1/3/5/6 de Fabio y resolución de 2/4/7; memoria de corto plazo del seguimiento **durable**
 036; recepción personalizada del administrador —saludo por hora, nombre propio, nombre del usuario
@@ -56,15 +56,16 @@ flowchart TB
         GE2["guardia_entrada"] --> SUP2["enrutar (supervisor)"]
         SUP2 --> CONS["consultar | sin_agente"] --> GS2["guardia_salida"]
       end
-      subgraph LG["t2c2-langgraph · A2A nativo (:2025) · 8 agentes"]
+       subgraph LG["t2c2-langgraph · A2A nativo (:2025) · 9 agentes"]
         A1["meteorologia · clima REAL"]
         A2["reiki · RAG + terapias"]
         A3["bioinformatica · UniProt"]
         A4["mlbioinformatica · pipelines"]
         A5["machinelearning · tecnica/metricas/modelo"]
         A6["cocinachilena · recetas/costeo/nutricion"]
-        A7["viajes · destino real + demo"]
-        A8["administrador · recepcion"]
+         A7["viajes · destino real + demo"]
+         A8["administrador · recepcion"]
+         A9["meteo_mcp · Meteosource MCP"]
       end
     end
 
@@ -89,6 +90,7 @@ flowchart TB
       FXR["open.er-api.com<br/>tipo de cambio"]
       WK["Wikipedia REST"]
       SMTP["SMTP etmk.cl"]
+      MCP["MCP Meteosource<br/>Streamable HTTP · Bearer"]
     end
 
     SUP2 -->|decide agente| GEM
@@ -109,11 +111,30 @@ flowchart TB
     MONI --> MEM
     MONI --> CFG
     API -->|despacho correo| SMTP
+    A9 -.herramientas MCP.-> MCP
     FICHAS -.re-aplica cards.-> LG
 ```
 
 > Convención del diagrama: líneas sólidas = flujo de petición/datos; línea punteada = proceso de
 > soporte. "REAL" marca datos en vivo de una API pública; "demo" marca datos de ejemplo.
+
+---
+
+## Flujo interno de `meteo_mcp`
+
+```mermaid
+flowchart LR
+    MSTART([mensaje]) --> GDE[guardia_de_entrada<br/>Veredicto estructurado]
+    GDE -->|permitido| MAG[agente<br/>Gemini + tools]
+    GDE -->|no permitido| BLOQ[respuesta_bloqueada<br/>respuesta fija]
+    MAG --> TOOLS[search_places<br/>get_forecast<br/>get_weather_history]
+    TOOLS --> MCP
+    MCP[Meteosource MCP<br/>Streamable HTTP]
+```
+
+La guardia clasifica antes de ejecutar el agente meteorológico. Los mensajes fuera de alcance,
+inyecciones, datos personales y acciones no soportadas reciben una respuesta fija sin usar las
+tools meteorológicas.
 
 ---
 
@@ -125,10 +146,11 @@ flowchart TB
 | Monitor | `t2c2-monitor` | 8798 | `src/canales/monitor.py` | Accesos, eventos, cuota Gemini, `/config` |
 | Gateway | `t2c2-api` | 8796 | `src/api/app.py` | FastAPI protegido por `API_KEY`; único acceso a agentes |
 | Coordinador | (en gateway) | — | `src/coordinador/` | Supervisor: guardias + ruteo por turno |
-| Agentes A2A | `t2c2-langgraph` | 2025 | `src/agente_*/` | 8 grafos LangGraph (A2A nativo) |
+| Agentes A2A | `t2c2-langgraph` | 2025 | `src/agente_*/`, `src/agente_meteo_mcp/` | 9 grafos LangGraph (A2A nativo) |
 | Vigilante fichas | `t2c2-fichas` | — | `tools/configurar_fichas.py` | Re-aplica las agent cards de `src/fichas.py` |
 | Memoria | — | — | `src/memoria/` | SQLite (conversaciones, allowlist, accesos, eventos) |
 | Config / Usuarios | — | — | `src/config/` | `ajustes.py`, `bootstrap.py`, `usuarios.py`, `estado.py` |
+| Adaptador MCP | — | externo | `src/integraciones/mcp_langchain.py` | Cliente MCP 2.3 asíncrono y conversión a `StructuredTool` |
 
 ## Agentes y sus fuentes de datos
 
@@ -142,6 +164,7 @@ flowchart TB
 | cocinachilena | recetas/costeo/nutrición (SQLite + reglas) | referencia |
 | viajes | geocoding + cambio + clima + Wikipedia (real); vuelos/hoteles (demo) | **real** + demo |
 | administrador | fichas del resto de agentes | interno |
+| meteo_mcp | Meteosource MCP (`search_places`, `get_forecast`, `get_weather_history`) | **real** |
 
 ## Fuentes externas (sin API key salvo Gemini)
 
@@ -152,6 +175,7 @@ flowchart TB
 - **open.er-api.com**: tipo de cambio con CLP (sin key).
 - **Wikipedia REST**: resúmenes de destinos (sin key).
 - **SMTP** (`tarea2curso2@etmk.cl`): despacho de correo (allowlist).
+- **MCP Meteosource** (`MCP_SERVER_METEOSOURCE`): herramientas meteorológicas por Streamable HTTP; autentificación Bearer mediante `MCP_BEARER_TOKEN_ENV_VAR` (token directo o nombre de variable).
 
 ## Seguridad (resumen)
 
@@ -159,6 +183,9 @@ flowchart TB
 - BFF con login multiusuario (PBKDF2 + cookie `HttpOnly+SameSite=Lax+Secure`, anti-fuerza-bruta).
 - Guardrails de entrada/salida en el coordinador; la respuesta de un agente es **dato**, no instrucción.
 - Secretos fuera del repo (`.env`/`/etc/t2c2.env` o el config store); correo solo a la allowlist.
+- El token Bearer MCP se resuelve desde `MCP_BEARER_TOKEN_ENV_VAR` y nunca se registra.
+- `meteo_mcp` filtra el mensaje con `guardia_de_entrada` antes de ejecutar sus herramientas; los
+  bloqueos no invocan el agente meteorológico ni las tools.
 
 ## Despliegue
 

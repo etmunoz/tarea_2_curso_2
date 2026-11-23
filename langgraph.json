@@ -10,7 +10,8 @@
     "agente_meteorologia": "./src/agente_meteorologia/graph.py:graph",
     "agente_bioinformatica": "./src/agente_bioinformatica/graph.py:graph",
     "agente_mlbioinformatica": "./src/agente_mlbioinformatica/graph.py:graph",
-    "agente_administrador": "./src/agente_administrador/graph.py:graph"
+    "agente_administrador": "./src/agente_administrador/graph.py:graph",
+    "meteo_mcp": "./src/agente_meteo_mcp/graph.py:graph"
   },
   "env": ".env"
 }

@@ -136,7 +136,11 @@ flujo.add_conditional_edges(
 )
 flujo.add_edge("agente", END)
 flujo.add_edge("respuesta_bloqueada", END)
-graph = flujo.compile(checkpointer=MemorySaver())
+# `graph` SIN checkpointer: es el que publica `langgraph dev` (A2A) y langgraph.json. La plataforma
+# maneja la persistencia por hilo; un checkpointer propio hace que langgraph-api RECHACE el grafo y no
+# levante el servidor. `_graph_mem` (con checkpointer) es solo para los helpers standalone del CLI/server.
+graph = flujo.compile()
+_graph_mem = flujo.compile(checkpointer=MemorySaver())
 
 
 def _texto_mensaje(mensaje: Any) -> str:
@@ -200,7 +204,7 @@ def _configuracion(context_id: str) -> dict[str, dict[str, str]]:
 
 async def responder(texto: str, context_id: str) -> str:
     """Responde usando el grafo y conserva memoria por context_id."""
-    estado = await graph.ainvoke(
+    estado = await _graph_mem.ainvoke(
         {"messages": [{"role": "user", "content": texto}]},
         config=_configuracion(context_id),
     )
@@ -213,7 +217,7 @@ async def saltos(texto: str) -> str:
     cantidad = 0
     ultimo_mensaje: Any = None
 
-    async for actualizacion in graph.astream(
+    async for actualizacion in _graph_mem.astream(
         {"messages": [{"role": "user", "content": texto}]},
         config=_configuracion(context_id),
         stream_mode="updates",

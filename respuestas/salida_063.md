@@ -39,6 +39,16 @@
   tests/test_agente_viajes.py` → **30 passed** (incluye el fallback). Local (sin mcp) → **164 passed**.
 - **En vivo (tras reiniciar + key):** pendiente — ver §5.
 
+## 4b. Incidente en la activación (resuelto)
+
+Al reiniciar, **langgraph no levantó** (`:2025/ok` 000; `t2c2-fichas` en timeout). Causa raíz (capturada
+corriendo `langgraph dev` manual): el grafo `meteo_mcp` compilaba con un **checkpointer propio**
+(`MemorySaver`), y **langgraph-api lo RECHAZA** (`ValueError: ... includes a custom checkpointer ...
+please remove it`), tumbando la carga de TODO el servidor (los 9 agentes). **Fix:** `graph` ahora
+compila **sin** checkpointer (langgraph dev maneja la persistencia) y se agregó `_graph_mem` (con
+checkpointer) solo para los helpers `responder`/`saltos` del CLI/server de Gustavo. Validado: `langgraph
+dev` sirve y lista los 9 grafos (incluido `meteo_mcp`).
+
 ## 5. Pendiente de activación
 
 - La **API key de Meteosource** va en `/etc/t2c2.env` del VPS (la carga Ezequiel/administrator, oculta).

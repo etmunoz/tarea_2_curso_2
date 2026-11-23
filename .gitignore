@@ -30,3 +30,6 @@ logs/
 
 # Credenciales del coordinador: local + en el zip, NUNCA en git
 CLAVE-COORDINADOR.txt
+
+# Apaño de arranque LOCAL (excluye meteo_mcp por cryptography en Mac); no es parte de la entrega
+langgraph.local.json

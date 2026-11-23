@@ -136,6 +136,24 @@ prompt actualizado. Reindexado en Redis: **18 fragmentos** (antes 9). Verificado
   reemplazar la medicación… sigue las indicaciones de tu médico, Reiki solo como apoyo"*. Guardrail OK.
 - Todas con `ruta: guardia_entrada → supervisor → agente_local → guardia_salida`.
 
+## Anexo 18 · Evidencia LOCAL — funcionamiento de todos los agentes (registro 067)
+
+Montaje **local reproducible** en el Mac y batería de evidencia real, rotulada **LOCAL**:
+
+- **Todos los agentes:** [`agentes_local.md`](agentes_local.md) — una consulta real por agente
+  (**8/8** ruteados correctamente), con fuentes reales (Gemini, Redis remoto, Open-Meteo, UniProt, tipo
+  de cambio, Wikipedia). El 9º, `meteo_mcp`, se prueba en VPS (Anexos 14/17; no carga en Mac por
+  `cryptography`).
+- **Seguridad + recorrido + memoria:** [`backend_local.md`](backend_local.md) — 401/200 sin exponer la
+  clave; `POST /consulta` con ruta A2A y datos reales; `[coordinador] checkpointer: postgres` con un
+  **PostgreSQL local** (tabla `checkpoints` con filas > 0; fallback a InMemorySaver verificado).
+- **UI web local** `127.0.0.1:8797`: chat con respuesta etiquetada `[agente_meteorologia]` + panel de
+  ruteo del coordinador — verificado en vivo; la captura la aporta el equipo.
+- **Montaje:** claves copiadas del VPS al `.env` local sin pasar por el chat (GOOGLE_API_KEY + REDIS_URL
+  real del almacén de config); Postgres 16 por Homebrew (nativo). Detalle: `respuestas/salida_067.md`.
+
+---
+
 ## Anexo 17 · Contraste contra el enunciado + capturas pendientes (registro 066)
 
 Auditoría de pre-entrega contra el PDF oficial (`taller_implementacion_agentes_tarea_2_curso_2.pdf`).
@@ -238,6 +256,7 @@ Mapa de toda la evidencia de la Tarea 2 (ver resumen en `respuestas/salida_040.m
 | Memoria durable del coordinador: PostgresSaver (con fallback) | Anexo 15 · `respuestas/salida_064.md` |
 | Documentación al día para profesores (9 agentes, meteo_mcp, Postgres) | Anexo 16 · `respuestas/salida_065.md` |
 | Contraste contra el enunciado + capturas pendientes (pre-entrega) | Anexo 17 · `respuestas/salida_066.md` |
+| Evidencia LOCAL — todos los agentes (8/8), seguridad y memoria | Anexo 18 · `evidencias/agentes_local.md` · `backend_local.md` |
 | Recepción personalizada (administrador) | Anexo 10 |
 | Idioma preferido y forma de saludar | Anexo 11 |
 | Health check post-hardening | Anexo 12 |

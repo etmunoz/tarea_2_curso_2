@@ -6,8 +6,9 @@
 
 # Backend — **LOCAL**, 2026-11-23
 
-**Entorno y fecha:** LOCAL (Mac), 2026-11-23. FastAPI `127.0.0.1:8796` + langgraph `127.0.0.1:2025` (8 agentes;
-`meteo_mcp` se prueba en VPS). La **API_KEY no se muestra**.
+**Entorno y fecha:** LOCAL (Mac), 2026-11-23. FastAPI `127.0.0.1:8796` + langgraph `127.0.0.1:2025`
+(**los 9 agentes**, incluido `meteo_mcp` tras reinstalar `cryptography` en el venv local). La
+**API_KEY no se muestra**.
 
 ## 1. Control de acceso (clave validada en el servidor)
 
@@ -15,7 +16,7 @@
 |---|---|---|
 | `GET /salud` | 200 | **200** |
 | `GET /agentes` **sin** API_KEY | 401 (rechazado) | **401** |
-| `GET /agentes` **con** API_KEY | 200 + agentes | **200**, 9 fichas (8 ruteables en local; `meteo_mcp` es el 9º, probado en VPS) |
+| `GET /agentes` **con** API_KEY | 200 + agentes | **200**, **9 agentes** (incluye `meteo_mcp`) |
 
 ## 2. Consulta real con ruteo A2A (recorrido completo)
 
@@ -38,5 +39,6 @@ Regla verificada: si falta `PG_DSN` o Postgres no está, cae a `InMemorySaver` s
 
 ## 4. Funcionamiento de TODOS los agentes
 
-Ver [`agentes_local.md`](agentes_local.md): una consulta real por agente (8/8 ruteados correctamente),
-con fuentes reales (Gemini, Redis remoto, Open-Meteo, UniProt, tipo de cambio, Wikipedia).
+Ver [`agentes_local.md`](agentes_local.md): una consulta real por agente (**9/9** ruteados
+correctamente, incluido `meteo_mcp` con "¿qué clima hace en Madrid hoy?" → respaldo Open-Meteo), con
+fuentes reales (Gemini, Redis remoto, Open-Meteo, UniProt, tipo de cambio, Wikipedia, MCP Meteosource).

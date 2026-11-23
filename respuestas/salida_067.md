@@ -18,28 +18,32 @@
   **Gemini OK**, **Redis remoto OK** (dbsize=53). Valores nunca impresos.
 - **PostgreSQL 16 local** (Homebrew, nativo, sin Docker). Rol/base `t2c2`; `PG_DSN` en `.env` →
   coordinador con **PostgresSaver** en local.
-- **langgraph** con `langgraph.local.json` (8 agentes; `meteo_mcp` excluido en Mac por el fallo de
-  `cryptography`/`libssl`; en el VPS siguen los 9). FastAPI, web y monitor levantados con el `.env` cargado.
+- **langgraph con los 9 agentes.** `meteo_mcp` fallaba al cargar en el Mac (`cryptography` buscaba
+  `libssl.4.dylib`); se **reinstaló `cryptography`** (wheel con openssl incorporado) y pasó a importar.
+  Se aplicaron las **fichas** (`tools/configurar_fichas.py`) a las agent cards locales — sin ellas el
+  supervisor no distinguía `meteo_mcp` (mundial) de `meteorologia` (Chile). FastAPI, web y monitor con
+  el `.env` cargado; vigilante de fichas corriendo.
 
 ## 2. Evidencia del funcionamiento de TODOS los agentes — [`../evidencias/agentes_local.md`](../evidencias/agentes_local.md)
 
 Una consulta real por agente, por el gateway local, con fuentes reales (Gemini, Redis remoto, Open-Meteo,
-UniProt, tipo de cambio, Wikipedia). **8/8 ruteados correctamente:**
+UniProt, tipo de cambio, Wikipedia, MCP Meteosource). **9/9 ruteados correctamente:**
 
 | Agente | Solicitud (resumen) | Elegido |
 |---|---|---|
-| meteorologia | clima hoy en Valdivia | ✅ `agente_meteorologia` |
-| reiki (RAG) | ¿qué es el Reiki y beneficios? | ✅ `agente_reiki` |
-| bioinformatica | gen TP53 en UniProt | ✅ `agente_bioinformatica` |
-| mlbioinformatica | pipeline ML punta a punta (sin fuga por homología) | ✅ `agente_mlbioinformatica` |
-| machinelearning | técnica para desbalance de clases | ✅ `agente_machinelearning` |
-| cocinachilena | pastel de choclo con costo | ✅ `agente_cocinachilena` |
-| viajes | Lima: destino + tipo de cambio | ✅ `agente_viajes` |
-| administrador | ¿qué agentes hay? | ✅ `agente_administrador` |
+| meteorologia | verificar pronóstico vs observado en Santiago | ✅ Agente de Meteorología |
+| **meteo_mcp** | **¿qué clima hace en Madrid hoy?** | ✅ **meteo_mcp** (respaldo Open-Meteo) |
+| reiki (RAG) | ¿qué es el Reiki y beneficios? | ✅ Agente de Reiki |
+| bioinformatica | gen TP53 en UniProt | ✅ Agente de Bioinformática |
+| mlbioinformatica | pipeline ML punta a punta (sin fuga por homología) | ✅ Agente de ML en Bioinformática |
+| machinelearning | técnica para desbalance de clases | ✅ Agente de Machine Learning |
+| cocinachilena | pastel de choclo con costo | ✅ Agente de Cocina Chilena |
+| viajes | Lima: destino + tipo de cambio | ✅ Agente de Viajes |
+| administrador | ¿qué agentes hay? | ✅ Agente Administrador |
 
 Todas con ruta `guardia_entrada → supervisor → agente_local → guardia_salida` (la respuesta del agente
-llega como **dato** etiquetado `[agente_...]`). El 9º agente, `meteo_mcp`, está probado en el VPS
-(Anexos 14/17).
+llega como **dato** etiquetado `[Nombre]`). **Reparto del clima verificado:** Chile→`meteorologia`,
+mundo→`meteo_mcp` (igual que en el VPS).
 
 ## 3. Seguridad y memoria — [`../evidencias/backend_local.md`](../evidencias/backend_local.md)
 
@@ -57,8 +61,16 @@ llega como **dato** etiquetado `[agente_...]`). El 9º agente, `meteo_mcp`, est�
 - **Correo recibido** (bandeja Gmail) y **muestra de voz** (audio/video de `/voz`).
 - Rotular la evidencia del **VPS** como el **+1** (entorno remoto).
 
-## 5. Estado
+## 5. Paridad con el VPS (verificada)
 
-- ✅ Montaje local reproducible, **8/8 agentes funcionando en LOCAL** con fuentes reales, control de
-  acceso y memoria durable (Postgres local) evidenciados como archivos en el repo. Bitácora **067**,
-  Anexo **18**.
+El síntoma inicial —"Madrid" respondido por `agente_meteorologia` en vez de `meteo_mcp`— era **solo del
+montaje local** (meteo_mcp excluido + fichas sin aplicar), **no un defecto de producción**. Verificado
+en vivo en el VPS: catálogo de **9 agentes**; "¿qué clima hace en Madrid hoy?" → **meteo_mcp**
+(Meteosource real, 14.2 °C); "clima hoy en Valdivia" → **Agente de Meteorología** (Chile). El reparto
+Chile/mundo funciona bien en el VPS: **nada que reparar allí**.
+
+## 6. Estado
+
+- ✅ Montaje local reproducible, **9/9 agentes funcionando en LOCAL** (incluido `meteo_mcp`) con fuentes
+  reales, control de acceso y memoria durable (Postgres local) evidenciados como archivos en el repo.
+  Paridad con el VPS verificada. Bitácora **067**, Anexo **18**.

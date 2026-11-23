@@ -153,21 +153,12 @@ def _texto_mensaje(mensaje: Any) -> str:
 
 def _limpiar_respuesta(texto: str) -> str:
     """Entrega una respuesta humana sin restos técnicos del MCP o JSON."""
-    texto_minusculas = texto.casefold()
-    posiciones = [
-        posicion
-        for posicion in (
-            texto_minusculas.find("extras:"),
-            texto_minusculas.find("signature:"),
-        )
-        if posicion >= 0
-    ]
-    for patron in (r"(?i)extras\s*:\s*", r"(?i)signature\s*:\s*"):
-        coincidencia = re.search(patron, texto)
-        if coincidencia:
-            posiciones.append(coincidencia.start())
-    if posiciones:
-        texto = texto[: min(posiciones)]
+    # Recorta desde el primer marcador técnico (extras/signature), tolerando comillas, espacios o comas
+    # alrededor (p. ej. `"extras":`, `, extras :`) que el JSON del MCP puede dejar. Antes solo buscaba
+    # `extras:`/`signature:` literales y el `"extras":` del JSON se colaba al final.
+    tecnico = re.search(r'[\s",]*["\']?(?:extras|signature)["\']?\s*:', texto, re.IGNORECASE)
+    if tecnico:
+        texto = texto[: tecnico.start()]
     texto = re.sub(r"(?im)^\s*fuente\s*:?.*$", "", texto)
     texto = texto.replace("\\r\\n", "\n").replace("\\n", "\n").replace("\\t", " ")
     texto = re.sub(r"\*\*(.*?)\*\*", r"\1", texto)

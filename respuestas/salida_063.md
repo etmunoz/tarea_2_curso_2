@@ -2,7 +2,7 @@
 > **Archivo:** `respuestas/salida_063.md`  
 > **Objetivo:** 063 · Respuesta — meteo_mcp integrado con "Clima resiliente en dos niveles"  
 > **Grupo del curso:** Fabio Durán - Gustavo Reyes - Ezequiel Muñoz  
-> **Creación:** 20261123 1200 · **Última modificación:** 20261123 1200
+> **Creación:** 20261123 1200 · **Última modificación:** 20261123 1600
 <!--/encabezado-grupo-->
 
 # 063 · Respuesta — Clima resiliente (meteo_mcp)
@@ -61,6 +61,23 @@ dev` sirve y lista los 9 grafos (incluido `meteo_mcp`).
 - **Fallback Open-Meteo**: cubierto por tests (si Meteosource no está, responde igual).
 - **Incidente de activación** (checkpointer) resuelto — ver §4b.
 
+## 5b. Fix del respaldo — fuga de `extras:`/`signature:` (resuelto)
+
+En el respaldo Open-Meteo se coló texto técnico al final de la respuesta
+(`...0.0 milímetros, extras: signature: EowBCok...`). Causa: `_limpiar_respuesta` buscaba los
+literales `extras:`/`signature:`, pero el JSON del MCP deja `"extras":` **entre comillas** (y esas
+comillas se quitaban después, exponiendo el bloque). **Fix** (`src/agente_meteo_mcp/graph.py`): el
+recorte ahora usa un regex tolerante a comillas/espacios/comas alrededor del marcador
+(`[\s",]*["\']?(?:extras|signature)["\']?\s*:`). Se agregó test unitario
+(`test_limpiar_respuesta_quita_extras_signature`) y se corrigió el test de `saltos` (ahora parchea
+`_graph_mem`, que es lo que usan los helpers tras el fix del checkpointer).
+
+- **Verificado en vivo (VPS, con la key de MCP borrada):** `responder("clima hoy en Tokio")` →
+  respuesta limpia con el aviso *"(Este pronóstico proviene de una fuente de respaldo)"* y **sin**
+  `extras:`/`signature:` (chequeo programático: `tiene extras/signature?: False`).
+- **Tests:** `pytest tests/test_meteo_mcp.py` → **16 passed** (incluye el test nuevo).
+
 ## 6. Estado
 
-- ✅ Dependencia OK, merge hecho, clima resiliente implementado, tests verdes, docs al día. Bitácora **063**.
+- ✅ Dependencia OK, merge hecho, clima resiliente implementado, respaldo sin fugas técnicas, tests
+  verdes, docs al día. Bitácora **063**.

@@ -216,7 +216,8 @@ def test_saltos_devuelve_el_mensaje_final_del_update(monkeypatch, capsys):
                 }
             }
 
-    monkeypatch.setattr(modulo_grafo, "graph", GrafoFalso())
+    # `saltos()` usa `_graph_mem` (con checkpointer), no `graph` (sin checkpointer, para langgraph-api)
+    monkeypatch.setattr(modulo_grafo, "_graph_mem", GrafoFalso())
     respuesta = asyncio.run(modulo_grafo.saltos("consulta"))
 
     assert respuesta == "Respuesta final"
@@ -327,3 +328,14 @@ def test_pronostico_respaldo_ciudad_no_ubicada(monkeypatch):
     monkeypatch.setattr(clientes, "geocodificar", lambda c: None)
     out = asyncio.run(pronostico_respaldo.ainvoke({"ciudad": "Xyzzy", "dias": 3}))
     assert "no pude ubicar" in out.lower()
+
+
+def test_limpiar_respuesta_quita_extras_signature():
+    # nit: el JSON del MCP deja `"extras":`/`signature:` que antes se colaba al final
+    from src.agente_meteo_mcp.graph import _limpiar_respuesta
+    sucio = "Clima en Tokio: 10 °C, 0.0 milímetros, extras: signature: EowBCok123=="
+    limpio = _limpiar_respuesta(sucio)
+    assert "extras" not in limpio.lower() and "signature" not in limpio.lower()
+    assert "Tokio" in limpio and "10" in limpio
+    sucio_json = 'Madrid 9 grados "extras": "signature: abc=="'
+    assert "extras" not in _limpiar_respuesta(sucio_json).lower()

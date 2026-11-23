@@ -136,6 +136,24 @@ prompt actualizado. Reindexado en Redis: **18 fragmentos** (antes 9). Verificado
   reemplazar la medicación… sigue las indicaciones de tu médico, Reiki solo como apoyo"*. Guardrail OK.
 - Todas con `ruta: guardia_entrada → supervisor → agente_local → guardia_salida`.
 
+## Anexo 19 · Seguimiento inteligente — re-ruteo al cambiar de dominio (registro 068)
+
+**Síntoma:** en el chat, «qué clima hace en Santiago de Chile» → Meteorología; luego «y en Santiago de
+Compostela?» → se quedaba en Meteorología («solo Chile… te sugiero Viajes») en vez de ir a `meteo_mcp`.
+
+**Causa:** el coordinador reutilizaba el agente previo **sin re-rutear** ante seguimientos cortos
+(«y en…»). Afectaba local y VPS (mismo código).
+
+**Arreglo:** el agente previo pasó de **atajo** a **pista** para el supervisor (`enrutar`), y la regla
+del `SYSTEM_SUPERVISOR` ahora cambia de agente si el nuevo lugar/tema corresponde a otro («la continuidad
+nunca debe mandar la pregunta a un agente que no puede responderla»).
+
+**Verificado (LOCAL):** «y en Santiago de Compostela?» → **meteo_mcp**; continuidad intacta («¿y mañana?»,
+«¿y en Concepción?» → Meteorología). Tests coordinador **41 passed**. Deploy al VPS + verificación en
+vivo: ver `respuestas/salida_068.md`.
+
+---
+
 ## Anexo 18 · Evidencia LOCAL — funcionamiento de todos los agentes (registro 067)
 
 Montaje **local reproducible** en el Mac y batería de evidencia real, rotulada **LOCAL**:
@@ -258,6 +276,7 @@ Mapa de toda la evidencia de la Tarea 2 (ver resumen en `respuestas/salida_040.m
 | Documentación al día para profesores (9 agentes, meteo_mcp, Postgres) | Anexo 16 · `respuestas/salida_065.md` |
 | Contraste contra el enunciado + capturas pendientes (pre-entrega) | Anexo 17 · `respuestas/salida_066.md` |
 | Evidencia LOCAL — todos los agentes (9/9), seguridad y memoria | Anexo 18 · `evidencias/agentes_local.md` · `backend_local.md` |
+| Seguimiento inteligente (re-ruteo al cambiar de dominio) | Anexo 19 · `respuestas/salida_068.md` |
 | Recepción personalizada (administrador) | Anexo 10 |
 | Idioma preferido y forma de saludar | Anexo 11 |
 | Health check post-hardening | Anexo 12 |

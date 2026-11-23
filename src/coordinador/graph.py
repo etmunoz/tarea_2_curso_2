@@ -175,18 +175,22 @@ def enrutar(estado: Estado) -> dict:
     pregunta = _ultimo_texto(estado["messages"])
     catalogo = construir_catalogo()
     nombres = [a.nombre for a in catalogo]
-    # Seguimiento corto ("¿y en Santiago?"): no re-rutear por palabras sueltas; seguir con el agente
-    # previo. Fuente DURABLE: 'agente_previo' lo pone el gateway desde el store SQLite (sobrevive
+    # Seguimiento corto ("¿y en Santiago?"): el agente del turno anterior es una PISTA para el supervisor,
+    # NO un atajo que saltee el ruteo. Antes se reusaba a ciegas y un seguimiento que cambiaba de dominio
+    # (p. ej. "¿y en Santiago de Compostela?") se quedaba en meteorología de Chile y no podía responder.
+    # Fuente DURABLE del previo: 'agente_previo' lo pone el gateway desde el store SQLite (sobrevive
     # reinicios); como respaldo, se infiere de los mensajes del hilo en memoria.
-    if len(pregunta.split()) <= 6 and _RE_SEGUIMIENTO.match(pregunta):
-        previo = (estado.get("agente_previo") or "").strip() or _agente_previo(estado["messages"], nombres)
-        if previo and previo in nombres:
-            return {"elegido": previo, "motivo": "Seguimiento del turno anterior: mantengo el mismo agente.",
-                    "ruta": ["supervisor"]}
+    previo = (estado.get("agente_previo") or "").strip() or (_agente_previo(estado["messages"], nombres) or "")
+    es_seguimiento = len(pregunta.split()) <= 6 and bool(_RE_SEGUIMIENTO.match(pregunta))
     historial = _historial_breve(estado["messages"])
     humano = f"Catálogo de agentes:\n{texto_catalogo(catalogo)}\n\n"
     if historial:
         humano += f"<historial>\n{historial}\n</historial>\n\n"
+    if previo in nombres:
+        marca = "Esta parece una pregunta de SEGUIMIENTO. " if es_seguimiento else ""
+        humano += (f"<pista>{marca}El agente del turno anterior fue «{previo}». Si el seguimiento aplica "
+                   "al mismo agente, manténlo; si el nuevo lugar, entidad o tema corresponde a OTRO "
+                   "agente del catálogo, elige ese.</pista>\n\n")
     humano += f"Pregunta del usuario:\n{pregunta}"
     d = modelo.with_structured_output(Decision).invoke([
         SystemMessage(content=SYSTEM_SUPERVISOR),

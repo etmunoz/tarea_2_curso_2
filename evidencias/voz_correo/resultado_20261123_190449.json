@@ -1,0 +1,66 @@
+{
+  "entorno": "https://tarea2curso2.etmk.cl",
+  "usuario": "fabio",
+  "fin": "2026-11-23T19:04:49-03:00",
+  "todo_ok": true,
+  "pasos": [
+    {
+      "paso": "acceso_sin_sesion",
+      "ts": "2026-11-23T19:04:40-03:00",
+      "esperado": "401 en /api/consulta",
+      "status": 401,
+      "ok": true
+    },
+    {
+      "paso": "login_clave_incorrecta",
+      "ts": "2026-11-23T19:04:41-03:00",
+      "esperado": "401",
+      "status": 401,
+      "ok": true
+    },
+    {
+      "paso": "login_correcto",
+      "ts": "2026-11-23T19:04:41-03:00",
+      "esperado": "302 → /",
+      "status": 302,
+      "ok": true,
+      "location": "/"
+    },
+    {
+      "paso": "consulta",
+      "ts": "2026-11-23T19:04:47-03:00",
+      "esperado": "200 con respuesta y agente elegido",
+      "status": 200,
+      "ok": true,
+      "segundos": 5.4,
+      "pregunta": "¿Cómo está el clima hoy en Talca?",
+      "elegido": "Agente de Meteorología",
+      "motivo": "El usuario pregunta por el clima en Talca, que es una ciudad de Chile, especialidad del Agente de Meteorología.",
+      "ruta": [
+        "guardia_entrada",
+        "supervisor",
+        "agente_local",
+        "guardia_salida"
+      ],
+      "respuesta": "[Agente de Meteorología] El clima para hoy en Talca:\n\n- **Temperatura actual:** 22,6 °C\n- **Mínima:** 11,6 °C\n- **Máxima:** 24,6 °C\n- **Condición:** Llovizna débil\n- **Precipitación estimada:** 0,3 mm",
+      "error": null
+    },
+    {
+      "paso": "registrar_destinatario",
+      "ts": "2026-11-23T19:04:48-03:00",
+      "esperado": "200 ok",
+      "status": 200,
+      "ok": true
+    },
+    {
+      "paso": "enviar_correo",
+      "ts": "2026-11-23T19:04:49-03:00",
+      "esperado": "200 {ok:true}",
+      "status": 200,
+      "ok": true,
+      "asunto": "Evidencia voz→chat→correo · Agente de Meteorología · 2026-11-23 19:04",
+      "destinatario": "fabio@gnome.cl",
+      "error": null
+    }
+  ]
+}

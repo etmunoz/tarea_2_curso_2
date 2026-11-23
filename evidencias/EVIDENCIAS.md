@@ -33,6 +33,8 @@ marca como *(captura)*.
 | 8 | **Monitor — operación/seguridad** | público, 2026-11-17 | `https://monitortarea2curso2.etmk.cl/` | panel con 200/401, despachos, allowlist | Accesos 8 (7 OK / 1 rechazado 401), despachos (enviado/fallo), allowlist, **Clave Gemini: OK** | *(captura del panel)* |
 | 9 | **Publicación — force-HTTPS** | público, 2026-11-17 | `http://…` en ambos subdominios | redirige a `https` | **http → 301 → https** en app y monitor | — |
 | 10 | **Reproducibilidad — pruebas** | VPS, 2026-11-17 | `pytest tests/test_tarea2.py` | suite en verde | **8 passed** | sin secretos ni red |
+| 11 | **Voz → chat → correo** | VPS (remoto), 2026-11-23 | «¿Cómo está el clima hoy en Talca?» + ✉️ a fabio@gnome.cl | 401/401/302, Meteorología, correo `ok:true` | **6/6 OK** (`tools/prueba_voz_correo.py`), ver [`voz_correo/`](voz_correo/README.md) | *(video con audio pendiente)* |
+| 11b | **Voz → chat → correo (bioinformática)** | VPS (remoto), 2026-11-23 | «¿Qué función cumple la proteína p53 en humanos?» + ✉️ a fabio@gnome.cl | 401/401/302, Bioinformática con dato de UniProt, correo `ok:true` | **5/5 OK**, Agente de Bioinformática, UniProt **P04637**, ver [`voz_correo/`](voz_correo/README.md) | *(video con audio pendiente)* |
 
 ---
 

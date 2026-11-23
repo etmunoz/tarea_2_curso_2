@@ -148,9 +148,9 @@ Compostela?» → se quedaba en Meteorología («solo Chile… te sugiero Viajes
 del `SYSTEM_SUPERVISOR` ahora cambia de agente si el nuevo lugar/tema corresponde a otro («la continuidad
 nunca debe mandar la pregunta a un agente que no puede responderla»).
 
-**Verificado (LOCAL):** «y en Santiago de Compostela?» → **meteo_mcp**; continuidad intacta («¿y mañana?»,
-«¿y en Concepción?» → Meteorología). Tests coordinador **41 passed**. Deploy al VPS + verificación en
-vivo: ver `respuestas/salida_068.md`.
+**Verificado (LOCAL y VPS):** «y en Santiago de Compostela?» → **meteo_mcp** (en el VPS, Meteosource real
+13.5 °C); continuidad intacta («¿y mañana?», «¿y en Concepción?» → Meteorología) en ambos entornos.
+Tests coordinador **41 passed**. Detalle: `respuestas/salida_068.md`.
 
 ---
 

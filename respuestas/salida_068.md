@@ -42,14 +42,21 @@ del store SQLite, ADR-0001) se mantiene — ahora como pista, no como atajo.
 Tests del coordinador: `test_coordinador.py` + `test_guardrails.py` + `test_guardrails_auth_48.py` →
 **41 passed**.
 
-## 4. Verificación en el VPS
+## 4. Verificación en el VPS (hecha)
 
-- Código **desplegado** (`deploy/deploy_local_a_vps.sh`). Requiere **reiniciar `t2c2-api`** (ahí corre
-  el coordinador) para tomar el cambio.
-- Tras el reinicio: repetir en vivo «clima en Santiago de Chile» → «y en Santiago de Compostela?» y
-  confirmar el segundo turno en **meteo_mcp**. (Se completa esta sección con la evidencia del VPS.)
+Desplegado con `deploy/deploy_local_a_vps.sh` y reiniciado `t2c2-api`. Verificado en vivo (gateway
+`127.0.0.1:8796` del VPS):
+
+| Turno (mismo hilo) | Elegido |
+|---|---|
+| «qué clima hace en Santiago de Chile» | **Agente de Meteorología** (20,7 °C) |
+| «y en Santiago de Compostela?» | **meteo_mcp** ✅ (Meteosource real, 13.5 °C) |
+| «clima en Valdivia» → «¿y mañana?» → «¿y en Concepción?» | Meteorología → Meteorología → Meteorología (continuidad intacta) |
+
+Mismo comportamiento que en local: el seguimiento re-rutea al cambiar de dominio y se mantiene en los
+seguimientos del mismo tema.
 
 ## 5. Estado
 
-- ✅ Arreglo aplicado y verificado en LOCAL; desplegado al VPS (pendiente reinicio + verificación en
-  vivo). Afectaba a ambos entornos (mismo código). Bitácora **068**, Anexo **19**.
+- ✅ Arreglo aplicado y **verificado en LOCAL y en el VPS** (re-ruteo correcto + continuidad intacta).
+  Afectaba a ambos entornos (mismo código), ahora corregido en los dos. Bitácora **068**, Anexo **19**.

@@ -2,13 +2,14 @@
 > **Archivo:** `docs/decisiones/ADR-0001-memoria-corto-plazo.md`  
 > **Objetivo:** Decisión de arquitectura — memoria de corto plazo del coordinador (checkpointer)  
 > **Grupo del curso:** Fabio Durán - Gustavo Reyes - Ezequiel Muñoz  
-> **Creación:** 20261119 1030 · **Última modificación:** 20261119 1030
+> **Creación:** 20261119 1030 · **Última modificación:** 20261123 1700
 <!--/encabezado-grupo-->
 
 # ADR-0001 · Memoria de corto plazo del coordinador
 
-- **Estado:** ACEPTADA (2026-11-19)
-- **Contexto registros:** 036 (implementación) · relacionados: 034–035 (fallos del sitio)
+- **Estado:** ACEPTADA (2026-11-19) · **ACTUALIZADA (2026-11-23, registro 064):** se adopta
+  `PostgresSaver` **opcional** en el coordinador — ver [§ Actualización](#actualización-registro-064--checkpointer-postgres-opcional-adoptado).
+- **Contexto registros:** 036 (implementación) · 064 (checkpointer Postgres) · relacionados: 034–035 (fallos del sitio)
 
 ## Contexto
 
@@ -87,7 +88,38 @@ agente desde el archivo SQLite y **mantiene el hilo correctamente**.
 - 🔁 **Cuándo revisar:** si se migra a LangGraph 2.x (ver backlog), evaluar reemplazar `InMemorySaver`
   por un checkpointer persistente nativo y retirar el `agente_previo` manual.
 
+## Actualización (registro 064) — checkpointer Postgres opcional (ADOPTADO)
+
+El descarte de `SqliteSaver` seguía vigente por la incompatibilidad de versiones, pero quedaba la
+limitación ⚠️: el estado completo del hilo del coordinador vivía solo en RAM. Un **dry-run** mostró que
+`langgraph-checkpoint-postgres` (3.2.x) **sí es compatible** con nuestro `langgraph-checkpoint` 4.3.1
+(0 downgrades), a diferencia del de SQLite. Y el VPS ya tiene **PostgreSQL 16** corriendo
+(instalado 2026-11-19), así que no agrega infraestructura nueva.
+
+**Decisión:** el coordinador usa `PostgresSaver` (memoria durable real del hilo) **cuando hay `PG_DSN`**
+y Postgres responde; **si no, cae a `InMemorySaver`** (regla explícita del grupo: ante cualquier fallo
+de Postgres, InMemorySaver). Implementado en `src/coordinador/graph.py::_checkpointer()`:
+
+- `PG_DSN` definido y alcanzable → `PostgresSaver(ConnectionPool(..., timeout=5))` + `.setup()`
+  (crea las tablas, idempotente) → etiqueta `postgres`.
+- Sin `PG_DSN`, o Postgres caído / credencial mala → `InMemorySaver` → etiqueta `memoria`. El
+  `timeout=5` del pool hace que el fallback sea rápido y el arranque del gateway nunca se cuelgue.
+
+**Base/rol dedicados:** rol `t2c2` + base `t2c2` en el Postgres del VPS; el `PG_DSN`
+(`postgresql://t2c2:***@localhost:5432/t2c2`) se guarda en `/etc/t2c2.env` (nunca en el chat ni en el
+repo). La dependencia `langgraph-checkpoint-postgres>=3.2,<4` quedó en `requirements.txt`.
+
+El `agente_previo` del store SQLite **se mantiene** como respaldo determinista del seguimiento (defensa
+en profundidad): aunque el checkpointer sea volátil, el seguimiento no se corta.
+
+**Consecuencias de la actualización:**
+- ✅ Con `PG_DSN`, el estado completo del hilo del coordinador **sobrevive reinicios** del gateway.
+- ✅ Degrada con gracia: sin Postgres, el sistema funciona igual que antes (InMemorySaver).
+- ✅ Verificado en el VPS: round-trip real contra la base `t2c2` (tablas creadas), y las tres rutas de
+  selección (`postgres` / `memoria` / fallback por credencial inválida). Evidencia: Anexo 15.
+
 ## Qué usamos, en una línea
 
-`InMemorySaver` (estado intra-proceso) **+** store `memoria` SQLite para el agente del turno anterior
-(`agente_previo`) = **memoria de corto plazo del seguimiento durable, sin `SqliteSaver`**.
+**`PostgresSaver` si hay `PG_DSN`** (memoria durable del hilo; cae a `InMemorySaver` ante cualquier
+fallo) **+** store `memoria` SQLite para el `agente_previo` del turno anterior = **memoria de corto
+plazo del seguimiento durable, ahora con el estado del hilo también persistente cuando Postgres está**.

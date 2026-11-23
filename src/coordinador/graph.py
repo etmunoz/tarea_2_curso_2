@@ -291,10 +291,38 @@ def _rama(estado: Estado) -> str:
     return "consultar" if estado.get("elegido") in nombres else "sin_agente"
 
 
+def _checkpointer():
+    """Objetivo: elegir el checkpointer del coordinador (memoria de corto plazo del hilo).
+    Con `PG_DSN` definido y Postgres alcanzable usa **PostgresSaver** — memoria DURABLE real que
+    sobrevive reinicios del gateway (a diferencia de `InMemorySaver`). Si `PG_DSN` no está o Postgres
+    no responde, cae a `InMemorySaver` (comportamiento previo) para NO tumbar el gateway. El
+    'agente_previo' sigue además en el store SQLite como respaldo determinista del seguimiento.
+    Salida: (checkpointer, etiqueta)."""
+    dsn = os.environ.get("PG_DSN", "").strip()
+    if not dsn:
+        return InMemorySaver(), "memoria"
+    try:
+        from psycopg_pool import ConnectionPool  # noqa: PLC0415
+        from langgraph.checkpoint.postgres import PostgresSaver  # noqa: PLC0415
+
+        # timeout=5: si el PG_DSN quedara mal, el fallback a InMemorySaver ocurre rápido y el
+        # arranque del gateway no se cuelga esperando conexiones (por defecto serían ~30s).
+        pool = ConnectionPool(conninfo=dsn, max_size=10, open=True, timeout=5,
+                              kwargs={"autocommit": True, "prepare_threshold": 0})
+        cp = PostgresSaver(pool)
+        cp.setup()  # crea/migra las tablas del checkpointer (idempotente)
+        return cp, "postgres"
+    except Exception as e:  # noqa: BLE001 - si Postgres no está, el gateway sigue con memoria volátil
+        print(f"[coordinador] PG_DSN presente pero PostgresSaver no disponible "
+              f"({type(e).__name__}): uso InMemorySaver.")
+        return InMemorySaver(), "memoria"
+
+
 def _construir_grafo():
     """Objetivo: construir y compilar el grafo supervisor con guardrail de entrada
     (guardia_entrada → enrutar → consultar/sin_agente).
-    Entradas: ninguna. Salida: grafo LangGraph compilado con InMemorySaver."""
+    Entradas: ninguna. Salida: grafo LangGraph compilado con el checkpointer de `_checkpointer()`
+    (PostgresSaver si hay `PG_DSN`, si no InMemorySaver)."""
     g = StateGraph(Estado)
     g.add_node("guardia_entrada", guardia_entrada)
     g.add_node("enrutar", enrutar)
@@ -307,7 +335,9 @@ def _construir_grafo():
     g.add_edge("consultar", "guardia_salida")
     g.add_edge("sin_agente", "guardia_salida")
     g.add_edge("guardia_salida", END)
-    return g.compile(checkpointer=InMemorySaver())
+    checkpointer, etiqueta = _checkpointer()
+    print(f"[coordinador] checkpointer: {etiqueta}")
+    return g.compile(checkpointer=checkpointer)
 
 
 graph = _construir_grafo()

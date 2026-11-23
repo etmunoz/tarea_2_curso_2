@@ -8,7 +8,10 @@
 # Arquitectura técnica — Tarea 2 · Curso 2
 
 Documento **vivo**: refleja la complejidad actual del sistema y se actualiza con cada evolución.
-Última revisión de arquitectura: **registro 063** — integración del agente **meteo_mcp** (MCP de
+Última revisión de arquitectura: **registro 064** — el **coordinador** gana memoria durable opcional
+con **`PostgresSaver`** (si hay `PG_DSN`; si falla, cae a `InMemorySaver`), usando el PostgreSQL del
+VPS (rol/base `t2c2`). Ver [`decisiones/ADR-0001`](decisiones/ADR-0001-memoria-corto-plazo.md)
+(§ Actualización). Revisión previa: **registro 063** — integración del agente **meteo_mcp** (MCP de
 Meteosource, PR #1 de Gustavo) con el patrón **"Clima resiliente en dos niveles"**: meteo_mcp es el
 clima **mundial** por defecto con **respaldo keyless Open-Meteo**; `agente_meteorologia` queda para
 **verificación** (pronóstico vs observado) y Chile; `agente_viajes` **deja el clima** y lo deriva a
@@ -77,11 +80,12 @@ flowchart TB
     API --> COORD
     CONS -->|A2A| LG
 
-    subgraph DATA["Persistencia (SQLite + Redis)"]
+    subgraph DATA["Persistencia (SQLite + Redis + Postgres)"]
       MEM["Memoria SQLite<br/>conversaciones, destinatarios, despachos, accesos, eventos, perfiles"]
       CFG["Config store SQLite<br/>GOOGLE_API_KEY, API_KEY, SMTP_PASS, REDIS_URL, REDIS_INDEX"]
       REC["Recetas / Clima SQLite"]
       USR["Usuarios SQLite<br/>login multiusuario (PBKDF2)"]
+      PG["Postgres (opcional)<br/>checkpointer durable del coordinador si hay PG_DSN"]
     end
 
     subgraph EXT["Servicios externos"]
@@ -110,6 +114,7 @@ flowchart TB
     BFF --> USR
     API --> MEM
     API --> CFG
+    COORD -.checkpointer si PG_DSN.-> PG
     MONI --> MEM
     MONI --> CFG
     API -->|despacho correo| SMTP

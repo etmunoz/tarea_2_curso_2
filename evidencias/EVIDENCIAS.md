@@ -136,6 +136,30 @@ prompt actualizado. Reindexado en Redis: **18 fragmentos** (antes 9). Verificado
   reemplazar la medicación… sigue las indicaciones de tu médico, Reiki solo como apoyo"*. Guardrail OK.
 - Todas con `ruta: guardia_entrada → supervisor → agente_local → guardia_salida`.
 
+## Anexo 15 · Memoria durable del coordinador — PostgresSaver (registro 064)
+
+El coordinador pasa de `InMemorySaver` (estado del hilo en RAM, se pierde al reiniciar) a
+**`PostgresSaver` opcional**, con **fallback a `InMemorySaver`** ante cualquier fallo (regla del grupo).
+
+- **Compatibilidad:** `langgraph-checkpoint-postgres` 3.2.x es compatible con `langgraph-checkpoint`
+  4.3.1 (0 downgrades), a diferencia del de SQLite (descartado en ADR-0001). Declarada en
+  `requirements.txt`.
+- **Base:** PostgreSQL 16 ya corría en el VPS (instalado 2026-11-19; no por una sesión con credenciales
+  entregadas). Se crearon rol `t2c2` + base `t2c2` dedicados. `PG_DSN` en `/etc/t2c2.env` (clave rotada
+  por el usuario; nunca en el chat ni en el repo).
+- **Round-trip real** contra la base `t2c2`: `setup()` crea las tablas; `put()`+`get_tuple()` →
+  `round-trip OK: True`, `filas en checkpoints: 1`; `delete_thread` de la prueba → `0` filas (base limpia).
+- **Selección del checkpointer** (`src/coordinador/graph.py::_checkpointer()`):
+  - `PG_DSN` válido → `[coordinador] checkpointer: postgres`
+  - sin `PG_DSN` → `[coordinador] checkpointer: memoria`
+  - `PG_DSN` con credencial inválida → `PostgresSaver no disponible (PoolTimeout): uso InMemorySaver` +
+    `checkpointer: memoria` (cumple la regla; `timeout=5` hace el fallback rápido)
+- **Tests (coordinador):** `test_coordinador.py` + `test_guardrails.py` + `test_guardrails_auth_48.py`
+  → **41 passed** (sin regresión).
+- **Detalle:** `respuestas/salida_064.md` · `docs/decisiones/ADR-0001-memoria-corto-plazo.md` (§ Actualización).
+
+---
+
 ## Anexo 14 · meteo_mcp (MCP Meteosource) + clima resiliente (registro 063)
 
 Integración del PR #1 de Gustavo con el patrón "Clima resiliente en dos niveles".
@@ -168,6 +192,7 @@ Mapa de toda la evidencia de la Tarea 2 (ver resumen en `respuestas/salida_040.m
 | Viajes como asistente de destino real | Anexo 7 |
 | Revisión y merge de la rama de Fabio (fallos + red-team) | Anexo 8 · `fallos.md` · `pruebas-prompts.md` |
 | Memoria de corto plazo: NO SqliteSaver (decisión) | Anexo 9 · `docs/decisiones/ADR-0001-memoria-corto-plazo.md` |
+| Memoria durable del coordinador: PostgresSaver (con fallback) | Anexo 15 · `respuestas/salida_064.md` |
 | Recepción personalizada (administrador) | Anexo 10 |
 | Idioma preferido y forma de saludar | Anexo 11 |
 | Health check post-hardening | Anexo 12 |

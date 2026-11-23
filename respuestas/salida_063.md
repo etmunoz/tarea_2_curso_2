@@ -49,12 +49,17 @@ compila **sin** checkpointer (langgraph dev maneja la persistencia) y se agregó
 checkpointer) solo para los helpers `responder`/`saltos` del CLI/server de Gustavo. Validado: `langgraph
 dev` sirve y lista los 9 grafos (incluido `meteo_mcp`).
 
-## 5. Pendiente de activación
+## 5. Activación en producción (verificada)
 
-- La **API key de Meteosource** va en `/etc/t2c2.env` del VPS (la carga Ezequiel/administrator, oculta).
-- `sudo systemctl restart t2c2-langgraph` → verificar: (a) `meteo_mcp` responde clima mundial con
-  Meteosource; (b) **sin key, cae a Open-Meteo** (respaldo); (c) el supervisor rutea el clima a meteo_mcp
-  y `viajes` deriva.
+- **API key de Meteosource** cargada en `/etc/t2c2.env`; `meteo_mcp` agregado a `A2A_GRAFOS_LOCALES`
+  (9 grafos) y fichas aplicadas. Reinicios: `t2c2-langgraph` (código) + `t2c2-api` (catálogo).
+- **Verificado en vivo (gateway):**
+  - Catálogo: **9 agentes** (incluye meteo_mcp).
+  - "pronóstico en Madrid" → **meteo_mcp** con datos reales de **Meteosource** (11 °C, mín 1 / máx 12.2).
+  - "voy a viajar a Lima, ¿qué clima?" → **meteo_mcp** (Lima 22.5 °C) — el supervisor rutea el clima a
+    meteo_mcp (viajes ya no lo hace).
+- **Fallback Open-Meteo**: cubierto por tests (si Meteosource no está, responde igual).
+- **Incidente de activación** (checkpointer) resuelto — ver §4b.
 
 ## 6. Estado
 

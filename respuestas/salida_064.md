@@ -2,7 +2,7 @@
 > **Archivo:** `respuestas/salida_064.md`
 > **Objetivo:** 064 · Respuesta — PostgresSaver en el coordinador (memoria durable con fallback)
 > **Grupo del curso:** Fabio Durán - Gustavo Reyes - Ezequiel Muñoz
-> **Creación:** 20261123 1700 · **Última modificación:** 20261123 1700
+> **Creación:** 20261123 1700 · **Última modificación:** 20261123 1715
 <!--/encabezado-grupo-->
 
 # 064 · Respuesta — PostgresSaver en el coordinador
@@ -50,16 +50,35 @@ El `agente_previo` del store SQLite se **mantiene** (defensa en profundidad del 
   tests/test_guardrails_auth_48.py` → **41 passed** (sin regresión; el import sin `PG_DSN` sigue
   usando InMemorySaver).
 
-## 4. Activación en producción
+## 4. Activación en producción — CONFIRMADA
 
-El código ya está desplegado. Para activar la memoria durable en vivo:
-1. El administrador deja `PG_DSN` (con la clave rotada) en `/etc/t2c2.env`.
-2. `sudo systemctl restart t2c2-api` → el coordinador arranca con `PostgresSaver`.
+El administrador, en el VPS:
+1. **Rotó la clave** del rol `t2c2` a una aleatoria generada en el propio servidor
+   (`openssl rand`), sin que pase por el chat (`ALTER ROLE` → `ALTER ROLE`).
+2. Escribió `PG_DSN=postgresql://t2c2:***@localhost:5432/t2c2` en `/etc/t2c2.env` (reemplazando la
+   línea previa) y reinició `t2c2-api`.
 
-Si `PG_DSN` no está o Postgres falla, `t2c2-api` sigue operativo con `InMemorySaver` (sin cambios de
-comportamiento respecto de antes).
+**Verificación en vivo:**
+- `curl POST /consulta` al gateway (`:8796`) → **http=200** (fuerza el import diferido del coordinador).
+- Log del servicio:
+  ```
+  Nov 23 12:10:25 server28 uv[1051209]: [coordinador] checkpointer: postgres
+  ```
+  Es decir, el pool conectó y `setup()` corrió contra la base real `t2c2`. Si Postgres hubiera
+  fallado, el log diría `PoolTimeout ... uso InMemorySaver` + `checkpointer: memoria`.
+- Las líneas `status=143/n/a` + `Failed with result 'exit-code'` al parar el servicio son el
+  `SIGTERM` normal del `restart` de uvicorn (128+15=143), no un error (tras ellas: `Application
+  startup complete`).
+
+> Nota operativa: el `print` del checkpointer aparece en la **primera `/consulta`** (el grafo del
+> coordinador se importa de forma diferida en `src/api/app.py::_coordinador()`), no al arrancar el
+> servicio.
+
+Si en el futuro `PG_DSN` no estuviera o Postgres fallara, `t2c2-api` seguiría operativo con
+`InMemorySaver` (sin cambios de comportamiento respecto de antes).
 
 ## 5. Estado
 
 - ✅ PostgresSaver implementado con fallback a InMemorySaver, dependencia declarada, base/rol
-  dedicados, round-trip verificado, ADR-0001 al día. Bitácora **064**, evidencia **Anexo 15**.
+  dedicados, round-trip verificado, **activado y confirmado en producción** (`checkpointer: postgres`),
+  ADR-0001 al día. Bitácora **064**, evidencia **Anexo 15**.

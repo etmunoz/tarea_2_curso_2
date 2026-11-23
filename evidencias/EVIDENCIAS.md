@@ -156,6 +156,12 @@ El coordinador pasa de `InMemorySaver` (estado del hilo en RAM, se pierde al rei
     `checkpointer: memoria` (cumple la regla; `timeout=5` hace el fallback rápido)
 - **Tests (coordinador):** `test_coordinador.py` + `test_guardrails.py` + `test_guardrails_auth_48.py`
   → **41 passed** (sin regresión).
+- **Activación en producción CONFIRMADA:** el administrador rotó la clave del rol `t2c2` (aleatoria,
+  generada en el VPS, fuera del chat), escribió `PG_DSN` en `/etc/t2c2.env` y reinició `t2c2-api`.
+  Tras un `POST /consulta` (http=200) el log del servicio muestra:
+  `Nov 23 12:10:25 server28 uv[...]: [coordinador] checkpointer: postgres` → pool conectado y `setup()`
+  OK contra la base real. (La línea aparece en la primera consulta porque el coordinador se importa
+  diferido.)
 - **Detalle:** `respuestas/salida_064.md` · `docs/decisiones/ADR-0001-memoria-corto-plazo.md` (§ Actualización).
 
 ---

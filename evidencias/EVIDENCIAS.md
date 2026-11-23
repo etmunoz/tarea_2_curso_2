@@ -166,12 +166,12 @@ Montaje **local reproducible** en el Mac y batería de evidencia real, rotulada 
 - **Seguridad + recorrido + memoria:** [`backend_local.md`](backend_local.md) — 401/200 sin exponer la
   clave; `POST /consulta` con ruta A2A y datos reales; `[coordinador] checkpointer: postgres` con un
   **PostgreSQL local** (tabla `checkpoints` con filas > 0; fallback a InMemorySaver verificado).
-- **UI web local** `127.0.0.1:8797`: **7 capturas** del chat documentadas in extenso (pedido → ruteo →
-  respuesta, con panel del coordinador) en [`ui/README.md`](ui/README.md), cada una con pie de foto de 5
-  campos. Incluyen: cobertura Chile (meteorología), **seguimiento que re-rutea a `meteo_mcp` (Barcelona,
-  registro 068)**, resiliencia ante fallo de Open-Meteo (mensaje claro, sin éxito falso) + recuperación,
-  cambio de tema a Cocina, guardrail de Reiki (no médico) y restricción vegana con costeo. Los PNG los
-  guarda el equipo en `evidencias/ui/` con los nombres indicados.
+- **UI web local** `127.0.0.1:8797`: **8 capturas PNG** del chat (en `evidencias/ui/`) documentadas in
+  extenso (pedido → ruteo → respuesta, con panel del coordinador) en [`ui/README.md`](ui/README.md),
+  cada una con pie de foto de 5 campos. Tomadas en una **misma conversación**. Incluyen: cobertura Chile
+  (meteorología), **seguimiento que re-rutea a `meteo_mcp` (Barcelona, registro 068)**, resiliencia ante
+  fallo de Open-Meteo (mensaje claro, sin éxito falso) + recuperación, cambio de tema a Cocina (catálogo
+  + costeo/restricciones), guardrail de Reiki (no médico) y restricción **vegana con costeo**.
 - **Montaje:** claves copiadas del VPS al `.env` local sin pasar por el chat (GOOGLE_API_KEY + REDIS_URL
   real del almacén de config); Postgres 16 por Homebrew (nativo). Detalle: `respuestas/salida_067.md`.
 

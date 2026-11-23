@@ -11,7 +11,8 @@ muestra **pedido → ruteo del coordinador → respuesta del agente** en el cana
 coordinador" (agente elegido + ruta A2A `guardia_entrada → supervisor → agente_local → guardia_salida`).
 Entorno **LOCAL** (no producción). La API_KEY no aparece (el BFF la agrega server-side).
 
-> Guardar los 7 PNG en esta carpeta con los nombres indicados; los enlaces de abajo los mostrarán.
+> Las **8 capturas PNG** están en esta carpeta (convertidas de los originales del equipo). Se tomaron
+> en una **misma conversación** en el chat local, con el panel "Ruteo del coordinador" visible.
 
 ## 1. Cobertura de meteorología (Chile)
 ![](meteorologia_cobertura_chile.png)
@@ -60,6 +61,15 @@ Entorno **LOCAL** (no producción). La API_KEY no aparece (el BFF la agrega serv
 - **Resultado obtenido:** **Agente de Cocina Chilena** lista recetas (empanadas, pastel de choclo,
   cazuela, …) y ofrece costo/nutrición/restricciones.
 - **Observaciones:** el seguimiento cambió de dominio (clima → cocina) correctamente.
+
+## 5b. Catálogo de recetas (continuación) + oferta de costeo/nutrición/restricciones
+![](cocina_recetas_detalle.png)
+- **Entorno y fecha:** LOCAL, 2026-11-23
+- **Solicitud:** (misma respuesta de Cocina, desplazada) — continuación del listado.
+- **Resultado obtenido:** lista completa (humitas, sopaipillas, pantrucas, mote con huesillo, …) y la
+  invitación a ver ingredientes, **calcular costo**, revisar **nutrición** o filtrar por **restricción**
+  (vegetariano, vegano, sin gluten).
+- **Observaciones:** muestra la amplitud del agente de Cocina (catálogo + costeo + restricciones).
 
 ## 6. Guardrail de dominio: Reiki no hace de médico
 ![](reiki_malestar.png)

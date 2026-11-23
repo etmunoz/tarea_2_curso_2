@@ -136,6 +136,23 @@ prompt actualizado. Reindexado en Redis: **18 fragmentos** (antes 9). Verificado
   reemplazar la medicación… sigue las indicaciones de tu médico, Reiki solo como apoyo"*. Guardrail OK.
 - Todas con `ruta: guardia_entrada → supervisor → agente_local → guardia_salida`.
 
+## Anexo 14 · meteo_mcp (MCP Meteosource) + clima resiliente (registro 063)
+
+Integración del PR #1 de Gustavo con el patrón "Clima resiliente en dos niveles".
+
+- **Dependencia `mcp==2.3.0` (de-risking):** dry-run en el venv de producción → agrega solo `mcp`,
+  `mcp-types`, `python-multipart`, **0 downgrades**. `streamable_http_client` existe en 2.3.0. El grafo
+  `meteo_mcp` importa limpio y exporta `graph` (CompiledStateGraph) → seguro para `langgraph.json`.
+- **Clima resiliente:** `meteo_mcp` = clima mundial (Meteosource) con **respaldo keyless Open-Meteo**
+  (`pronostico_respaldo`) si el MCP cae; `meteorologia` = verificación (pronóstico vs observado) + Chile;
+  `viajes` deja el clima y deriva a meteo_mcp.
+- **Tests:** VPS **30 passed** (meteo_mcp + mcp_langchain + descubre_mcp + viajes, incluye el fallback);
+  local **164 passed** (resto de la suite).
+- **Seguridad:** la API key de pago va en `/etc/t2c2.env` del VPS, nunca en el chat ni en el repo; el
+  sistema funciona sin la key gracias al respaldo.
+
+---
+
 ## Anexo 13 · Índice de evidencias (resumen · registro 040)
 
 Mapa de toda la evidencia de la Tarea 2 (ver resumen en `respuestas/salida_040.md`):

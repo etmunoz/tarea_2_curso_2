@@ -135,7 +135,9 @@ def buscar_actividades(ciudad: str) -> list[dict]:
     return [dict(a, fuente="demo") for a in ACTIVIDADES.get(ciudad.upper(), [])]
 
 
+# El CLIMA del destino lo da el agente meteo_mcp (Opción "clima resiliente"): viajes NO expone
+# clima_destino para no solapar el ruteo; la función queda definida pero sin publicar como herramienta.
 HERRAMIENTAS = [
-    info_destino, tipo_cambio, convertir_moneda, clima_destino, resumen_destino,  # reales
-    buscar_vuelos, buscar_hoteles, buscar_actividades,                            # demo
+    info_destino, tipo_cambio, convertir_moneda, resumen_destino,  # reales
+    buscar_vuelos, buscar_hoteles, buscar_actividades,             # demo
 ]

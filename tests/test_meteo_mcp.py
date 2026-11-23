@@ -302,3 +302,28 @@ def test_endpoint_http_devuelve_texto_limpio():
     assert respuesta.text == "Pronóstico correcto."
     assert "signature" not in respuesta.text
     assert "\\n" not in respuesta.text
+
+
+def test_pronostico_respaldo_usa_openmeteo(monkeypatch):
+    # Opción "clima resiliente": si Meteosource no está, meteo_mcp cae a Open-Meteo (keyless, mundial).
+    import asyncio
+    from src.agente_meteo_mcp.herramientas import pronostico_respaldo
+    from src.agente_viajes import clientes
+    from src.agente_meteorologia import openmeteo
+    monkeypatch.setattr(clientes, "geocodificar",
+                        lambda c: {"nombre": "Lima", "pais": "Perú", "lat": -12.0, "lon": -77.0})
+    monkeypatch.setattr(openmeteo, "pronostico",
+                        lambda lat, lon, dias=3: {"actual": {"temp_c": 22, "condicion": "Despejado"},
+                                                  "dias": [{"fecha": "2026-11-23", "min_c": 18, "max_c": 27,
+                                                            "precip_mm": 0, "condicion": "Despejado"}]})
+    out = asyncio.run(pronostico_respaldo.ainvoke({"ciudad": "Lima", "dias": 1}))
+    assert "respaldo" in out.lower() and "Lima" in out and "22" in out and "27" in out
+
+
+def test_pronostico_respaldo_ciudad_no_ubicada(monkeypatch):
+    import asyncio
+    from src.agente_meteo_mcp.herramientas import pronostico_respaldo
+    from src.agente_viajes import clientes
+    monkeypatch.setattr(clientes, "geocodificar", lambda c: None)
+    out = asyncio.run(pronostico_respaldo.ainvoke({"ciudad": "Xyzzy", "dias": 3}))
+    assert "no pude ubicar" in out.lower()

@@ -8,11 +8,13 @@
 # Arquitectura técnica — Tarea 2 · Curso 2
 
 Documento **vivo**: refleja la complejidad actual del sistema y se actualiza con cada evolución.
-Última revisión de arquitectura: **registro 059** (agentes mejorados 028–032: bioinformática/UniProt,
-ML-bio/pipelines, cocina, fichas, viajes real; endurecimiento de seguridad/robustez 034–035: merge de
-los fallos 1/3/5/6 de Fabio y resolución de 2/4/7; memoria de corto plazo del seguimiento **durable**
-036; recepción personalizada del administrador —saludo por hora, nombre propio, nombre del usuario
-durable— 037). Backlog en [`MEJORAS_FUTURAS.md`](MEJORAS_FUTURAS.md). Decisiones:
+Última revisión de arquitectura: **registro 063** — integración del agente **meteo_mcp** (MCP de
+Meteosource, PR #1 de Gustavo) con el patrón **"Clima resiliente en dos niveles"**: meteo_mcp es el
+clima **mundial** por defecto con **respaldo keyless Open-Meteo**; `agente_meteorologia` queda para
+**verificación** (pronóstico vs observado) y Chile; `agente_viajes` **deja el clima** y lo deriva a
+meteo_mcp. (Hitos previos: agentes reales 028–032; seguridad 034–035 y guardia anti-ofuscación 043;
+memoria durable 036; recepción personalizada 037–039.) Backlog en
+[`MEJORAS_FUTURAS.md`](MEJORAS_FUTURAS.md). Decisiones:
 [`decisiones/ADR-0001-memoria-corto-plazo.md`](decisiones/ADR-0001-memoria-corto-plazo.md).
 
 ---
@@ -112,6 +114,7 @@ flowchart TB
     MONI --> CFG
     API -->|despacho correo| SMTP
     A9 -.herramientas MCP.-> MCP
+    A9 -.respaldo si MCP cae.-> OM
     FICHAS -.re-aplica cards.-> LG
 ```
 
@@ -128,8 +131,8 @@ flowchart LR
     GDE -->|permitido| MAG[agente<br/>Gemini + tools]
     GDE -->|no permitido| BLOQ[respuesta_bloqueada<br/>respuesta fija]
     MAG --> TOOLS[search_places<br/>get_forecast<br/>get_weather_history]
-    TOOLS --> MCP
-    MCP[Meteosource MCP<br/>Streamable HTTP]
+    TOOLS -->|primario| MCP[Meteosource MCP<br/>Streamable HTTP]
+    MAG -.respaldo si MCP cae.-> RESP[pronostico_respaldo<br/>Open-Meteo keyless]
 ```
 
 La guardia clasifica antes de ejecutar el agente meteorológico. Los mensajes fuera de alcance,
@@ -162,9 +165,9 @@ tools meteorológicas.
 | mlbioinformatica | catálogos bio-ML + pipelines | referencia |
 | machinelearning | catálogos ML/DS + SQLite | referencia |
 | cocinachilena | recetas/costeo/nutrición (SQLite + reglas) | referencia |
-| viajes | geocoding + cambio + clima + Wikipedia (real); vuelos/hoteles (demo) | **real** + demo |
+| viajes | geocoding + cambio + Wikipedia (real); vuelos/hoteles (demo). El clima lo deriva a meteo_mcp | **real** + demo |
 | administrador | fichas del resto de agentes | interno |
-| meteo_mcp | Meteosource MCP (`search_places`, `get_forecast`, `get_weather_history`) | **real** |
+| meteo_mcp | **clima mundial** por Meteosource MCP (`search_places`/`get_forecast`/`get_weather_history`); **respaldo keyless Open-Meteo** si el MCP cae | **real** |
 
 ## Fuentes externas (sin API key salvo Gemini)
 

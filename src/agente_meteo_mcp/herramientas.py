@@ -14,6 +14,7 @@ antes de cada ejecución.
 """
 from __future__ import annotations
 
+import asyncio
 from typing import Any
 
 from langchain_core.tools import tool
@@ -109,4 +110,27 @@ async def get_weather_history(
     )
 
 
-HERRAMIENTAS = [search_places, get_forecast, get_weather_history]
+@tool("pronostico_respaldo")
+async def pronostico_respaldo(ciudad: str, dias: int = 3) -> str:
+    """RESPALDO keyless (Open-Meteo, mundial) para cuando el servidor de Meteosource NO está disponible.
+    Da el tiempo actual y de los próximos días (máx. 7) de cualquier ciudad del mundo. Úsala SOLO como
+    respaldo si las herramientas de Meteosource respondieron que no se pudo consultar el servidor."""
+    try:
+        from src.agente_meteorologia import openmeteo  # import tardío
+        from src.agente_viajes import clientes
+        geo = await asyncio.to_thread(clientes.geocodificar, ciudad)
+        if not geo:
+            return f"No pude ubicar «{ciudad}»."
+        p = await asyncio.to_thread(openmeteo.pronostico, geo["lat"], geo["lon"], max(1, min(dias, 7)))
+        act = p.get("actual", {})
+        lineas = [f"Pronóstico (fuente de respaldo) para {geo['nombre']}, {geo.get('pais', '')}:",
+                  f"- Ahora: {act.get('temp_c', '—')} °C, {act.get('condicion', '—')}"]
+        for d in p.get("dias", [])[:max(1, min(dias, 7))]:
+            lineas.append(f"- {d['fecha']}: mín {d['min_c']} °C / máx {d['max_c']} °C, "
+                          f"{d['condicion']}, lluvia {d['precip_mm']} mm")
+        return "\n".join(lineas)
+    except Exception as error:  # noqa: BLE001
+        return f"No pude obtener el pronóstico de respaldo ({type(error).__name__})."
+
+
+HERRAMIENTAS = [search_places, get_forecast, get_weather_history, pronostico_respaldo]

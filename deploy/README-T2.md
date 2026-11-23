@@ -101,6 +101,7 @@ son los accesos que necesita. Verificado operativo el 2026-11-19 (ver `evidencia
 | UniProt | `rest.uniprot.org` | bioinformática |
 | Tipo de cambio | `open.er-api.com` | viajes |
 | Wikipedia | `es.wikipedia.org` | viajes |
+| **Meteosource MCP** | `mcp.meteosource.com` | meteo_mcp (clima mundial; requiere token Bearer) |
 | Redis cloud (RediSearch) | el host:puerto del `REDIS_URL` (p. ej. `…redis.io:10484`, **no** 443) | RAG de Reiki |
 
 - **Correo (SMTP):** `SMTP_HOST=localhost:587` → es **local** (Postfix de la máquina), no requiere egress externo.

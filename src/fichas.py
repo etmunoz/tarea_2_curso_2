@@ -69,20 +69,20 @@ FICHAS: dict[str, dict[str, str]] = {
     "agente_meteorologia": {
         "name": "Agente de Meteorología",
         "description": (
-            "Pronóstico del clima para ciudades de CHILE únicamente: el tiempo de hoy y de los próximos "
-            "siete días (temperaturas en °C y condiciones), con historial de pronósticos y comparación de "
-            "lo pronosticado con lo observado. Para clima de ciudades de otros países, deriva a "
-            "agente_viajes. No responde fuera de la meteorología. Horas en America/Santiago."
+            "Meteorología de CHILE con una especialidad distintiva: la VERIFICACIÓN del pronóstico — "
+            "guarda sus pronósticos y COMPARA lo pronosticado con lo observado (calidad del pronóstico), "
+            "y su historial. También da el tiempo de hoy y 7 días en Chile sin API key (respaldo). Para "
+            "el clima general de cualquier ciudad del mundo (o por hora), el agente es meteo_mcp. No "
+            "responde fuera de la meteorología. Horas en America/Santiago."
         ),
     },
     "agente_viajes": {
         "name": "Agente de Viajes",
         "description": (
             "Planificación de viajes con datos REALES del destino (sin API key): país, capital, moneda, "
-            "idiomas y zona horaria (info_destino), tipo de cambio y conversión a/desde CLP, el CLIMA de "
-            "una ciudad de CUALQUIER país del mundo para el viaje (clima_destino) y un resumen del lugar "
-            "(Wikipedia). Además una estimación DEMO de vuelos, hoteles y actividades (datos de ejemplo). "
-            "Para clima fuera de Chile, este es el agente (meteorología es solo Chile). No gestiona pagos, "
+            "idiomas y zona horaria (info_destino), tipo de cambio y conversión a/desde CLP, y un resumen "
+            "del lugar (Wikipedia). Además una estimación DEMO de vuelos, hoteles y actividades (datos de "
+            "ejemplo). El CLIMA del destino NO lo da este agente: deriva a meteo_mcp. No gestiona pagos, "
             "seguros ni visas."
         ),
     },
@@ -99,10 +99,11 @@ FICHAS: dict[str, dict[str, str]] = {
     "meteo_mcp": {
         "name": "meteo_mcp",
         "description": (
-            "Pronóstico meteorológico en español mediante las herramientas en vivo de Meteosource: "
-            "primero ubica ciudades con search_places y luego consulta get_forecast o "
-            "get_weather_history usando place_id. "
-            "No responde temas ajenos a la meteorología ni inventa datos que el servidor no entregue."
+            "Clima MUNDIAL en vivo (servidor MCP de Meteosource): pronóstico de cualquier ciudad del "
+            "mundo —hoy, próximos días por hora e histórico de hasta 7 días—. Es el agente de clima POR "
+            "DEFECTO para cualquier país (incluido Chile). Si el servicio no está disponible, responde "
+            "igual con una fuente de respaldo keyless (Open-Meteo). No responde temas ajenos a la "
+            "meteorología ni inventa datos."
         ),
     },
 }

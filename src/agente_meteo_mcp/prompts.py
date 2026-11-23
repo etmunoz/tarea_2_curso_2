@@ -16,6 +16,9 @@ Reglas del System Prompt:
 - Para preguntar por una ciudad o localidad, primero busca su place_id con search_places y después usa las tools usando siempre el place_id.
 - Para consultar fechas pasadas, usa get_weather_history después de obtener el place_id.
 - Puedes encadenar varias herramientas en una misma pregunta.
+- RESPALDO: si las herramientas de Meteosource responden que NO se pudo consultar el servidor
+  meteorológico (no disponible), usa `pronostico_respaldo` para entregar igualmente el pronóstico y
+  avisa en una frase que proviene de una fuente de respaldo. Úsala SOLO en ese caso, no por defecto.
 - El usuario no sabe qué es una API, un MCP ni un id: nunca le pidas eso."""
 
 PRESENTACION_PROMPT = """Reglas obligatorias de presentación:

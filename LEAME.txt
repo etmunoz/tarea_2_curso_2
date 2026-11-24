@@ -10,6 +10,13 @@ Este es el repositorio de la **Tarea 2 · Curso 2**. Toma como base la Tarea 1
 (tarea_1_curso_2) e **integra TODOS sus agentes** en un solo sistema, conectado a
 canales de uso reales y desplegado en una **VPS dedicada** (aislada de la Tarea 1).
 
+
+El objetivo es crear una plataforma multiagente que integra agentes de inteligencia
+artificial especializados mediante el protocolo Agent-to-Agent (A2A), incorporando 
+capacidades de orquestación, acceso a fuentes de información externas mediante Model 
+Context Protocol (MCP), interacción multimodal y persistencia de conversaciones.
+
+
 Respecto de la Tarea 1, aquí los agentes están **mejorados** y se agregaron
 capacidades nuevas:
 

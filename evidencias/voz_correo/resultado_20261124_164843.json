@@ -1,0 +1,59 @@
+{
+  "entorno": "https://tarea2curso2.etmk.cl",
+  "usuario": "profesor",
+  "fin": "2026-11-24T16:48:43-03:00",
+  "todo_ok": true,
+  "pasos": [
+    {
+      "paso": "acceso_sin_sesion",
+      "ts": "2026-11-24T16:48:32-03:00",
+      "esperado": "401 en /api/consulta",
+      "status": 401,
+      "ok": true
+    },
+    {
+      "paso": "login_clave_incorrecta",
+      "ts": "2026-11-24T16:48:33-03:00",
+      "esperado": "401",
+      "status": 401,
+      "ok": true
+    },
+    {
+      "paso": "login_correcto",
+      "ts": "2026-11-24T16:48:34-03:00",
+      "esperado": "302 → /",
+      "status": 302,
+      "ok": true,
+      "location": "/"
+    },
+    {
+      "paso": "consulta",
+      "ts": "2026-11-24T16:48:40-03:00",
+      "esperado": "200 con respuesta y agente elegido",
+      "status": 200,
+      "ok": true,
+      "segundos": 6.0,
+      "pregunta": "¿Cómo estará el clima mañana en Talca?",
+      "elegido": "Agente de Meteorología",
+      "motivo": "Consulta el pronóstico del tiempo para una ciudad en Chile.",
+      "ruta": [
+        "guardia_entrada",
+        "supervisor",
+        "agente_local",
+        "guardia_salida"
+      ],
+      "respuesta": "[Agente de Meteorología] Para mañana en Talca (miércoles 25 de noviembre de 2026), el pronóstico es el siguiente:\n\n* **Condición:** Despejado\n* **Temperatura mínima:** 11,4 °C\n* **Temperatura máxima:** 28,5 °C\n* **Precipitación:** 0 mm",
+      "error": null
+    },
+    {
+      "paso": "enviar_correo",
+      "ts": "2026-11-24T16:48:42-03:00",
+      "esperado": "200 {ok:true}",
+      "status": 200,
+      "ok": true,
+      "asunto": "Evidencia voz→chat→correo · Agente de Meteorología · 2026-11-24 16:48",
+      "destinatario": "fabio@gnome.cl",
+      "error": null
+    }
+  ]
+}

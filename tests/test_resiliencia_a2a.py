@@ -157,6 +157,8 @@ def test_consultar_hace_fallback_local(monkeypatch):
     fallback local y lo marca (origen='fallback_local', ruta incluye 'fallback_local')."""
     from langchain_core.messages import HumanMessage  # noqa: PLC0415
 
+    # el grafo construye el cliente Gemini al importarse; aquí nunca se llama, basta una clave ficticia
+    monkeypatch.setenv("GOOGLE_API_KEY", os.environ.get("GOOGLE_API_KEY") or "clave-ficticia-test")
     from src.coordinador import graph  # noqa: PLC0415
 
     class FakeRemoto:

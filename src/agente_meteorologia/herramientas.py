@@ -43,7 +43,7 @@ def pronostico_hoy(ciudad: str) -> dict | str:
     except Exception:  # noqa: BLE001
         pass
     hoy = p["dias"][0]
-    return {"ciudad": ciudad, "fecha": hoy["fecha"], "temperatura_actual_c": p["actual"]["temp_c"],
+    return {"ciudad": ciudad, "fecha": hoy["fecha"], "dia": hoy["dia"], "temperatura_actual_c": p["actual"]["temp_c"],
             "min_c": hoy["min_c"], "max_c": hoy["max_c"], "precip_mm": hoy["precip_mm"],
             "condicion": hoy["condicion"]}
 

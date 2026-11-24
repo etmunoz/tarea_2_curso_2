@@ -22,7 +22,11 @@ import httpx
 import pytest
 
 from src.coordinador import a2a
-from src.puente_a2a import servidor
+try:  # el puente A2A clásico (Taller 1) no viaja en esta entrega
+    from src.puente_a2a import servidor
+except ImportError:
+    servidor = None
+requiere_puente = pytest.mark.skipif(servidor is None, reason="src.puente_a2a no está en esta entrega")
 
 
 class _Resp:
@@ -108,6 +112,7 @@ def test_enviar_mensaje_clasico_postea_a_la_url_base(monkeypatch):
 
 # ---------------- funciones de traducción del puente ----------------
 
+@requiere_puente
 def test_card_clasica_reescribe_url():
     card = servidor.card_clasica({"name": "Agente de Ezequiel", "description": "IA", "skills": [{"name": "s"}]},
                                  "https://pub.example")
@@ -117,6 +122,7 @@ def test_card_clasica_reescribe_url():
     assert card["preferredTransport"] == "JSONRPC"
 
 
+@requiere_puente
 def test_extraer_texto_y_ctx_coacciona_uuid():
     payload = {"params": {"message": {"parts": [{"kind": "text", "text": "hola"}], "contextId": "c1"}}}
     texto, ctx = servidor.extraer_texto_y_ctx(payload)
@@ -124,6 +130,7 @@ def test_extraer_texto_y_ctx_coacciona_uuid():
     uuid.UUID(ctx)  # el contextId quedó como UUID válido
 
 
+@requiere_puente
 def test_resultado_a2a_forma():
     r = servidor.resultado_a2a("respuesta", "7", "ctx")
     assert r["id"] == "7"
@@ -133,6 +140,7 @@ def test_resultado_a2a_forma():
 
 # ---------------- puente END-TO-END (servidor real, langgraph simulado) ----------------
 
+@requiere_puente
 def test_puente_end_to_end(monkeypatch):
     """Levanta el puente real en un puerto libre con un langgraph simulado y lo ejerce por HTTP:
     card sin assistant_id, message/send (contextId no-UUID) y método desconocido."""

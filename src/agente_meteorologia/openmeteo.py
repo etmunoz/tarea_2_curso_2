@@ -17,6 +17,15 @@ from __future__ import annotations
 import json
 import urllib.parse
 import urllib.request
+from datetime import date
+
+_DIAS = ("lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo")
+
+
+def dia_semana(fecha: str) -> str:
+    """Nombre del día en español para 'YYYY-MM-DD' (el LLM lo calculaba mal)."""
+    return _DIAS[date.fromisoformat(fecha).weekday()]
+
 
 FORECAST_URL = "https://api.open-meteo.com/v1/forecast"
 ARCHIVE_URL = "https://archive-api.open-meteo.com/v1/archive"
@@ -59,7 +68,7 @@ def pronostico(lat: float, lon: float, dias: int = 7) -> dict:
     for i, f in enumerate(diario.get("time", [])):
         cod = diario["weather_code"][i]
         dias_list.append({
-            "fecha": f, "min_c": diario["temperature_2m_min"][i], "max_c": diario["temperature_2m_max"][i],
+            "fecha": f, "dia": dia_semana(f), "min_c": diario["temperature_2m_min"][i], "max_c": diario["temperature_2m_max"][i],
             "precip_mm": diario["precipitation_sum"][i], "codigo": cod, "condicion": condicion(cod),
         })
     cw = d.get("current_weather", {})
@@ -81,5 +90,5 @@ def observado(lat: float, lon: float, fecha: str) -> dict | None:
     if not t or diario.get("temperature_2m_max", [None])[0] is None:
         return None
     cod = diario["weather_code"][0]
-    return {"fecha": t[0], "min_c": diario["temperature_2m_min"][0], "max_c": diario["temperature_2m_max"][0],
+    return {"fecha": t[0], "dia": dia_semana(t[0]), "min_c": diario["temperature_2m_min"][0], "max_c": diario["temperature_2m_max"][0],
             "precip_mm": diario["precipitation_sum"][0], "codigo": cod, "condicion": condicion(cod)}

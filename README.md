@@ -9,6 +9,11 @@
 Evolución del Taller 1: los agentes A2A se conectan a **canales de uso reales**, todo **LOCAL** y
 reproducible. **Todo en español**, horarios en `America/Santiago`.
 
+> 📄 **Empieza por [`LEAME.txt`](LEAME.txt) — lectura recomendada antes que nada.** Es la guía de
+> orientación general de la entrega: qué es el proyecto, cómo acceder al sistema **en vivo** (VPS),
+> las rutas de los archivos relevantes, las protecciones de seguridad y **dónde están las evidencias**.
+> Este `README.md` entra luego en el detalle técnico y de instalación.
+
 ## Integrantes y aportes
 
 | Integrante | Aporte principal |

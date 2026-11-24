@@ -33,3 +33,6 @@ CLAVE-COORDINADOR.txt
 
 # Apaño de arranque LOCAL (excluye meteo_mcp por cryptography en Mac); no es parte de la entrega
 langgraph.local.json
+
+# Credenciales de acceso al sitio en vivo (entrega al evaluador por vía privada; NUNCA al repo)
+CREDENCIALES.txt

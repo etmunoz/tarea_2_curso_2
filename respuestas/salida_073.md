@@ -9,6 +9,11 @@
 
 **Prompt:** [`../prompts_ejecutados/prompt_073.md`](../prompts_ejecutados/prompt_073.md)
 
+> ⚠️ **ESTE ARREGLO ES POSTERIOR A LA ENTREGA.** La entrega ya estaba **congelada** (ZIP descargado del
+> repo + rama `main` **bloqueada**). Este fix (día de la semana) se revisó, mergeó y desplegó **después**
+> de la entrega, y se deja registrado aquí solo por **trazabilidad y transparencia**. **No forma parte
+> del ZIP entregado.** Tras aplicarlo, `main` se vuelve a bloquear.
+
 ---
 
 ## 1. El fix (qué estaba mal y cómo se corrigió)
@@ -44,12 +49,17 @@ p. ej. «Lunes, 24 de noviembre de 2026» cuando el 24-11-2026 es **martes**.
 - **Reinicio** de `t2c2-langgraph` + `t2c2-fichas` (los agentes) para tomar el fix — lo hace el
   administrador con sudo.
 
-## 4. Verificación en vivo
+## 4. Verificación en vivo (hecha)
 
-- Tras reiniciar: consultar el pronóstico de 7 días de una ciudad de Chile y confirmar que el **nombre
-  del día coincide con la fecha**. (Se completa esta sección con la salida del VPS.)
+Tras reiniciar `t2c2-langgraph` + `t2c2-fichas` (ambos `active`):
+- **Determinista:** `dia_semana` → 2026-11-23 **lunes**, 24 **martes**, 25 **miércoles**, 26 **jueves**. ✓
+- **End-to-end (gateway del VPS):** «pronóstico de 7 días en Santiago» → Agente de Meteorología, con
+  los nombres de día **ya correctos**: `martes 2026-11-24`, `miércoles 25`, `jueves 26`, `viernes 27`,
+  `sábado 28`, `domingo 29` (hoy, 24-11-2026, es martes). El bug intermitente **quedó corregido**.
+- `meteo_mcp` usa la misma `openmeteo.dia_semana`, por lo que su respaldo también sale correcto.
 
 ## 5. Estado
 
-- ✅ PR revisado (sin regresiones), **mergeado a `main`** y **desplegado al VPS**. Pendiente: reinicio +
-  verificación en vivo del día de la semana, y re-bloqueo de `main`. Bitácora **073**.
+- ✅ PR revisado (sin regresiones, 201 passed), **mergeado a `main`**, **desplegado al VPS**, reiniciado
+  y **verificado en vivo** (día de la semana correcto). `main` se vuelve a **bloquear** para congelar la
+  entrega. Bitácora **073**.

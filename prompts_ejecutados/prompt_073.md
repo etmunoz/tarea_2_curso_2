@@ -7,6 +7,9 @@
 
 # 073 · Merge del PR de Fabio (fix día de la semana) + deploy + registro
 
+> ⚠️ **POSTERIOR A LA ENTREGA.** La entrega ya estaba congelada (ZIP descargado + `main` bloqueada);
+> este registro documenta un fix hecho **después**, por trazabilidad. No forma parte del ZIP entregado.
+
 **Pedido del usuario (verbatim):**
 
 > «revisa un PR de Fabio, por favor.» … «desbloquea» … «aplica A, y deja un mensaje del fix en la repo.»

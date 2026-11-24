@@ -64,7 +64,8 @@ ARCHIVOS RELEVANTES (rutas)
   Documentación principal:
     README.md .............. visión, integrantes/aportes, opción elegida, cómo instalar/levantar/probar
     AGENTS.md .............. arquitectura y reglas de trabajo del sistema
-    docs/ARQUITECTURA.md ... diagrama técnico (vivo) de componentes, flujos y fuentes de datos
+    ARQUITECTURA.txt ....... diagrama de arquitectura en texto (ASCII): visión general rápida
+    docs/ARQUITECTURA.md ... diagrama técnico (vivo, Mermaid): componentes, flujos y fuentes de datos
     docs/decisiones/ADR-0001-memoria-corto-plazo.md ... decisión de memoria del coordinador
     docs/MEJORAS_FUTURAS.md  backlog de mejoras
 

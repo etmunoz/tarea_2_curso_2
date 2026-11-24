@@ -83,7 +83,11 @@ ARCHIVOS RELEVANTES (rutas)
     src/canales/web.py ............ frontend web (chat + VOZ, login por sesión)
     src/canales/monitor.py ........ monitor (accesos 200/401, eventos, cuota, /config)
     src/canales/correo.py ......... despacho de correo (allowlist)
-    src/memoria/ .................. persistencia SQLite (conversaciones, allowlist, eventos, perfiles)
+    src/memoria/ .................. store de la app en SQLite (conversaciones, allowlist, despachos, accesos, eventos, perfiles)
+    src/coordinador/ (checkpointer)  MEMORIA DURABLE del coordinador en PostgreSQL (PostgresSaver):
+                                     guarda el estado del hilo/seguimiento y sobrevive reinicios. Tiene
+                                     FALLBACK AUTOMÁTICO: si PostgreSQL no está disponible (o no hay
+                                     PG_DSN), cae a memoria en RAM (InMemorySaver) sin romperse (ADR-0001)
     src/config/ ................... almacén de config y login de usuarios
 
   Despliegue:

@@ -53,9 +53,15 @@
   ====================================================================
 
     +-------------------+ +-------------------+ +-------------------+
-    | Memoria durable   | |  Monitorizacion   | |      Correo       |
-    |      SQLite       | |    Backoffice     | |     Allowlist     |
+    |   Persistencia    | |  Monitorizacion   | |      Correo       |
+    | SQLite + Postgres | |    Backoffice     | |     Allowlist     |
     +-------------------+ +-------------------+ +-------------------+
+
+    (*) Persistencia:
+        - SQLite .......... store de la app (conversaciones, allowlist, eventos, perfiles)
+        - PostgreSQL ...... MEMORIA DURABLE del coordinador (checkpointer del hilo),
+                            con FALLBACK AUTOMATICO a memoria en RAM (InMemory) si
+                            PostgreSQL no esta disponible.
 
     +-------------------+ +-------------------+ +-------------------+
     |     Seguridad     | |   Configuracion   | | Registro de eventos|

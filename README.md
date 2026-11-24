@@ -23,10 +23,27 @@ reproducible. **Todo en español**, horarios en `America/Santiago`.
 | Integrante | Aporte principal |
 |---|---|
 | **Ezequiel Muñoz** | Arquitectura e integración: coordinador/supervisor, gateway FastAPI, canal web + voz (BFF), correo, monitor, memoria SQLite, seguridad/guardrails, RAG de Reiki en Redis, despliegue systemd+HTTPS y memoria durable `PostgresSaver` del coordinador. |
-| **Gustavo Reyes** | Agente `meteo_mcp` (clima mundial vía **MCP** de Meteosource) y el adaptador MCP `src/integraciones/mcp_langchain.py`. |
-| **Fabio Durán** | Pruebas adversariales / red-team y guardrails **anti-ofuscación** (ver `evidencias/fallos.md`, `pruebas-prompts.md`, `pruebas-masivas.md`, `pruebas-mezcla.md`, `pruebas-ofuscacion.md`, `inyeccion_prompt.md`). |
+| **Gustavo Reyes** | Agentes de **clima**: `meteorologia` (Chile) y `meteo_mcp` (clima mundial vía **MCP** de Meteosource) + el adaptador MCP `src/integraciones/mcp_langchain.py`. |
+| **Fabio Durán** | Agentes de **bioinformática**: `bioinformatica` (UniProt/NCBI, pipelines) y `mlbioinformatica` (IA/Data Science sobre datos biológicos; su agente "ProteinMAN"). Además, pruebas adversariales / red-team y guardrails **anti-ofuscación** (ver `evidencias/fallos.md`, `pruebas-*.md`, `inyeccion_prompt.md`). |
 
 > Repartición según lo trabajado y registrado en ramas/bitácora; el equipo puede ajustar el detalle.
+
+### Autoría de los agentes (origen en el Taller 1)
+
+Los agentes se crearon en `tarea_1_curso_2` (ver su `entrega/companeros.md`) y continúan integrados y
+mejorados en este repositorio. Autoría por agente:
+
+| Agente | Autor |
+|---|---|
+| `agente_meteorologia` (clima de Chile) | **Gustavo Reyes** |
+| `meteo_mcp` (clima mundial · MCP Meteosource) | **Gustavo Reyes** (agregado en el Taller 2) |
+| `agente_bioinformatica` (UniProt/NCBI · pipelines) | **Fabio Durán** |
+| `agente_mlbioinformatica` (IA/DS sobre datos biológicos · "ProteinMAN") | **Fabio Durán** |
+| `agente_machinelearning` | **Ezequiel Muñoz** |
+| `agente_reiki` (RAG) | **Ezequiel Muñoz** (era el "agente de Tomás" = Ezequiel **Tomás** Muñoz) |
+| `agente_cocinachilena` | **Ezequiel Muñoz** |
+| `agente_viajes` | **Ezequiel Muñoz** |
+| `agente_administrador` (recepción) | **Ezequiel Muñoz** |
 
 ## Opción elegida (y qué reutilizamos del Taller 1)
 

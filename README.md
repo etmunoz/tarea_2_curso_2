@@ -24,7 +24,7 @@ reproducible. **Todo en español**, horarios en `America/Santiago`.
 |---|---|
 | **Ezequiel Muñoz** | Arquitectura e integración: coordinador/supervisor, gateway FastAPI, canal web + voz (BFF), correo, monitor, memoria SQLite, seguridad/guardrails, RAG de Reiki en Redis, despliegue systemd+HTTPS y memoria durable `PostgresSaver` del coordinador. |
 | **Gustavo Reyes** | Agentes de **clima**: `meteorologia` (Chile) y `meteo_mcp` (clima mundial vía **MCP** de Meteosource) + el adaptador MCP `src/integraciones/mcp_langchain.py`. |
-| **Fabio Durán** | Agentes de **bioinformática**: `bioinformatica` (UniProt/NCBI, pipelines) y `mlbioinformatica` (IA/Data Science sobre datos biológicos; su agente "ProteinMAN"). Además, pruebas adversariales / red-team y guardrails **anti-ofuscación** (ver `evidencias/fallos.md`, `pruebas-*.md`, `inyeccion_prompt.md`). |
+| **Fabio Durán** | Agentes de **bioinformática** (origen Taller 1): `bioinformatica` (UniProt/NCBI, pipelines) y `mlbioinformatica` ("ProteinMAN"). **QA y red-team** en producción: fallos funcionales y de seguridad (`evidencias/fallos.md`) y su corrección (validaciones, cabeceras web, errores A2A, tests); pruebas de mezcla, masivas y de **ofuscación** (`pruebas-*.md`), que llevaron a la guardia anti-ofuscación; ajuste de prompts y ruteo; prueba E2E **voz→chat→correo**; `ARQUITECTURA.txt`. |
 
 > Repartición según lo trabajado y registrado en ramas/bitácora; el equipo puede ajustar el detalle.
 

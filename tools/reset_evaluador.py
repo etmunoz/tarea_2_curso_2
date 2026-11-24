@@ -135,7 +135,12 @@ def main() -> None:
     if args.dry_run:
         print("\n(Nada se borró — quita --dry-run para aplicar.)")
     else:
-        print(f"\nListo: «{args.usuario}» quedó en cero. Vuelve a entrar y prueba de nuevo.")
+        print(f"\nListo: «{args.usuario}» quedó en cero EN EL SERVIDOR.")
+        print("\n  OJO (lado navegador — esto NO lo puede borrar un script del servidor):")
+        print("   - El login es una cookie y el historial del chat vive en sessionStorage del navegador.")
+        print("   - Para una demo 100% limpia (pide credenciales + chat vacío + onboarding de correo):")
+        print("       >>> abre una ventana de INCÓGNITO (Chrome: Cmd+Shift+N) en http://127.0.0.1:8797/")
+        print("     Alternativa: 🚪 Salir (cerrar sesión) + 🔄 Nueva conversación en la misma ventana.")
 
 
 if __name__ == "__main__":

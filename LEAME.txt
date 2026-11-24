@@ -38,9 +38,14 @@ ACCESO (VPS dedicada, se puede probar en vivo)
   * Interacción por voz:        https://tarea2curso2.etmk.cl/voz   (Chrome/Edge + micrófono)
   * Monitor / backoffice:       https://monitortarea2curso2.etmk.cl/
 
-  El sitio tiene login por usuario (multiusuario). El acceso de prueba para el
-  equipo docente se coordina por una vía privada (las credenciales NO van en el
-  repositorio). La entrega también es reproducible en LOCAL (ver README.md).
+  El sitio tiene login por usuario (multiusuario). Las CREDENCIALES de acceso para
+  el equipo docente (usuarios y claves del chat/voz y del monitor) están en el archivo:
+
+        >>>  CREDENCIALES.txt  <<<   (adjunto al ZIP de entrega)
+
+  IMPORTANTE: lea ese archivo para obtener los accesos. NO está en el repositorio
+  público por seguridad; se entrega solo adjunto al ZIP. La entrega también es
+  reproducible en LOCAL (ver README.md).
 
 SEGURIDAD (protecciones incorporadas)
 -------------------------------------

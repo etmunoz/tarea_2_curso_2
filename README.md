@@ -13,6 +13,10 @@ reproducible. **Todo en español**, horarios en `America/Santiago`.
 > orientación general de la entrega: qué es el proyecto, cómo acceder al sistema **en vivo** (VPS),
 > las rutas de los archivos relevantes, las protecciones de seguridad y **dónde están las evidencias**.
 > Este `README.md` entra luego en el detalle técnico y de instalación.
+>
+> 🔐 **Credenciales para probar el sitio en vivo:** van en el archivo **`CREDENCIALES.txt`**, adjunto
+> al **ZIP de entrega** (usuarios y claves del chat/voz y del monitor). **No** está en este repositorio
+> (es público) por seguridad — léelo desde el ZIP.
 
 ## Integrantes y aportes
 

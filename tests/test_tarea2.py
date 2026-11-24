@@ -61,6 +61,13 @@ def test_wmo_condicion():
     assert openmeteo.condicion(None) == "—"
 
 
+def test_dia_semana_lo_calcula_la_herramienta():
+    # el LLM decía «Lunes, 24 de noviembre 2026» (era martes): el día viene calculado en el dato
+    from src.agente_meteorologia import openmeteo
+    assert openmeteo.dia_semana("2026-11-24") == "martes"
+    assert openmeteo.dia_semana("2026-11-29") == "domingo"
+
+
 def test_bd_clima(tmp_path, monkeypatch):
     monkeypatch.setenv("CLIMA_DB", str(tmp_path / "c.sqlite"))
     from src.agente_meteorologia import bd_clima

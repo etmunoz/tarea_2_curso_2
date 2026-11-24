@@ -126,7 +126,7 @@ async def pronostico_respaldo(ciudad: str, dias: int = 3) -> str:
         lineas = [f"Pronóstico (fuente de respaldo) para {geo['nombre']}, {geo.get('pais', '')}:",
                   f"- Ahora: {act.get('temp_c', '—')} °C, {act.get('condicion', '—')}"]
         for d in p.get("dias", [])[:max(1, min(dias, 7))]:
-            lineas.append(f"- {d['fecha']}: mín {d['min_c']} °C / máx {d['max_c']} °C, "
+            lineas.append(f"- {openmeteo.dia_semana(d['fecha'])} {d['fecha']}: mín {d['min_c']} °C / máx {d['max_c']} °C, "
                           f"{d['condicion']}, lluvia {d['precip_mm']} mm")
         return "\n".join(lineas)
     except Exception as error:  # noqa: BLE001

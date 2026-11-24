@@ -21,7 +21,11 @@ import httpx
 import pytest
 
 from src.coordinador import a2a, auth
-from src.puente_a2a import servidor
+try:  # el puente A2A clásico (Taller 1) no viaja en esta entrega
+    from src.puente_a2a import servidor
+except ImportError:
+    servidor = None
+requiere_puente = pytest.mark.skipif(servidor is None, reason="src.puente_a2a no está en esta entrega")
 
 
 @pytest.fixture(autouse=True)
@@ -51,6 +55,7 @@ def test_token_si_a_host_confiable(monkeypatch):
     assert auth.token_para("https://mi-mac.example/a2a") == "secreto"
 
 
+@requiere_puente
 def test_cliente_no_filtra_token_a_tercero(monkeypatch):
     """`enviar_mensaje` a un host NO confiable no debe adjuntar Authorization."""
     monkeypatch.setenv("A2A_TOKEN", "secreto")
@@ -93,6 +98,7 @@ def _msg(texto, ctx="c1"):
             "params": {"message": {"parts": [{"kind": "text", "text": texto}], "contextId": ctx}}}
 
 
+@requiere_puente
 def test_puente_bloquea_inyeccion_en_entrada(monkeypatch):
     srv, base = _levantar_puente(monkeypatch)
     try:
@@ -102,6 +108,7 @@ def test_puente_bloquea_inyeccion_en_entrada(monkeypatch):
         srv.shutdown()
 
 
+@requiere_puente
 def test_puente_redacta_secreto_en_salida(monkeypatch):
     srv, base = _levantar_puente(monkeypatch, respuesta_agente="la clave es AIzaSyA1234567890abcdefghijklmnopqrstuv")
     try:
@@ -112,6 +119,7 @@ def test_puente_redacta_secreto_en_salida(monkeypatch):
         srv.shutdown()
 
 
+@requiere_puente
 def test_puente_exige_token_si_configurado(monkeypatch):
     srv, base = _levantar_puente(monkeypatch, token="tok-puente")
     try:
@@ -124,6 +132,7 @@ def test_puente_exige_token_si_configurado(monkeypatch):
         srv.shutdown()
 
 
+@requiere_puente
 def test_puente_no_filtra_trazas(monkeypatch):
     """Un error interno (JSON malformado / excepción) nunca devuelve traceback."""
     srv, base = _levantar_puente(monkeypatch)
@@ -135,6 +144,7 @@ def test_puente_no_filtra_trazas(monkeypatch):
         srv.shutdown()
 
 
+@requiere_puente
 def test_puente_card_publica_sin_token(monkeypatch):
     """La card (descubrimiento) es pública aunque el puente exija token para mensajes."""
     srv, base = _levantar_puente(monkeypatch, token="tok-puente")

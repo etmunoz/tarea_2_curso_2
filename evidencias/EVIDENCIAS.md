@@ -29,7 +29,7 @@ marca como *(captura)*.
 | 4 | **Ruteo meta — administrador** | VPS, 2026-11-17 | `POST /consulta` "¿qué agentes hay?" | ruteo al administrador | **Agente Administrador** lista agentes en español | — |
 | 5 | **Impl 2 — web de chat (HTTPS)** | público, 2026-11-17 | `https://tarea2curso2.etmk.cl/` con login | chat responde | 200 + chat; login propio (BFF, API_KEY server-side) | *(captura del chat)* |
 | 6 | **Impl 2 — correo** | VPS, 2026-11-17 | despacho a destinatario registrado | correo con ruta + grafo | **recibido** en etmunoz@gmail.com (`enviado`); fuera de allowlist → rechazado | *(captura del correo)* |
-| 7 | **Impl 3 — voz (Etapa A)** | público, 2026-11-17 | `https://tarea2curso2.etmk.cl/voz` | STT→agentes→TTS | página operativa (SpeechRecognition/`es-CL` + speechSynthesis) | *(audio/video)* |
+| 7 | **Impl 3 — voz (Etapa A)** | LOCAL, 2026-11-23 | chat `127.0.0.1:8797` dictando por voz | STT→agentes→TTS (se escucha la respuesta) | **video con audio**: dos consultas dictadas (clima + 5 principios del Reiki), ruteo A2A y respuesta **leída en voz** | [`voz/evidencia_agente_por_voz.mov`](voz/README.md) |
 | 8 | **Monitor — operación/seguridad** | público, 2026-11-17 | `https://monitortarea2curso2.etmk.cl/` | panel con 200/401, despachos, allowlist | Accesos 8 (7 OK / 1 rechazado 401), despachos (enviado/fallo), allowlist, **Clave Gemini: OK** | *(captura del panel)* |
 | 9 | **Publicación — force-HTTPS** | público, 2026-11-17 | `http://…` en ambos subdominios | redirige a `https` | **http → 301 → https** en app y monitor | — |
 | 10 | **Reproducibilidad — pruebas** | VPS, 2026-11-17 | `pytest tests/test_tarea2.py` | suite en verde | **8 passed** | sin secretos ni red |
@@ -284,6 +284,7 @@ Mapa de toda la evidencia de la Tarea 2 (ver resumen en `respuestas/salida_040.m
 | Evidencia LOCAL — todos los agentes (9/9), seguridad y memoria | Anexo 18 · `evidencias/agentes_local.md` · `backend_local.md` |
 | Seguimiento inteligente (re-ruteo al cambiar de dominio) | Anexo 19 · `respuestas/salida_068.md` |
 | Capturas del canal web (7, con pies de foto de 5 campos) | `evidencias/ui/README.md` |
+| **Interacción por VOZ** (video con audio: STT→agente→TTS) | `evidencias/voz/README.md` · `evidencia_agente_por_voz.mov` |
 | Recepción personalizada (administrador) | Anexo 10 |
 | Idioma preferido y forma de saludar | Anexo 11 |
 | Health check post-hardening | Anexo 12 |
